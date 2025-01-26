@@ -6,6 +6,7 @@
     <File Path=".gitignore" />
     <File Path="directory.build.props" />
     <File Path="directory.packages.props" />
+    <File Path="KappaDuck.Aquila.targets" />
     <File Path="nuget.config" />
   </Folder>
   <Folder Name="/docs/" Id="a7c7c0c9-a386-4782-a1be-04177692934d">

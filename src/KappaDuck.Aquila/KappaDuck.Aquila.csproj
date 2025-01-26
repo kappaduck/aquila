@@ -21,6 +21,8 @@
 	<ItemGroup Label="Files to include into the package">
 		<None Include="$(MSBuildStartupDirectory)\readme.md" Pack="true" PackagePath="" />
 		<None Include="$(MSBuildStartupDirectory)\license" Pack="true" PackagePath="" />
+		<None Include="$(MSBuildStartupDirectory)\SDL3\bin\*.dll" Pack="true" PackagePath="build\" IncludeInPackage="false" />
+		<None Include="$(MSBuildStartupDirectory)\$(MSBuildProjectName).targets" Pack="true" PackagePath="build\" IncludeInPackage="false" />
 	</ItemGroup>
 
 	<ItemGroup Label="Enabling reproducible builds">
