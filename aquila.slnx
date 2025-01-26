@@ -1,0 +1,32 @@
+<Solution>
+  <Folder Name="/configurations/" Id="02ea681e-c7d8-13c7-8484-4ac65e1b71e8">
+    <File Path=".config/stylecop.json" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="directory.build.props" />
+    <File Path="directory.packages.props" />
+    <File Path="nuget.config" />
+  </Folder>
+  <Folder Name="/docs/" Id="a7c7c0c9-a386-4782-a1be-04177692934d">
+    <File Path="changelog.md" />
+    <File Path="license" />
+    <File Path="readme.md" />
+  </Folder>
+  <Folder Name="/docs/issues/" Id="6fb2bac2-6941-4553-be39-91e28ef6e7d3">
+    <File Path=".github/ISSUE_TEMPLATE/bug.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/config.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/request.yml" />
+  </Folder>
+  <Folder Name="/rules/" Id="3674bce0-6996-40a4-a3a7-dfd7bd296826">
+    <File Path="rules/code.style.editorconfig" />
+    <File Path="rules/disabled.editorconfig" />
+    <File Path="rules/meziantou.editorconfig" />
+    <File Path="rules/roslynator.editorconfig" />
+    <File Path="rules/sonar.editorconfig" />
+    <File Path="rules/stylecop.editorconfig" />
+    <File Path="rules/underscore.editorconfig" />
+  </Folder>
+  <Project Path="src/Aquila.Demo/Aquila.Demo.csproj" Id="ba938d04-2e2c-4d78-88c3-bf1d265952e3" />
+  <Project Path="src/KappaDuck.Aquila/KappaDuck.Aquila.csproj" />
+</Solution>

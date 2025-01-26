@@ -1,0 +1,20 @@
+name: Request
+description: Suggest a new feature or enhancement.
+labels: ["enhancement", "triage"]
+assignees:
+  - beauchama
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to suggest a new feature or enhancement. Please fill in the information below to help us understand your suggestion.
+        Please search to see if the request has already been suggested ([aquila/issues](https://github.com/kappaduck/aquila/issues))
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: >-
+        Is your feature request related to a missing binding from SDL or help the library to be better? Please describe the feature.
+      description: A clear and concise description of what the feature is.
+      placeholder: I would like X binding to appear in the library.
+    validations:
+      required: false
