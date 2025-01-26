@@ -27,6 +27,9 @@
     <File Path="rules/stylecop.editorconfig" />
     <File Path="rules/underscore.editorconfig" />
   </Folder>
+  <Folder Name="/setup/" Id="53a53267-6abe-4d83-9b16-dd96060293ae">
+    <Project Path="src/Setup/Setup.csproj" Id="a945907e-95e7-4321-b1b2-df4e1f4d672e" />
+  </Folder>
   <Project Path="src/Aquila.Demo/Aquila.Demo.csproj" Id="ba938d04-2e2c-4d78-88c3-bf1d265952e3" />
   <Project Path="src/KappaDuck.Aquila/KappaDuck.Aquila.csproj" />
 </Solution>

@@ -17,4 +17,9 @@
   <ItemGroup Label="Common packages">
     <PackageVersion Include="DotNet.ReproducibleBuilds" Version="1.2.25" />
   </ItemGroup>
+
+  <ItemGroup Label="Setup packages">
+    <PackageVersion Include="Cake.Cmake" Version="1.4.0" />
+    <PackageVersion Include="Cake.Frosting" Version="5.0.0" />
+  </ItemGroup>
 </Project>
