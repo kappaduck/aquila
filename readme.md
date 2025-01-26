@@ -11,6 +11,9 @@ Aquila is a NuGet package build on top of [SDL3], designed to provide a clean an
   - [Installation](#installation)
   - [Usage](#usage)
   - [Development](#development)
+    - [Prerequisites](#prerequisites)
+    - [SDL](#sdl)
+      - [Arguments](#arguments)
   - [Acknowledgments](#acknowledgments)
 
 ## Compatibility
@@ -40,7 +43,45 @@ At the moment, Aquila is only supported on Windows. However, it is designed to b
 
 ## Development
 
-*Work in progress...*
+To build Aquila from source, you need to have the following tools installed:
+
+### Prerequisites
+
+- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+> The .NET 9.0 SDK includes everything you need to build and run .NET applications on your machine.
+
+- [Cmake](https://cmake.org/download/)
+> Minimum version required: `3.16.0`
+>
+> CMake is an open-source, cross-platform family of tools designed to build, test and package software which is used to build the native SDL3 library.
+>
+> You can install CMake using the following command `winget install Kitware.CMake`.
+
+### SDL
+
+Aquila depends on the SDL3 library. It is not included in the repository. The project offers a script to download and build SDL from source. To build the library, run the following command:
+
+```bash
+.setup.bat sdl --silent --configuration debug
+```
+or
+```sh
+./setup.sh sdl --silent --configuration debug
+```
+or using aliases
+```bash
+./setup.bat sdl -sf -c debug
+```
+
+#### Arguments
+
+|     Argument      | Alias |           Description           |     Default     |
+| :---------------: | :---: | :-----------------------------: | :-------------: |
+|    `--branch`     | `-b`  | build a specific SDL branch/tag | `release-3.2.0` |
+| `--configuration` | `-c`  |       Build configuration       |    `release`    |
+|     `--force`     | `-f`  | Force the reinstallation of SDL |     `false`     |
+|    `--silent`     | `-s`  |           Silent mode           |     `false`     |
+
 
 ## Acknowledgments
 
