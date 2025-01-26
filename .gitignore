@@ -38,3 +38,8 @@ coverage*.info
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# SDL
+
+SDL/
+SDL3/
