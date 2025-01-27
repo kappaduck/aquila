@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(sandbox)
+
+# set the C++ standard
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# include SDL3
+set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/../../SDL3" ${CMAKE_PREFIX_PATH})
+find_package(SDL3 REQUIRED)
+
+# create the executable
+add_executable(sandbox "main.cpp")
+
+# link SDL3
+target_link_libraries(sandbox PRIVATE SDL3::SDL3)
+
+# copy SDL3 dlls to output directory
+file(GLOB dlls "${CMAKE_SOURCE_DIR}/../../SDL3/bin/*.dll")
+add_custom_command(TARGET sandbox POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${dlls} $<TARGET_FILE_DIR:sandbox>)

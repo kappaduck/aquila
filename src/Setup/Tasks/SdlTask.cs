@@ -15,7 +15,6 @@ namespace Setup.Tasks;
 /// Setup task to download and install SDL.
 /// </summary>
 [TaskName("sdl")]
-[TaskDescription("Download and install SDL")]
 public sealed class SdlTask : FrostingTask<SetupArguments>
 {
     private const string InstallPath = "SDL3";
@@ -49,7 +48,7 @@ public sealed class SdlTask : FrostingTask<SetupArguments>
             return;
         }
 
-        context.Information($"SDL3-{GetVersion(context.Branch)} | {context.SdlConfiguration}");
+        context.Information($"SDL3-{GetVersion(context.Branch)} | {context.BuildConfiguration}");
 
         context.Information("Cloning SDL repository...");
         context.StartProcess("git", new ProcessSettings
@@ -69,14 +68,14 @@ public sealed class SdlTask : FrostingTask<SetupArguments>
         context.CMakeBuild(new CMakeBuildSettings
         {
             BinaryPath = binaryPath,
-            Configuration = context.SdlConfiguration,
+            Configuration = context.BuildConfiguration,
             SetupProcessSettings = settings => settings.RedirectStandardOutput = context.Silent
         });
 
         context.Information("Installing SDL3...");
         context.StartProcess("cmake", new ProcessSettings
         {
-            Arguments = $"--install {binaryPath} --config {context.SdlConfiguration} --prefix {InstallPath}",
+            Arguments = $"--install {binaryPath} --config {context.BuildConfiguration} --prefix {InstallPath}",
             RedirectStandardOutput = context.Silent
         });
 

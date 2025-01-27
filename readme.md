@@ -14,6 +14,8 @@ Aquila is a NuGet package build on top of [SDL3], designed to provide a clean an
     - [Prerequisites](#prerequisites)
     - [SDL](#sdl)
       - [Arguments](#arguments)
+    - [Sandbox](#sandbox)
+      - [Arguments](#arguments-1)
   - [Acknowledgments](#acknowledgments)
 
 ## Compatibility
@@ -47,10 +49,10 @@ To build Aquila from source, you need to have the following tools installed:
 
 ### Prerequisites
 
-- [.NET 9.0 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- [.NET 9.0 SDK]
 > The .NET 9.0 SDK includes everything you need to build and run .NET applications on your machine.
 
-- [Cmake](https://cmake.org/download/)
+- [Cmake]
 > Minimum version required: `3.16.0`
 >
 > CMake is an open-source, cross-platform family of tools designed to build, test and package software which is used to build the native SDL3 library.
@@ -59,7 +61,7 @@ To build Aquila from source, you need to have the following tools installed:
 
 ### SDL
 
-Aquila depends on the SDL3 library. It is not included in the repository. The project offers a script to download and build SDL from source. To build the library, run the following command:
+Aquila depends on the SDL3 library. It is not included in the repository. The project offers a script to download and build SDL from source.
 
 ```bash
 .setup.bat sdl --silent --configuration debug
@@ -75,6 +77,8 @@ or using aliases
 
 #### Arguments
 
+Available arguments for the SDL setup script:
+
 |     Argument      | Alias |           Description           |     Default     |
 | :---------------: | :---: | :-----------------------------: | :-------------: |
 |    `--branch`     | `-b`  | build a specific SDL branch/tag | `release-3.2.0` |
@@ -82,14 +86,47 @@ or using aliases
 |     `--force`     | `-f`  | Force the reinstallation of SDL |     `false`     |
 |    `--silent`     | `-s`  |           Silent mode           |     `false`     |
 
+### Sandbox
+
+The sandbox project is a simple C++ console application that experiments with the SDL3 library. It make sure that Aquila has the same behavior as the original SDL3 library.
+
+> Make sure to run the SDL setup script before building the sandbox.
+
+```bash
+.setup.bat sandbox --silent --configuration debug
+```
+or
+```sh
+./setup.sh sandbox --silent --configuration debug
+```
+or using aliases
+```bash
+./setup.bat sandbox -sf -c debug
+```
+
+#### Arguments
+
+Available arguments for the sandbox setup script:
+
+|     Argument      | Alias  |     Description     |  Default  |
+| :---------------: | :----: | :-----------------: | :-------: |
+| `--configuration` |  `-c`  | Build configuration | `release` |
+|     `--force`     |  `-f`  |  Force the rebuild  |  `false`  |
+|    `--no-run`     | `none` | Do not run the app  |  `false`  |
+|    `--silent`     |  `-s`  |     Silent mode     |  `false`  |
 
 ## Acknowledgments
 
 Aquila leverages SDL3 and draws inspiration from the following resources:
 
 - [SDL3]
-- [Lazy Foo' Productions](https://lazyfoo.net/index.php)
-- [Sayers.SDL2.Core](https://github.com/JeremySayers/Sayers.SDL2.Core)
-- [SDL3-CS](https://github.com/flibitijibibo/SDL3-CS)
+- [Lazy Foo' Productions]
+- [Sayers.SDL2.Core]
+- [SDL3-CS]
 
+[Cmake]: https://cmake.org/download/
+[Lazy Foo' Productions]: https://lazyfoo.net/index.php
+[.NET 9.0 SDK]: https://dotnet.microsoft.com/download/dotnet/9.0
+[Sayers.SDL2.Core]: https://github.com/JeremySayers/Sayers.SDL2.Core
 [SDL3]: https://www.libsdl.org/
+[SDL3-CS]: https://github.com/flibitijibibo/SDL3-CS

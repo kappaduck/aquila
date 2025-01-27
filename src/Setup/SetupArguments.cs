@@ -16,17 +16,24 @@ public sealed class SetupArguments(ICakeContext context) : FrostingContext(conte
     /// <summary>
     /// Gets the specific SDL branch/tag to build and install.
     /// </summary>
+    /// <remarks>Only used for the installation of SDL.</remarks>
     public string Branch { get; } = GetArgument(context, "branch", "b", "release-3.2.0");
 
     /// <summary>
-    /// Gets the configuration to build SDL.
+    /// Gets the build configuration to use.
     /// </summary>
-    public string SdlConfiguration { get; } = GetArgument(context, "configuration", "c", "release");
+    public string BuildConfiguration { get; } = GetArgument(context, "configuration", "c", "release");
 
     /// <summary>
-    /// Gets a value indicating whether to force the reinstallation of SDL.
+    /// Gets a value indicating whether to force a clean build.
     /// </summary>
     public bool Force { get; } = HasArgument(context, "force", "f");
+
+    /// <summary>
+    /// Gets a value indicating whether to not run sandbox after building.
+    /// </summary>
+    /// <remarks>Only used for the sandbox task.</remarks>
+    public bool NoRun { get; } = context.HasArgument("no-run");
 
     /// <summary>
     /// Gets a value indicating whether to suppress the output of the installation.
