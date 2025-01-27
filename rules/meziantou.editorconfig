@@ -1,5 +1,10 @@
 is_global = true
 
+# MA0001: Use an overload that has a StringComparison parameter
+# Doesn't need for every method that use a comparer
+# https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0001.md
+dotnet_diagnostic.MA0001.severity = none
+
 # MA0002: Use an overload that has a IEqualityComparer or IComparer parameter
 # Doesn't need for every method that use a comparer
 # https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0002.md

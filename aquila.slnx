@@ -6,6 +6,7 @@
     <File Path=".gitignore" />
     <File Path="directory.build.props" />
     <File Path="directory.packages.props" />
+    <File Path="KappaDuck.Aquila.targets" />
     <File Path="nuget.config" />
   </Folder>
   <Folder Name="/docs/" Id="a7c7c0c9-a386-4782-a1be-04177692934d">
@@ -26,6 +27,15 @@
     <File Path="rules/sonar.editorconfig" />
     <File Path="rules/stylecop.editorconfig" />
     <File Path="rules/underscore.editorconfig" />
+  </Folder>
+  <Folder Name="/sandbox/" Id="3452502d-2f61-41a5-823d-c957a8c04864">
+    <File Path="src/sandbox/cmakelists.txt" />
+    <File Path="src/sandbox/main.cpp" />
+  </Folder>
+  <Folder Name="/setup/" Id="53a53267-6abe-4d83-9b16-dd96060293ae">
+    <File Path="setup.bat" />
+    <File Path="setup.sh" />
+    <Project Path="src/Setup/Setup.csproj" Id="a945907e-95e7-4321-b1b2-df4e1f4d672e" />
   </Folder>
   <Project Path="src/Aquila.Demo/Aquila.Demo.csproj" Id="ba938d04-2e2c-4d78-88c3-bf1d265952e3" />
   <Project Path="src/KappaDuck.Aquila/KappaDuck.Aquila.csproj" />

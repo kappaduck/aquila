@@ -6,8 +6,12 @@
 		<InvariantGlobalization>true</InvariantGlobalization>
 	</PropertyGroup>
 
+	<ItemGroup Label="Link SDL3">
+		<None Include="$(MSBuildStartupDirectory)\SDL3\**\*.dll" Link="%(FileName)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 	<ItemGroup>
-	  <ProjectReference Include="..\KappaDuck.Aquila\KappaDuck.Aquila.csproj" />
+		<ProjectReference Include="..\KappaDuck.Aquila\KappaDuck.Aquila.csproj" />
 	</ItemGroup>
 
 </Project>
