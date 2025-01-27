@@ -92,15 +92,15 @@ The sandbox project is a simple C++ console application that experiments with th
 
 > Make sure to run the SDL setup script before building the sandbox.
 
-```bash
+```console
 .setup.bat sandbox --silent --configuration debug
 ```
 or
-```sh
+```console
 ./setup.sh sandbox --silent --configuration debug
 ```
 or using aliases
-```bash
+```console
 ./setup.bat sandbox -sf -c debug
 ```
 
