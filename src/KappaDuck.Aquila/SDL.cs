@@ -1,9 +1,11 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Marshallers;
 using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila;
 
@@ -17,6 +19,16 @@ public static partial class SDL
     private static SubSystem _initializedSubSystems;
 
     /// <summary>
+    /// Get the latest message with information about the specific error that occurred,
+    /// or an empty string if there hasn't been an error message set since the last call to <see href="https://wiki.libsdl.org/SDL3/SDL_ClearError">SDL_ClearError</see>.
+    /// </summary>
+    /// <remarks>It is possible for multiple errors to occur before calling this function. Only the last error is returned.
+    /// The message is only applicable when an SDL function has signaled an error.
+    /// </remarks>
+    /// <returns>The last error message.</returns>
+    public static string GetError() => SDL_GetError();
+
+    /// <summary>
     /// Initializes the specified subsystems.
     /// </summary>
     /// <remarks>
@@ -25,7 +37,7 @@ public static partial class SDL
     /// You can initialize the same subsystem multiple times. It will only initializes once.
     /// </remarks>
     /// <param name="subSystem">The subsystems to initialize.</param>
-    /// <returns>Returns true on success or false on failure.</returns>
+    /// <returns>Returns true on success or false on failure; call <see cref="GetError"/> for more information.</returns>
     public static bool Init(SubSystem subSystem)
     {
         if ((_initializedSubSystems & subSystem) != SubSystem.None)
@@ -81,6 +93,11 @@ public static partial class SDL
     /// </returns>
     public static SubSystem WasInit(SubSystem? subSystem)
         => subSystem.HasValue ? (_initializedSubSystems & subSystem.Value) : _initializedSubSystems;
+
+    [LibraryImport(NativeLibrary)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    private static partial string SDL_GetError();
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
