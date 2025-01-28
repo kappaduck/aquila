@@ -29,6 +29,12 @@ public static partial class SDL
     public static string GetError() => SDL_GetError();
 
     /// <summary>
+    /// Get the current system theme.
+    /// </summary>
+    /// <returns>The current system theme.</returns>
+    public static SystemTheme GetSystemTheme() => SDL_GetSystemTheme();
+
+    /// <summary>
     /// Get the version of the SDL that is linked against your program.
     /// </summary>
     /// <returns>The version of the linked library.</returns>
@@ -134,6 +140,10 @@ public static partial class SDL
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(OwnedStringMarshaller))]
     private static partial string SDL_GetError();
+
+    [LibraryImport(NativeLibrary)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    private static partial SystemTheme SDL_GetSystemTheme();
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
