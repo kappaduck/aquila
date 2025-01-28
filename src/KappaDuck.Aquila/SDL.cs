@@ -29,6 +29,21 @@ public static partial class SDL
     public static string GetError() => SDL_GetError();
 
     /// <summary>
+    /// Get the version of the SDL that is linked against your program.
+    /// </summary>
+    /// <returns>The version of the linked library.</returns>
+    public static string GetVersion()
+    {
+        int version = SDL_GetVersion();
+
+        int major = version / 1000000;
+        int minor = version / 1000 % 1000;
+        int patch = version % 1000;
+
+        return $"{major}.{minor}.{patch}";
+    }
+
+    /// <summary>
     /// Initializes the specified subsystems.
     /// </summary>
     /// <remarks>
@@ -119,6 +134,10 @@ public static partial class SDL
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(OwnedStringMarshaller))]
     private static partial string SDL_GetError();
+
+    [LibraryImport(NativeLibrary)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    private static partial int SDL_GetVersion();
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
