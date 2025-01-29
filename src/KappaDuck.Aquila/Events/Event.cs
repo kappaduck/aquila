@@ -105,9 +105,9 @@ public static partial class Event
     /// This function updates the event queue and internal input device state.
     /// Gathers all the pending input information from devices and places it in the event queue.
     /// Without calls to <see cref="Pump"/> no events would ever be placed on the queue.
-    /// Often the need for calls to <see cref="Pump"/> is hidden from the user since <see cref="Poll(out SdlEvent)"/>, <see cref="Wait(out SdlEvent)"/> and <see cref="Wait(out SdlEvent, TimeSpan)"/>
+    /// Often the need for calls to <see cref="Pump"/> is hidden from the user since <see cref="Poll(out SdlEvent)"/> and <see cref="Wait(out SdlEvent, TimeSpan?)"/>
     /// implicitly call <see cref="Pump"/>. However, if you are not polling or waiting for events(e.g.you are filtering them),
-    /// then you must call SDL_PumpEvents() to force an event queue update.
+    /// then you must call <see cref="Pump"/> to force an event queue update.
     /// </remarks>
     public static void Pump() => SDL_PumpEvents();
 
@@ -153,13 +153,6 @@ public static partial class Event
     }
 
     /// <summary>
-    /// Waits indefinitely for the next available event.
-    /// </summary>
-    /// <param name="e">The next filled event from the queue.</param>
-    /// <returns>True if this got an event or false if there are none available.</returns>
-    public static bool Wait(out SdlEvent e) => SDL_WaitEvent(out e) != 0;
-
-    /// <summary>
     /// Wait until the specified timeout (in milliseconds) for the next available event.
     /// </summary>
     /// <param name="e">The next filled event from the queue.</param>
@@ -167,14 +160,13 @@ public static partial class Event
     /// <returns>True if this got an event or false if the timeout elapsed without any events available.</returns>
     /// <remarks>
     /// The timeout is not guaranteed, the actual wait time could be longer due to system scheduling.
-    /// If you use <see cref="Timeout.InfiniteTimeSpan"/>, this will call <see cref="Wait(out SdlEvent)"/> instead.
     /// </remarks>
-    public static bool Wait(out SdlEvent e, TimeSpan timeSpan)
+    public static bool Wait(out SdlEvent e, TimeSpan? timeSpan = null)
     {
-        if (timeSpan == Timeout.InfiniteTimeSpan)
-            return Wait(out e);
+        if (timeSpan is null || timeSpan == Timeout.InfiniteTimeSpan)
+            return SDL_WaitEvent(out e) != 0;
 
-        return SDL_WaitEventTimeout(out e, (int)timeSpan.TotalMilliseconds) != 0;
+        return SDL_WaitEventTimeout(out e, (int)timeSpan.Value.TotalMilliseconds) != 0;
     }
 
     private static void ThrowIfGreaterThan([DoesNotReturnIf(true)] bool condition, string paramName)
