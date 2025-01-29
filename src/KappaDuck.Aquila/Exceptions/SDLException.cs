@@ -10,7 +10,7 @@ namespace KappaDuck.Aquila.Exceptions;
 /// <summary>
 /// Represents an exception that is thrown when an SDL error occurs.
 /// It uses <see cref="SDL.GetError"/> to get the error message
-/// then <see href="https://wiki.libsdl.org/SDL3/SDL_ClearError">SDL_ClearError</see> to clear the message.
+/// then use <see href="https://wiki.libsdl.org/SDL3/SDL_ClearError">SDL_ClearError</see> to clear the message.
 /// </summary>
 public sealed partial class SDLException : Exception
 {

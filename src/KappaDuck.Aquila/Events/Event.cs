@@ -47,7 +47,7 @@ public static partial class Event
     /// Check for the existence of a certain event types in the event queue.
     /// </summary>
     /// <param name="type">The type to check if exists.</param>
-    /// <returns>True if events matching type are present, or false if events matching type are not present.</returns>
+    /// <returns><see langword="true"/> if events matching type are present, or <see langword="false"/> if events matching type are not present.</returns>
     public static bool Has(EventType type) => SDL_HasEvent(type) != 0;
 
     /// <summary>
@@ -55,7 +55,7 @@ public static partial class Event
     /// </summary>
     /// <param name="minType">The low end of event type to be cleared, inclusive.</param>
     /// <param name="maxType">the high end of event type to be cleared, inclusive.</param>
-    /// <returns>True if events with type >= <paramref name="minType"/> and &lt;= <paramref name="maxType"/> are present, or false if not.</returns>
+    /// <returns><see langword="true"/> if events with type >= <paramref name="minType"/> and &lt;= <paramref name="maxType"/> are present, or <see langword="false"/> if not.</returns>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="minType"/> is greater than <paramref name="maxType"/>.</exception>
     public static bool Has(EventType minType, EventType maxType)
     {
@@ -68,7 +68,7 @@ public static partial class Event
     /// Query the state of processing events by type.
     /// </summary>
     /// <param name="type">The event type to check.</param>
-    /// <returns>True if the event is being processed, false otherwise.</returns>
+    /// <returns><see langword="true"/> if the event is being processed, false otherwise.</returns>
     public static bool IsEnabled(EventType type) => SDL_EventEnabled(type) != 0;
 
     /// <summary>
@@ -95,7 +95,7 @@ public static partial class Event
     /// Polls for currently pending events.
     /// </summary>
     /// <param name="e">The next filled event from the queue.</param>
-    /// <returns>True if this got an event or false if there are none available.</returns>
+    /// <returns><see langword="true"/> if this got an event or <see langword="false"/> if there are none available.</returns>
     public static bool Poll(out SdlEvent e) => SDL_PollEvent(out e) != 0;
 
     /// <summary>
@@ -115,7 +115,7 @@ public static partial class Event
     /// Add an event to the event queue.
     /// </summary>
     /// <param name="e">The event to push to the event queue.</param>
-    /// <returns>True on success, false if the event was filtered or on failure; call <see cref="SDL.GetError()"/> for more information.
+    /// <returns><see langword="true"/> on success, <see langword="false"/> if the event was filtered or on failure; call <see cref="SDL.GetError()"/> for more information.
     /// A common reason for error is the event queue being full.
     /// </returns>
     public static bool Push(ref SdlEvent e) => SDL_PushEvent(ref e) != 0;
@@ -157,7 +157,7 @@ public static partial class Event
     /// </summary>
     /// <param name="e">The next filled event from the queue.</param>
     /// <param name="timeSpan">The maximum time (milliseconds) to wait for the next available event.</param>
-    /// <returns>True if this got an event or false if the timeout elapsed without any events available.</returns>
+    /// <returns><see langword="true"/> if this got an event or <see langword="false"/> if the timeout elapsed without any events available.</returns>
     /// <remarks>
     /// The timeout is not guaranteed, the actual wait time could be longer due to system scheduling.
     /// </remarks>

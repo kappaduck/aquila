@@ -18,14 +18,14 @@ public static partial class ScreenSaver
     /// If you disable the screensaver, it is automatically re-enabled when SDL quits.
     /// The screensaver is disabled by default, but this may by changed by SDL_HINT_VIDEO_ALLOW_SCREENSAVER.
     /// </remarks>
-    /// <returns>Returns true on success or false on failure; call <see cref="SDL.GetError"/> for more information.</returns>
-    public static bool Disable() => SDL_DisableScreenSaver();
+    /// <returns><see langword="true"/> on success or <see langword="false"/> on failure; call <see cref="SDL.GetError"/> for more information.</returns>
+    public static bool Disable() => SDL_DisableScreenSaver() != 0;
 
     /// <summary>
     /// Allow the screen to be blanked by a screen saver.
     /// </summary>
-    /// <returns>Returns true on success or false on failure; call <see cref="SDL.GetError"/> for more information.</returns>
-    public static bool Enable() => SDL_EnableScreenSaver();
+    /// <returns>Returns <see langword="true"/> on success or <see langword="false"/> on failure; call <see cref="SDL.GetError"/> for more information.</returns>
+    public static bool Enable() => SDL_EnableScreenSaver() != 0;
 
     /// <summary>
     /// Check whether the screensaver is currently enabled.
@@ -33,21 +33,18 @@ public static partial class ScreenSaver
     /// <remarks>
     /// The screensaver is disabled by default, but this may by changed by SDL_HINT_VIDEO_ALLOW_SCREENSAVER.
     /// </remarks>
-    /// <returns>Returns true on success or false on failure; call <see cref="SDL.GetError"/> for more information.</returns>
-    public static bool IsEnabled() => SDL_ScreenSaverEnabled();
+    /// <returns>Returns <see langword="true"/> on success or <see langword="false"/> on failure; call <see cref="SDL.GetError"/> for more information.</returns>
+    public static bool IsEnabled() => SDL_ScreenSaverEnabled() != 0;
 
     [LibraryImport(SDL.NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SDL_DisableScreenSaver();
+    private static partial byte SDL_DisableScreenSaver();
 
     [LibraryImport(SDL.NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SDL_EnableScreenSaver();
+    private static partial byte SDL_EnableScreenSaver();
 
     [LibraryImport(SDL.NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SDL_ScreenSaverEnabled();
+    private static partial byte SDL_ScreenSaverEnabled();
 }

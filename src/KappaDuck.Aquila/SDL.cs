@@ -58,7 +58,7 @@ public static partial class SDL
     /// You can initialize the same subsystem multiple times. It will only initializes once.
     /// </remarks>
     /// <param name="subSystem">The subsystems to initialize.</param>
-    /// <returns>Returns true on success or false on failure; call <see cref="GetError"/> for more information.</returns>
+    /// <returns><see langword="true"/> on success or <see langword="false"/> on failure; call <see cref="GetError"/> for more information.</returns>
     public static bool Init(SubSystem subSystem)
     {
         if ((_initializedSubSystems & subSystem) != SubSystem.None)
@@ -66,7 +66,7 @@ public static partial class SDL
             return true;
         }
 
-        if (SDL_InitSubSystem(subSystem))
+        if (SDL_InitSubSystem(subSystem) != 0)
         {
             _initializedSubSystems |= subSystem;
             return true;
@@ -90,11 +90,11 @@ public static partial class SDL
     /// A successful result does not mean the URL loaded, just that we launched something to handle it(or at least believe we did).
     /// All this to say: this function can be useful, but you should definitely test it on every platform you target.
     /// </remarks>
-    /// <returns>True on success of false on failure; call <see cref="GetError"/> for more information.</returns>
-    public static bool OpenUrl(Uri uri) => SDL_OpenURL(uri.ToString());
+    /// <returns><see langword="true"/> on success of <see langword="false"/> on failure; call <see cref="GetError"/> for more information.</returns>
+    public static bool OpenUrl(Uri uri) => SDL_OpenURL(uri.ToString()) != 0;
 
     /// <inheritdoc cref="OpenUrl(Uri)"/>
-    public static bool OpenUrl(string url) => SDL_OpenURL(url);
+    public static bool OpenUrl(string uri) => SDL_OpenURL(uri) != 0;
 
     /// <summary>
     /// Clean up all initialized subsystems.
@@ -151,13 +151,11 @@ public static partial class SDL
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SDL_InitSubSystem(SubSystem subSystem);
+    private static partial byte SDL_InitSubSystem(SubSystem subSystem);
 
     [LibraryImport(NativeLibrary, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static partial bool SDL_OpenURL(string url);
+    private static partial byte SDL_OpenURL(string url);
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
