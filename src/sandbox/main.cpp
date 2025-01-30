@@ -1,35 +1,39 @@
+// Copyright (c) KappaDuck. All rights reserved.
+// The source code is licensed under MIT License.
+
 #include <iostream>
+#include <memory>
 #include <SDL3/SDL.h>
 
-bool userRequestQuit(const SDL_Event& event) {
-    return event.type == SDL_EventType::SDL_EVENT_QUIT ||
-          (event.type == SDL_EventType::SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE);
-}
+template<typename T, auto func>
+struct deleter {
+    void operator()(T* ptr) {
+        func(ptr);
+    }
+};
+
+using window_ptr = std::unique_ptr<SDL_Window, deleter<SDL_Window, SDL_DestroyWindow>>;
 
 int main(int argc, char** argv) {
-    SDL_Window* window = nullptr;
-
     SDL_Init(SDL_INIT_VIDEO);
 
-    window = SDL_CreateWindow("Hello, Aquila in C++", 640, 480, SDL_WINDOW_RESIZABLE);
+    window_ptr window{SDL_CreateWindow("Hello, World!", 800, 600, SDL_WINDOW_RESIZABLE)};
+    SDL_Surface* surface = SDL_GetWindowSurface(window.get());
+
+    SDL_FillSurfaceRect(surface, nullptr, SDL_MapSurfaceRGB(surface, 0xFF, 0xFF, 0xFF));
+
+    SDL_UpdateWindowSurface(window.get());
 
     bool running = true;
-    SDL_Event event;
+    SDL_Event e;
 
     while (running) {
-        while (SDL_PollEvent(&event)) {
-            if (userRequestQuit(event)) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_EventType::SDL_EVENT_QUIT) {
                 running = false;
-                break;
-            }
-
-            if (event.type == SDL_EventType::SDL_EVENT_MOUSE_BUTTON_DOWN) {
-                std::cout << "Mouse button down at (" << event.button.x << ", " << event.button.y << ")" << std::endl;
             }
         }
     }
-
-    SDL_DestroyWindow(window);
 
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     SDL_Quit();
