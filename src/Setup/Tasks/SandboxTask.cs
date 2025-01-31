@@ -51,12 +51,11 @@ public sealed class SandboxTask : FrostingTask<SetupArguments>
             return;
 
         context.Information("Running sandbox...");
-        using Process? process = Process.Start(new ProcessStartInfo
-        {
-            UseShellExecute = true,
-            CreateNoWindow = false,
-            FileName = GetExecutable(context, binaryPath)
-        });
+        using Process process = Process.Start(new ProcessStartInfo { FileName = GetExecutable(context, binaryPath) })!;
+
+        process.WaitForExit();
+
+        context.Information($"{Environment.NewLine}exit code: {process.ExitCode}");
 
         static string GetExecutable(SetupArguments context, DirectoryPath binaryPath)
         {
