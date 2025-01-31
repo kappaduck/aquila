@@ -136,10 +136,19 @@ public static partial class SDL
     public static SubSystem WasInit(SubSystem? subSystem)
         => subSystem.HasValue ? (_initializedSubSystems & subSystem.Value) : _initializedSubSystems;
 
+    internal static unsafe void Free<T>(T* memory) where T : unmanaged
+        => Free((IntPtr)memory);
+
+    internal static void Free(IntPtr memory) => SDL_free(memory);
+
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(OwnedStringMarshaller))]
     private static partial string SDL_GetError();
+
+    [LibraryImport(NativeLibrary)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    private static partial void SDL_free(IntPtr memory);
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
