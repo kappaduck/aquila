@@ -139,6 +139,9 @@ public static partial class SDL
     internal static unsafe void Free<T>(T* memory) where T : unmanaged
         => Free((IntPtr)memory);
 
+    internal static unsafe void Free<T>(T** memory) where T : unmanaged
+        => Free((IntPtr)memory);
+
     internal static void Free(IntPtr memory) => SDL_free(memory);
 
     [LibraryImport(NativeLibrary)]
