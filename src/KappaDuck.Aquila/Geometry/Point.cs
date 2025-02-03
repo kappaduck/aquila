@@ -40,18 +40,7 @@ public struct Point<T>(T x, T y) : IEquatable<Point<T>>, IAdditionOperators<Poin
     /// <remarks>
     /// If <typeparamref name="T"/> is <see cref="float"/>, the comparison is within a small tolerance.
     /// </remarks>
-    /// <param name="obj">The point to test.</param>
-    /// <returns><see langword="true"/> if the points are equal; otherwise, <see langword="false"/>.</returns>
-    public override readonly bool Equals([NotNullWhen(true)] object? obj)
-        => obj is Point<T> point && Equals(point);
-
-    /// <summary>
-    /// Checks if two points are equal.
-    /// </summary>
-    /// <remarks>
-    /// If <typeparamref name="T"/> is <see cref="float"/>, the comparison is within a small tolerance.
-    /// </remarks>
-    /// <param name="other">The point to test.</param>
+    /// <param name="other">The point to compare.</param>
     /// <returns><see langword="true"/> if the points are equal; otherwise, <see langword="false"/>.</returns>
     public readonly bool Equals(Point<T> other)
     {
@@ -60,6 +49,17 @@ public struct Point<T>(T x, T y) : IEquatable<Point<T>>, IAdditionOperators<Poin
 
         return X == other.X && Y == other.Y;
     }
+
+    /// <summary>
+    /// Checks if two points are equal.
+    /// </summary>
+    /// <remarks>
+    /// If <typeparamref name="T"/> is <see cref="float"/>, the comparison is within a small tolerance.
+    /// </remarks>
+    /// <param name="obj">The point to compare.</param>
+    /// <returns><see langword="true"/> if the points are equal; otherwise, <see langword="false"/>.</returns>
+    public override readonly bool Equals([NotNullWhen(true)] object? obj)
+        => obj is Point<T> point && Equals(point);
 
     /// <summary>
     /// Gets the hash code of the point.
@@ -118,8 +118,8 @@ public struct Point<T>(T x, T y) : IEquatable<Point<T>>, IAdditionOperators<Poin
     /// <remarks>
     /// If <typeparamref name="T"/> is <see cref="float"/>, the comparison is within a small tolerance.
     /// </remarks>
-    /// <param name="left">Left point to test.</param>
-    /// <param name="right">Right point to test.</param>
+    /// <param name="left">Left point to compare.</param>
+    /// <param name="right">Right point to compare.</param>
     /// <returns><see langword="true"/> if the points are equal; otherwise, <see langword="false"/>.</returns>
     public static bool operator ==(Point<T> left, Point<T> right) => left.Equals(right);
 
@@ -129,8 +129,8 @@ public struct Point<T>(T x, T y) : IEquatable<Point<T>>, IAdditionOperators<Poin
     /// <remarks>
     /// If <typeparamref name="T"/> is <see cref="float"/>, the comparison is within a small tolerance.
     /// </remarks>
-    /// <param name="left">Left point to test.</param>
-    /// <param name="right">Right point to test.</param>
+    /// <param name="left">Left point to compare.</param>
+    /// <param name="right">Right point to compare.</param>
     /// <returns><see langword="true"/> if the points are not equal; otherwise, <see langword="false"/>.</returns>
     public static bool operator !=(Point<T> left, Point<T> right) => !(left == right);
 
