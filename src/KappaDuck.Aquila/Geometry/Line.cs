@@ -49,7 +49,7 @@ public struct Line<T>(Point<T> start, Point<T> end) : IEquatable<Line<T>> where 
     /// </summary>
     /// <param name="obj">The line to compare.</param>
     /// <returns><see langword="true"/> if the lines are equal; otherwise, <see langword="false"/>.</returns>
-    public override bool Equals([NotNullWhen(true)] object? obj)
+    public override readonly bool Equals([NotNullWhen(true)] object? obj)
         => obj is Line<T> line && Equals(line);
 
     /// <summary>

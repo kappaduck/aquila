@@ -25,6 +25,11 @@ dotnet_diagnostic.MA0007.severity = none
 # https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0011.md
 dotnet_diagnostic.MA0011.severity = none
 
+# MA0018: Do not declare static members on generic types.
+# deprecated; use CA1000 instead
+# https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0018.md
+dotnet_diagnostic.MA0018.severity = none
+
 # MA0036: Make class static
 # Some Class does not need to be static (mostly for translations)
 # https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0036.md
