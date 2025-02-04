@@ -136,9 +136,7 @@ public struct Point<T>(T x, T y) : IEquatable<Point<T>>, IAdditionOperators<Poin
 
     private readonly bool CompareWithEpsilon(Point<float> right)
     {
-        float leftX = float.CreateChecked(X);
-        float leftY = float.CreateChecked(Y);
-
-        return Math.Approximately(leftX, right.X) && Math.Approximately(leftY, right.Y);
+        return Math.Approximately(float.CreateChecked(X), right.X)
+            && Math.Approximately(float.CreateChecked(Y), right.Y);
     }
 }
