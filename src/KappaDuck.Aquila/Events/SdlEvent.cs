@@ -17,6 +17,12 @@ public struct SdlEvent
     [FieldOffset(0)]
     public EventType Type;
 
+    /// <summary>
+    /// The display event data.
+    /// </summary>
+    [FieldOffset(0)]
+    public DisplayEvent Display;
+
     [FieldOffset(0)]
     private unsafe fixed byte _padding[128];
 }

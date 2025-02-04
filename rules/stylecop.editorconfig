@@ -25,6 +25,11 @@ dotnet_diagnostic.SA1128.severity = none
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1201.md
 dotnet_diagnostic.SA1201.severity = none
 
+# SA1202: Members should come before prive members
+# No need to put elements in a specific order
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1202.md
+dotnet_diagnostic.SA1202.severity = none
+
 # SA1204: Static members should appear before instance members
 # No need to put static members before instance members
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1204.md

@@ -135,6 +135,19 @@ public sealed partial class Display
     }
 
     /// <summary>
+    /// Get the display with the specified identifier.
+    /// </summary>
+    /// <param name="displayId">The display id.</param>
+    /// <returns>The display.</returns>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="displayId"/> is zero.</exception>
+    public static Display GetDisplay(uint displayId)
+    {
+        ArgumentOutOfRangeException.ThrowIfZero(displayId);
+
+        return new Display(displayId);
+    }
+
+    /// <summary>
     /// Get the display containing the specified point.
     /// </summary>
     /// <param name="point">The point to query.</param>
