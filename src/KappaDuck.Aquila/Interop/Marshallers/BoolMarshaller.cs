@@ -8,9 +8,9 @@ namespace KappaDuck.Aquila.Interop.Marshallers;
 [CustomMarshaller(typeof(bool), MarshalMode.Default, typeof(BoolMarshaller))]
 internal static class BoolMarshaller
 {
-    public static byte ConvertToUnmanaged(bool managed)
+    internal static byte ConvertToUnmanaged(bool managed)
         => managed ? (byte)1 : (byte)0;
 
-    public static bool ConvertToManaged(byte unmanaged)
+    internal static bool ConvertToManaged(byte unmanaged)
         => unmanaged != 0;
 }
