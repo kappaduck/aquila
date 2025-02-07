@@ -5,3 +5,6 @@ using KappaDuck.Aquila;
 using KappaDuck.Aquila.System;
 
 using SDLEngine engine = SDLEngine.Init(SubSystem.Video);
+
+Console.WriteLine($"SDL version: {SDLEngine.GetVersion()}");
+Console.WriteLine("Hello, Aquila!");

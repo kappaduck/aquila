@@ -23,6 +23,46 @@ public sealed class SDLEngine : IDisposable
     }
 
     /// <summary>
+    /// Clean up all initialized subsystems.
+    /// </summary>
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            if (Interlocked.Decrement(ref _refCount) > 0)
+                return;
+
+            SDLNative.SDL_QuitSubSystem(_subSystems);
+            SDLNative.SDL_Quit();
+
+            Cleanup();
+        }
+    }
+
+    /// <summary>
+    /// Get the version of the SDL that is linked against your program.
+    /// </summary>
+    /// <returns>The version of the linked library.</returns>
+    public static string GetVersion()
+    {
+        int version = SDLNative.SDL_GetVersion();
+
+        int major = version / 1000000;
+        int minor = version / 1000 % 1000;
+        int patch = version % 1000;
+
+        return $"{major}.{minor}.{patch}";
+    }
+
+    /// <summary>
+    /// Get whether the specified <see cref="SubSystem"/> is initialized.
+    /// </summary>
+    /// <param name="subSystem">The subsystem to compare.</param>
+    /// <returns><see langword="true"/> if the subsystem is initialized; otherwise, <see langword="false"/>.</returns>
+    public static bool Has(SubSystem subSystem)
+        => (_subSystems & subSystem) == subSystem;
+
+    /// <summary>
     /// Initialize SDL with the specified <see cref="SubSystem"/>.
     /// </summary>
     /// <remarks>
@@ -42,23 +82,6 @@ public sealed class SDLEngine : IDisposable
             InternalInit(subSystem);
 
             return _instance;
-        }
-    }
-
-    /// <summary>
-    /// Clean up all initialized subsystems.
-    /// </summary>
-    public void Dispose()
-    {
-        lock (_lock)
-        {
-            if (Interlocked.Decrement(ref _refCount) > 0)
-                return;
-
-            SDLNative.SDL_QuitSubSystem(_subSystems);
-            SDLNative.SDL_Quit();
-
-            Cleanup();
         }
     }
 
@@ -103,14 +126,6 @@ public sealed class SDLEngine : IDisposable
             _subSystems &= ~subSystem;
         }
     }
-
-    /// <summary>
-    /// Get whether the specified <see cref="SubSystem"/> is initialized.
-    /// </summary>
-    /// <param name="subSystem">The subsystem to compare.</param>
-    /// <returns><see langword="true"/> if the subsystem is initialized; otherwise, <see langword="false"/>.</returns>
-    public static bool Has(SubSystem subSystem)
-        => (_subSystems & subSystem) == subSystem;
 
     private static void InternalInit(SubSystem subSystem)
     {
