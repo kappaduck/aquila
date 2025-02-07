@@ -5,16 +5,16 @@
 #include <memory>
 #include <SDL3/SDL.h>
 
-template<typename T, auto func>
+template<typename T, void(*destroy)(T*)>
 struct deleter {
-    void operator()(T* ptr) {
-        func(ptr);
+    void operator()(T* ptr) const {
+        destroy(ptr);
     }
 };
 
 using window_ptr = std::unique_ptr<SDL_Window, deleter<SDL_Window, SDL_DestroyWindow>>;
 
-int main(int argc, char** argv) {
+int main() {
     SDL_Init(SDL_INIT_VIDEO);
 
     int version = SDL_GetVersion();
@@ -24,6 +24,4 @@ int main(int argc, char** argv) {
 
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     SDL_Quit();
-
-    return 0;
 }
