@@ -2,7 +2,7 @@
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Exceptions;
-using KappaDuck.Aquila.Marshallers;
+using KappaDuck.Aquila.Interop.Marshallers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;

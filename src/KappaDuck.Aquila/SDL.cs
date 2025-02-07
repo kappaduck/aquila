@@ -1,7 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Marshallers;
+using KappaDuck.Aquila.Interop.Marshallers;
 using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -136,22 +136,10 @@ public static partial class SDL
     public static SubSystem WasInit(SubSystem? subSystem)
         => subSystem.HasValue ? (_initializedSubSystems & subSystem.Value) : _initializedSubSystems;
 
-    internal static unsafe void Free<T>(T* memory) where T : unmanaged
-        => Free((IntPtr)memory);
-
-    internal static unsafe void Free<T>(T** memory) where T : unmanaged
-        => Free((IntPtr)memory);
-
-    internal static void Free(IntPtr memory) => SDL_free(memory);
-
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(OwnedStringMarshaller))]
     private static partial string SDL_GetError();
-
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial void SDL_free(IntPtr memory);
 
     [LibraryImport(NativeLibrary)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

@@ -3,7 +3,8 @@
 
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
-using KappaDuck.Aquila.Marshallers;
+using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.Marshallers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -129,7 +130,7 @@ public sealed partial class Display
         for (int i = 0; i < length; i++)
             displayModes[i] = *modes[i];
 
-        SDL.Free(modes);
+        Native.Free(modes);
 
         return displayModes;
     }
@@ -195,7 +196,7 @@ public sealed partial class Display
         for (int i = 0; i < length; i++)
             displays[i] = new Display(ids[i]);
 
-        SDL.Free(ids);
+        Native.Free(ids);
 
         return displays;
     }
