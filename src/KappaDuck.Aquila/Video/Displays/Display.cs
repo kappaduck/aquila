@@ -5,6 +5,7 @@ using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Interop;
 using KappaDuck.Aquila.Interop.Marshallers;
+using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -102,7 +103,7 @@ public sealed partial class Display
     /// <summary>
     /// Gets a value indicating whether HDR is enabled on the display.
     /// </summary>
-    public bool HdrEnabled => SDLProperties.Get(SDL_GetDisplayProperties(Id), HdrEnabledProperty, defaultValue: false);
+    public bool HdrEnabled => Properties.Get(SDL_GetDisplayProperties(Id), HdrEnabledProperty, defaultValue: false);
 
     /// <summary>
     /// Gets the orientation of a display.
