@@ -12,5 +12,5 @@ internal static class CallerOwnedStringMarshaller
     internal static string ConvertToManaged(nint unmanaged)
         => Marshal.PtrToStringUTF8(unmanaged) ?? string.Empty;
 
-    internal static void Free(nint unmanaged) => Native.Free(unmanaged);
+    internal static void Free(nint unmanaged) => SDLNative.Free(unmanaged);
 }

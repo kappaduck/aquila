@@ -1,15 +1,14 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+using KappaDuck.Aquila.Interop;
 
 namespace KappaDuck.Aquila.System;
 
 /// <summary>
 /// Represents a power supply such as laptop battery.
 /// </summary>
-public sealed partial class PowerSupply
+public sealed class PowerSupply
 {
     private PowerSupply(int? seconds, int? percentage, PowerState state)
     {
@@ -47,14 +46,10 @@ public sealed partial class PowerSupply
     /// It's possible a platform can only report battery percentage or time left but not both.
     /// </remarks>
     /// <returns>The current power supply information.</returns>
-    public static PowerSupply GetPowerInfo()
+    internal static PowerSupply GetPowerInfo()
     {
-        PowerState state = SDL_GetPowerInfo(out int seconds, out int percent);
+        PowerState state = SDLNative.SDL_GetPowerInfo(out int seconds, out int percent);
 
         return new PowerSupply(seconds == -1 ? null : seconds, percent == -1 ? null : percent, state);
     }
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial PowerState SDL_GetPowerInfo(out int seconds, out int percent);
 }

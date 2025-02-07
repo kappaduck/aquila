@@ -131,7 +131,7 @@ public sealed partial class Display
         for (int i = 0; i < length; i++)
             displayModes[i] = *modes[i];
 
-        Native.Free(modes);
+        SDLNative.Free(modes);
 
         return displayModes;
     }
@@ -197,7 +197,7 @@ public sealed partial class Display
         for (int i = 0; i < length; i++)
             displays[i] = new Display(ids[i]);
 
-        Native.Free(ids);
+        SDLNative.Free(ids);
 
         return displays;
     }

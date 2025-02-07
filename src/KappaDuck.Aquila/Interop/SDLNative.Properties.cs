@@ -8,7 +8,7 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila.Interop;
 
-internal static partial class Native
+internal static partial class SDLNative
 {
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

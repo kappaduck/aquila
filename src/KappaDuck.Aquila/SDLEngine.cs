@@ -55,8 +55,8 @@ public sealed class SDLEngine : IDisposable
             if (Interlocked.Decrement(ref _refCount) > 0)
                 return;
 
-            Native.SDL_QuitSubSystem(_subSystems);
-            Native.SDL_Quit();
+            SDLNative.SDL_QuitSubSystem(_subSystems);
+            SDLNative.SDL_Quit();
 
             Cleanup();
         }
@@ -98,7 +98,7 @@ public sealed class SDLEngine : IDisposable
             if (!Has(subSystem))
                 return;
 
-            Native.SDL_QuitSubSystem(subSystem);
+            SDLNative.SDL_QuitSubSystem(subSystem);
 
             _subSystems &= ~subSystem;
         }
@@ -117,7 +117,7 @@ public sealed class SDLEngine : IDisposable
         if (Has(subSystem))
             return;
 
-        if (!Native.SDL_InitSubSystem(subSystem))
+        if (!SDLNative.SDL_InitSubSystem(subSystem))
             SDLException.Throw();
 
         Interlocked.Increment(ref _refCount);

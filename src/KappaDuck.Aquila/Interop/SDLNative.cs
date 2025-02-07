@@ -9,7 +9,7 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila.Interop;
 
-internal static partial class Native
+internal static partial class SDLNative
 {
 #if Windows
     internal const string LibraryName = "SDL3.dll";

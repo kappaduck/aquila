@@ -47,8 +47,8 @@ public sealed class SDLException : Exception
     [DoesNotReturn]
     internal static void Throw()
     {
-        string message = Native.SDL_GetError();
-        Native.SDL_ClearError();
+        string message = SDLNative.SDL_GetError();
+        SDLNative.SDL_ClearError();
 
         throw new SDLException(message);
     }
