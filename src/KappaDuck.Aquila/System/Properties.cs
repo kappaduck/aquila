@@ -12,12 +12,12 @@ internal sealed class Properties : IDisposable
 
     internal Properties()
     {
-        _id = SDLNative.SDL_CreateProperties();
+        _id = NativeMethods.SDL_CreateProperties();
 
-        SDLException.ThrowIf(_id == 0);
+        SDLException.ThrowIfZero(_id);
     }
 
-    public void Dispose() => SDLNative.SDL_DestroyProperties(_id);
+    public void Dispose() => NativeMethods.SDL_DestroyProperties(_id);
 
     internal T Get<T>(string name, T defaultValue) => Get(_id, name, defaultValue);
 
@@ -27,10 +27,10 @@ internal sealed class Properties : IDisposable
     {
         return defaultValue switch
         {
-            bool boolean => (T)(object)SDLNative.SDL_GetBooleanProperty(propertiesId, name, boolean),
-            float floating => (T)(object)SDLNative.SDL_GetFloatProperty(propertiesId, name, floating),
-            long number => (T)(object)SDLNative.SDL_GetNumberProperty(propertiesId, name, number),
-            string str => (T)(object)SDLNative.SDL_GetStringProperty(propertiesId, name, str),
+            bool boolean => (T)(object)NativeMethods.SDL_GetBooleanProperty(propertiesId, name, boolean),
+            float floating => (T)(object)NativeMethods.SDL_GetFloatProperty(propertiesId, name, floating),
+            long number => (T)(object)NativeMethods.SDL_GetNumberProperty(propertiesId, name, number),
+            string str => (T)(object)NativeMethods.SDL_GetStringProperty(propertiesId, name, str),
             _ => throw new NotSupportedException($"The type {typeof(T)} is not supported.")
         };
     }
@@ -39,10 +39,10 @@ internal sealed class Properties : IDisposable
     {
         bool isSet = value switch
         {
-            bool boolean => SDLNative.SDL_SetBooleanProperty(propertiesId, name, boolean),
-            float floating => SDLNative.SDL_SetFloatProperty(propertiesId, name, floating),
-            long number => SDLNative.SDL_SetNumberProperty(propertiesId, name, number),
-            string str => SDLNative.SDL_SetStringProperty(propertiesId, name, str),
+            bool boolean => NativeMethods.SDL_SetBooleanProperty(propertiesId, name, boolean),
+            float floating => NativeMethods.SDL_SetFloatProperty(propertiesId, name, floating),
+            long number => NativeMethods.SDL_SetNumberProperty(propertiesId, name, number),
+            string str => NativeMethods.SDL_SetStringProperty(propertiesId, name, str),
             _ => throw new NotSupportedException($"The type {typeof(T)} is not supported.")
         };
 

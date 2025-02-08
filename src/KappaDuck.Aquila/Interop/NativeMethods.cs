@@ -9,7 +9,7 @@ using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila.Interop;
 
-internal static partial class SDLNative
+internal static partial class NativeMethods
 {
 #if Windows
     internal const string LibraryName = "SDL3.dll";
@@ -27,30 +27,12 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static partial void SDL_ClearError();
-
-    [LibraryImport(LibraryName)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
-    internal static partial string SDL_GetError();
-
-    [LibraryImport(LibraryName)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static partial SystemTheme SDL_GetSystemTheme();
-
-    [LibraryImport(LibraryName)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial int SDL_GetVersion();
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
     internal static partial bool SDL_InitSubSystem(SubSystem subSystem);
-
-    [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
-    internal static partial bool SDL_OpenURL(string url);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

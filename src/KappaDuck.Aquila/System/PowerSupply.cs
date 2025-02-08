@@ -48,7 +48,7 @@ public sealed class PowerSupply
     /// <returns>The current power supply information.</returns>
     internal static PowerSupply GetPowerInfo()
     {
-        PowerState state = SDLNative.SDL_GetPowerInfo(out int seconds, out int percent);
+        PowerState state = NativeMethods.SDL_GetPowerInfo(out int seconds, out int percent);
 
         return new PowerSupply(seconds == -1 ? null : seconds, percent == -1 ? null : percent, state);
     }

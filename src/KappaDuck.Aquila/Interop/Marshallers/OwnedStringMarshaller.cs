@@ -9,6 +9,6 @@ namespace KappaDuck.Aquila.Interop.Marshallers;
 [CustomMarshaller(typeof(string), MarshalMode.ManagedToUnmanagedOut, typeof(OwnedStringMarshaller))]
 internal static class OwnedStringMarshaller
 {
-    internal static string ConvertToManaged(nint unmanaged)
-        => Marshal.PtrToStringUTF8(unmanaged) ?? string.Empty;
+    internal static string? ConvertToManaged(nint unmanaged)
+        => Marshal.PtrToStringUTF8(unmanaged);
 }

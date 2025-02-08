@@ -26,18 +26,18 @@ public static class OperatingSystem
     /// <exception cref="SDLException">Failed to enable or disable the screensaver.</exception>
     public static bool ScreenSaver
     {
-        get => SDLNative.SDL_ScreenSaverEnabled();
+        get => NativeMethods.SDL_ScreenSaverEnabled();
         set
         {
             if (value)
             {
-                if (!SDLNative.SDL_EnableScreenSaver())
+                if (!NativeMethods.SDL_EnableScreenSaver())
                     SDLException.Throw();
 
                 return;
             }
 
-            if (!SDLNative.SDL_DisableScreenSaver())
+            if (!NativeMethods.SDL_DisableScreenSaver())
                 SDLException.Throw();
         }
     }
@@ -45,7 +45,7 @@ public static class OperatingSystem
     /// <summary>
     /// Gets the current system theme.
     /// </summary>
-    public static SystemTheme Theme => SDLNative.SDL_GetSystemTheme();
+    public static SystemTheme Theme => NativeMethods.SDL_GetSystemTheme();
 
     /// <summary>
     /// Open a URL/URI in the browser or other appropriate external application.
@@ -68,7 +68,7 @@ public static class OperatingSystem
     /// <inheritdoc cref="OpenUri(Uri)"/>
     public static void OpenUrl(string uri)
     {
-        if (!SDLNative.SDL_OpenURL(uri))
+        if (!NativeMethods.SDL_OpenURL(uri))
             SDLException.Throw();
     }
 }

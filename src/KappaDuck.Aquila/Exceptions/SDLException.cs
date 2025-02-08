@@ -3,6 +3,7 @@
 
 using KappaDuck.Aquila.Interop;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 
 namespace KappaDuck.Aquila.Exceptions;
 
@@ -44,11 +45,23 @@ public sealed class SDLException : Exception
             Throw();
     }
 
+    internal static void ThrowIfZero<T>(T value) where T : INumber<T>
+    {
+        if (T.IsZero(value))
+            Throw();
+    }
+
+    internal static void ThrowIfNullOrEmpty([NotNull] string? value)
+    {
+        if (string.IsNullOrEmpty(value))
+            Throw();
+    }
+
     [DoesNotReturn]
     internal static void Throw()
     {
-        string message = SDLNative.SDL_GetError();
-        SDLNative.SDL_ClearError();
+        string message = NativeMethods.SDL_GetError();
+        NativeMethods.SDL_ClearError();
 
         throw new SDLException(message);
     }
