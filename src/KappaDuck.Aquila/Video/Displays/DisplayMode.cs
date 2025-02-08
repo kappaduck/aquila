@@ -52,5 +52,5 @@ public struct DisplayMode
     /// </summary>
     public int RefreshRateDenominator;
 
-    private readonly IntPtr _internal;
+    private readonly nint _internal;
 }
