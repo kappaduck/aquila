@@ -1,38 +1,43 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Marshallers;
+using KappaDuck.Aquila.Exceptions;
+using KappaDuck.Aquila.Interop;
 using KappaDuck.Aquila.System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila;
 
 /// <summary>
-/// Represents global SDL functions.
+/// Represents the SDL engine which is used to initialize and quit the SDL <see cref="SubSystem"/>.
 /// </summary>
-public static partial class SDL
+public sealed class SDL : IDisposable
 {
-    internal const string NativeLibrary = "SDL3.dll";
+    private static readonly Lock _lock = new();
 
-    private static SubSystem _initializedSubSystems;
+    private static SDL? _instance;
+    private static SubSystem _subSystems = SubSystem.None;
+    private static int _refCount;
 
-    /// <summary>
-    /// Get the latest message with information about the specific error that occurred,
-    /// or an empty string if there hasn't been an error message set since the last call to <see href="https://wiki.libsdl.org/SDL3/SDL_ClearError">SDL_ClearError</see>.
-    /// </summary>
-    /// <remarks>It is possible for multiple errors to occur before calling this function. Only the last error is returned.
-    /// The message is only applicable when an SDL function has signaled an error.
-    /// </remarks>
-    /// <returns>The last error message.</returns>
-    public static string GetError() => SDL_GetError();
+    private SDL()
+    {
+    }
 
     /// <summary>
-    /// Get the current system theme.
+    /// Clean up all initialized subsystems.
     /// </summary>
-    /// <returns>The current system theme.</returns>
-    public static SystemTheme GetSystemTheme() => SDL_GetSystemTheme();
+    public void Dispose()
+    {
+        lock (_lock)
+        {
+            if (Interlocked.Decrement(ref _refCount) > 0)
+                return;
+
+            NativeMethods.SDL_QuitSubSystem(_subSystems);
+            NativeMethods.SDL_Quit();
+
+            Cleanup();
+        }
+    }
 
     /// <summary>
     /// Get the version of the SDL that is linked against your program.
@@ -40,7 +45,7 @@ public static partial class SDL
     /// <returns>The version of the linked library.</returns>
     public static string GetVersion()
     {
-        int version = SDL_GetVersion();
+        int version = NativeMethods.SDL_GetVersion();
 
         int major = version / 1000000;
         int minor = version / 1000 % 1000;
@@ -50,130 +55,100 @@ public static partial class SDL
     }
 
     /// <summary>
-    /// Initializes the specified subsystems.
+    /// Get whether the specified <see cref="SubSystem"/> is initialized.
+    /// </summary>
+    /// <param name="subSystem">The subsystem to compare.</param>
+    /// <returns><see langword="true"/> if the subsystem is initialized; otherwise, <see langword="false"/>.</returns>
+    public static bool Has(SubSystem subSystem)
+        => (_subSystems & subSystem) == subSystem;
+
+    /// <summary>
+    /// Initialize SDL with the specified <see cref="SubSystem"/>.
     /// </summary>
     /// <remarks>
-    /// Initialized subsystems are stored and will be uninitialized on <see cref="Quit" /> by using <see cref="QuitSubSystem(SubSystem)"/>
+    /// Initialized subsystems are stored and will be uninitialized on <see cref="Dispose" />
     /// or call directly <see cref="QuitSubSystem(SubSystem)"/> to shut down specific subsystems.
     /// You can initialize the same subsystem multiple times. It will only initializes once.
     /// </remarks>
-    /// <param name="subSystem">The subsystems to initialize.</param>
-    /// <returns><see langword="true"/> on success or <see langword="false"/> on failure; call <see cref="GetError"/> for more information.</returns>
-    public static bool Init(SubSystem subSystem)
+    /// <param name="subSystem">The subsystem to initialize.</param>
+    /// <returns>An instance of <see cref="SDL"/>.</returns>
+    /// <exception cref="SDLException">Failed to initialize the subsystem.</exception>
+    public static SDL Init(SubSystem subSystem)
     {
-        if ((_initializedSubSystems & subSystem) != SubSystem.None)
+        lock (_lock)
         {
-            return true;
-        }
+            _instance ??= new SDL();
 
-        if (SDL_InitSubSystem(subSystem) != 0)
-        {
-            _initializedSubSystems |= subSystem;
-            return true;
-        }
+            InternalInit(subSystem);
 
-        return false;
+            return _instance;
+        }
     }
 
     /// <summary>
-    /// Open a URL/URI in the browser or other appropriate external application.
-    /// </summary>
-    /// <param name="uri">The URL/URI to open.</param>
-    /// <remarks>
-    /// Open a URL in a separate, system-provided application. How this works will vary wildly depending on the platform.
-    /// This will likely launch what makes sense to handle a specific URL's protocol (a web browser for http://, etc),
-    /// but it might also be able to launch file managers for directories and other things.
-    /// What happens when you open a URL varies wildly as well: your game window may lose
-    /// focus(and may or may not lose focus if your game was Fullscreen or grabbing input at the time).
-    /// On mobile devices, your app will likely move to the background or your process might be paused. Any given platform may or may not handle a given URL.
-    /// If this is unimplemented (or simply unavailable) for a platform, this will fail with an error.
-    /// A successful result does not mean the URL loaded, just that we launched something to handle it(or at least believe we did).
-    /// All this to say: this function can be useful, but you should definitely test it on every platform you target.
-    /// </remarks>
-    /// <returns><see langword="true"/> on success of <see langword="false"/> on failure; call <see cref="GetError"/> for more information.</returns>
-    public static bool OpenUrl(Uri uri) => SDL_OpenURL(uri.ToString()) != 0;
-
-    /// <inheritdoc cref="OpenUrl(Uri)"/>
-    public static bool OpenUrl(string uri) => SDL_OpenURL(uri) != 0;
-
-    /// <summary>
-    /// Clean up all initialized subsystems.
+    /// Initialize SDL with the specified <see cref="SubSystem"/>.
     /// </summary>
     /// <remarks>
-    /// It will call <see cref="QuitSubSystem(SubSystem)"/> for initialized subsystems.
-    /// It is safe to call this function even in the case of errors in initialization.
+    /// You should call <see cref="Init(SubSystem)"/> before calling this method to make sure the SDL is initialized.
     /// </remarks>
-    public static void Quit()
+    /// <param name="subSystem">The subsystem to initialize.</param>
+    /// <exception cref="SDLException">Failed to initialize the subsystem.</exception>
+    /// <exception cref="InvalidOperationException">The SDL is not initialized.</exception>
+    public static void InitSubSystem(SubSystem subSystem)
     {
-        QuitSubSystem(_initializedSubSystems);
-        SDL_Quit();
+        ThrowIfInstanceNull();
+
+        lock (_lock)
+            InternalInit(subSystem);
     }
 
     /// <summary>
-    /// Shut down specific subsystems.
+    /// Quit the specified <see cref="SubSystem"/>.
     /// </summary>
     /// <remarks>
-    /// You still need to call <see cref="Quit" /> even if you close all subsystems.
-    /// You can shut down the same subsystem multiple times. It will only shut down once.
+    /// <para>You should call <see cref = "Init(SubSystem)" /> before calling this method to make sure the SDL is initialized.</para>
+    /// <para>You can shut down the same subsystem multiple times. It will only shut down once.</para>
+    /// You still need to call <see cref="Dispose" /> or <see langword="using"/> even if you close all subsystems.
     /// </remarks>
-    /// <param name="subSystem">Any of the subsystem used by <see cref="Init(SubSystem)"/>.</param>
+    /// <param name="subSystem">The subsystem to quit.</param>
+    /// <exception cref="InvalidOperationException">The SDL is not initialized.</exception>
     public static void QuitSubSystem(SubSystem subSystem)
     {
-        if ((_initializedSubSystems & subSystem) == SubSystem.None)
-            return;
+        ThrowIfInstanceNull();
 
-        SDL_QuitSubSystem(subSystem);
-        _initializedSubSystems &= ~subSystem;
+        lock (_lock)
+        {
+            if (!Has(subSystem))
+                return;
+
+            NativeMethods.SDL_QuitSubSystem(subSystem);
+
+            _subSystems &= ~subSystem;
+        }
     }
 
-    /// <summary>
-    /// Get a mask of the specified subsystems which are currently initialized.
-    /// </summary>
-    /// <param name="subSystem">The subsystem to check if it was initialized or <see langword="null"/> to check all subsystems.</param>
-    /// <returns>A mask of all initialized subsystems if <see cref="SubSystem"/> is <see langword="null"/>,
-    /// otherwise it returns the initialization status of the specified subsystem.
-    /// </returns>
-    public static SubSystem WasInit(SubSystem? subSystem)
-        => subSystem.HasValue ? (_initializedSubSystems & subSystem.Value) : _initializedSubSystems;
+    private static void InternalInit(SubSystem subSystem)
+    {
+        if (Has(subSystem))
+            return;
 
-    internal static unsafe void Free<T>(T* memory) where T : unmanaged
-        => Free((IntPtr)memory);
+        if (!NativeMethods.SDL_InitSubSystem(subSystem))
+            SDLException.Throw();
 
-    internal static unsafe void Free<T>(T** memory) where T : unmanaged
-        => Free((IntPtr)memory);
+        Interlocked.Increment(ref _refCount);
 
-    internal static void Free(IntPtr memory) => SDL_free(memory);
+        _subSystems |= subSystem;
+    }
 
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
-    private static partial string SDL_GetError();
+    private static void Cleanup()
+    {
+        _instance = null;
+        _subSystems = SubSystem.None;
+    }
 
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial void SDL_free(IntPtr memory);
-
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial SystemTheme SDL_GetSystemTheme();
-
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial int SDL_GetVersion();
-
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial byte SDL_InitSubSystem(SubSystem subSystem);
-
-    [LibraryImport(NativeLibrary, StringMarshalling = StringMarshalling.Utf8)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial byte SDL_OpenURL(string url);
-
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial void SDL_QuitSubSystem(SubSystem subSystem);
-
-    [LibraryImport(NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial void SDL_Quit();
+    private static void ThrowIfInstanceNull()
+    {
+        if (_instance is null)
+            throw new InvalidOperationException("SDL is not initialized.");
+    }
 }

@@ -18,11 +18,19 @@
     <PackageLicenseFile>license</PackageLicenseFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$([System.OperatingSystem]::IsWindows())'=='true'">
+    <DefineConstants>Windows</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$([System.OperatingSystem]::IsLinux())'=='true'">
+    <DefineConstants>Linux</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup Label="Files to include into the package">
-    <None Include="$(MSBuildStartupDirectory)\readme.md" Pack="true" PackagePath="" />
-    <None Include="$(MSBuildStartupDirectory)\license" Pack="true" PackagePath="" />
-    <None Include="$(MSBuildStartupDirectory)\SDL3\bin\*.dll" Pack="true" PackagePath="build\" IncludeInPackage="false" />
-    <None Include="$(MSBuildStartupDirectory)\$(MSBuildProjectName).targets" Pack="true" PackagePath="build\" IncludeInPackage="false" />
+    <None Include="$(MSBuildStartupDirectory)\readme.md" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\license" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\SDL3\bin\*.dll" Pack="true" PackagePath="build\" IncludeInPackage="false" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\$(MSBuildProjectName).targets" Pack="true" PackagePath="build\" IncludeInPackage="false" Visible="false" />
   </ItemGroup>
 
   <ItemGroup Label="Enabling reproducible builds">

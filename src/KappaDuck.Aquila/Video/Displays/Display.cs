@@ -3,17 +3,15 @@
 
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
-using KappaDuck.Aquila.Marshallers;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
+using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.System;
 
 namespace KappaDuck.Aquila.Video.Displays;
 
 /// <summary>
 /// Represents a display such as monitor.
 /// </summary>
-public sealed partial class Display
+public sealed class Display
 {
     private const string HdrEnabledProperty = "SDL.display.HDR_enabled";
 
@@ -25,19 +23,30 @@ public sealed partial class Display
     public uint Id { get; init; }
 
     /// <summary>
-    /// Gets the name of the display or <see cref="string.Empty"/> on failure; call <see cref="SDL.GetError"/> for more information.
+    /// Gets the name of the display.
     /// </summary>
-    public string Name => SDL_GetDisplayName(Id);
+    /// <exception cref="SDLException">Failed to get the display name.</exception>
+    public string Name
+    {
+        get
+        {
+            string? name = NativeMethods.SDL_GetDisplayName(Id);
+
+            SDLException.ThrowIfNullOrEmpty(name);
+
+            return name;
+        }
+    }
 
     /// <summary>
     /// Gets the bounds of the display.
     /// </summary>
-    /// <exception cref="SDLException">An error occurred while getting the display bounds.</exception>
+    /// <exception cref="SDLException">Failed to get the display bounds.</exception>
     public Rectangle<int> Bounds
     {
         get
         {
-            if (SDL_GetDisplayBounds(Id, out Rectangle<int> bounds) == 0)
+            if (!NativeMethods.SDL_GetDisplayBounds(Id, out Rectangle<int> bounds))
                 SDLException.Throw();
 
             return bounds;
@@ -50,11 +59,12 @@ public sealed partial class Display
     /// <remarks>
     /// This is the same area as <see cref="Bounds"/> reports, but with portions reserved by the system removed.
     /// </remarks>
+    /// <exception cref="SDLException">Failed to get the usable display bounds.</exception>
     public Rectangle<int> UsableBounds
     {
         get
         {
-            if (SDL_GetDisplayUsableBounds(Id, out Rectangle<int> bounds) == 0)
+            if (!NativeMethods.SDL_GetDisplayUsableBounds(Id, out Rectangle<int> bounds))
                 SDLException.Throw();
 
             return bounds;
@@ -62,7 +72,7 @@ public sealed partial class Display
     }
 
     /// <summary>
-    /// Gets content scale of the display or 0.0f on failure; call <see cref="SDL.GetError"/> for more information.
+    /// Gets content scale of the display.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -76,7 +86,18 @@ public sealed partial class Display
     /// from the base value of the display it is on, particularly on high-DPI and/or multi-monitor desktop configurations.
     /// </para>
     /// </remarks>
-    public float ContentScale => SDL_GetDisplayContentScale(Id);
+    /// <exception cref="SDLException">Failed to get the display content scale.</exception>
+    public float ContentScale
+    {
+        get
+        {
+            float scale = NativeMethods.SDL_GetDisplayContentScale(Id);
+
+            SDLException.ThrowIfZero(scale);
+
+            return scale;
+        }
+    }
 
     /// <summary>
     /// Gets information about the current display mode.
@@ -86,7 +107,21 @@ public sealed partial class Display
     /// When SDL run fullscreen and has changed the resolution. In that case, <see cref="CurrentMode"/> will return the current resolution,
     /// and not the previous native display mode.
     /// </remarks>
-    public unsafe DisplayMode CurrentMode => *SDL_GetCurrentDisplayMode(Id);
+    /// <exception cref="SDLException">Failed to get the current display mode.</exception>
+    public DisplayMode CurrentMode
+    {
+        get
+        {
+            unsafe
+            {
+                DisplayMode* mode = NativeMethods.SDL_GetCurrentDisplayMode(Id);
+
+                SDLException.ThrowIf(mode is null);
+
+                return *mode;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets information about the desktop display mode.
@@ -96,40 +131,66 @@ public sealed partial class Display
     /// When SDL run fullscreen and has changed the resolution. In that case, <see cref="DesktopMode"/> will return the previous native display mode,
     /// and not the current display mode.
     /// </remarks>
-    public unsafe DisplayMode DesktopMode => *SDL_GetDesktopDisplayMode(Id);
+    /// <exception cref="SDLException">Failed to get the desktop display mode.</exception>
+    public DisplayMode DesktopMode
+    {
+        get
+        {
+            unsafe
+            {
+                DisplayMode* mode = NativeMethods.SDL_GetDesktopDisplayMode(Id);
+
+                SDLException.ThrowIf(mode is null);
+
+                return *mode;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets a value indicating whether HDR is enabled on the display.
     /// </summary>
-    public bool HdrEnabled => SDLProperties.Get(SDL_GetDisplayProperties(Id), HdrEnabledProperty, defaultValue: false);
+    public bool HdrEnabled
+    {
+        get
+        {
+            uint properties = NativeMethods.SDL_GetDisplayProperties(Id);
+            return Properties.Get(properties, HdrEnabledProperty, defaultValue: false);
+        }
+    }
 
     /// <summary>
     /// Gets the orientation of a display.
     /// </summary>
-    public DisplayOrientation Orientation => SDL_GetCurrentDisplayOrientation(Id);
+    public DisplayOrientation Orientation => NativeMethods.SDL_GetCurrentDisplayOrientation(Id);
 
     /// <summary>
     /// Gets the orientation of a display when it is unrotated.
     /// </summary>
-    public DisplayOrientation NaturalOrientation => SDL_GetNaturalDisplayOrientation(Id);
+    public DisplayOrientation NaturalOrientation => NativeMethods.SDL_GetNaturalDisplayOrientation(Id);
 
     /// <summary>
     /// Get a list of fullscreen display modes available for the display.
     /// </summary>
     /// <returns>A list of fullscreen display modes.</returns>
-    public unsafe DisplayMode[] GetFullScreenModes()
+    /// <exception cref="SDLException">Failed to get the fullscreen display modes.</exception>
+    public DisplayMode[] GetFullScreenModes()
     {
-        DisplayMode** modes = SDL_GetFullscreenDisplayModes(Id, out int length);
+        DisplayMode[] displayModes;
 
-        if (modes is null)
-            return [];
+        unsafe
+        {
+            DisplayMode** modes = NativeMethods.SDL_GetFullscreenDisplayModes(Id, out int length);
 
-        DisplayMode[] displayModes = new DisplayMode[length];
+            SDLException.ThrowIf(modes is null);
 
-        for (int i = 0; i < length; i++)
-            displayModes[i] = *modes[i];
+            displayModes = new DisplayMode[length];
 
-        SDL.Free(modes);
+            for (int i = 0; i < length; i++)
+                displayModes[i] = *modes[i];
+
+            NativeMethods.Free(modes);
+        }
 
         return displayModes;
     }
@@ -139,10 +200,10 @@ public sealed partial class Display
     /// </summary>
     /// <param name="displayId">The display id.</param>
     /// <returns>The display.</returns>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="displayId"/> is zero.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="displayId"/> is zero or negative.</exception>
     public static Display GetDisplay(uint displayId)
     {
-        ArgumentOutOfRangeException.ThrowIfZero(displayId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(displayId);
 
         return new Display(displayId);
     }
@@ -153,12 +214,16 @@ public sealed partial class Display
     /// <param name="point">The point to query.</param>
     /// <returns>The display containing the specified point.</returns>
     /// <exception cref="SDLException">Failed to get the display containing the specified point.</exception>
-    public static unsafe Display GetDisplay(Point<int> point)
+    public static Display GetDisplay(Point<int> point)
     {
-        uint display = SDL_GetDisplayForPoint(&point);
+        uint display;
 
-        if (display == uint.MinValue)
-            SDLException.Throw();
+        unsafe
+        {
+            display = NativeMethods.SDL_GetDisplayForPoint(&point);
+        }
+
+        SDLException.ThrowIfZero(display);
 
         return new Display(display);
     }
@@ -169,12 +234,16 @@ public sealed partial class Display
     /// <param name="rectangle">The rectangle to query.</param>
     /// <returns>The display entirely containing the specified rectangle or closest to the center of the rectangle.</returns>
     /// <exception cref="SDLException">Failed to get the display containing the specified rectangle.</exception>
-    public static unsafe Display GetDisplay(Rectangle<int> rectangle)
+    public static Display GetDisplay(Rectangle<int> rectangle)
     {
-        uint display = SDL_GetDisplayForRect(&rectangle);
+        uint display;
 
-        if (display == uint.MinValue)
-            SDLException.Throw();
+        unsafe
+        {
+            display = NativeMethods.SDL_GetDisplayForRect(&rectangle);
+        }
+
+        SDLException.ThrowIfZero(display);
 
         return new Display(display);
     }
@@ -182,20 +251,26 @@ public sealed partial class Display
     /// <summary>
     /// Get a list of currently connected displays.
     /// </summary>
-    /// <returns>A list of currently connected displays otherwise empty on failure; call <see cref="SDL.GetError"/>.</returns>
-    public static unsafe Display[] GetDisplays()
+    /// <returns>A list of currently connected displays.</returns>
+    /// <exception cref="SDLException">Failed to get the displays.</exception>
+    public static Display[] GetDisplays()
     {
-        uint* ids = SDL_GetDisplays(out int length);
+        Display[] displays;
 
-        if (ids is null)
-            return [];
+        unsafe
+        {
+            uint* ids = NativeMethods.SDL_GetDisplays(out int length);
 
-        Display[] displays = new Display[length];
+            if (ids is null)
+                return [];
 
-        for (int i = 0; i < length; i++)
-            displays[i] = new Display(ids[i]);
+            displays = new Display[length];
 
-        SDL.Free(ids);
+            for (int i = 0; i < length; i++)
+                displays[i] = new Display(ids[i]);
+
+            NativeMethods.Free(ids);
+        }
 
         return displays;
     }
@@ -211,7 +286,7 @@ public sealed partial class Display
     /// <exception cref="SDLException">Failed to search the display mode.</exception>
     public DisplayMode SearchDisplayMode(int width, int height, float refreshRate, bool includeHighDensityMode)
     {
-        if (SDL_GetClosestFullscreenDisplayMode(Id, width, height, refreshRate, includeHighDensityMode, out DisplayMode displayMode) == 0)
+        if (!NativeMethods.SDL_GetClosestFullscreenDisplayMode(Id, width, height, refreshRate, includeHighDensityMode, out DisplayMode displayMode))
             SDLException.Throw();
 
         return displayMode;
@@ -221,66 +296,5 @@ public sealed partial class Display
     /// Get the primary display.
     /// </summary>
     /// <returns>The primary display.</returns>
-    public static Display GetPrimaryDisplay() => new(SDL_GetPrimaryDisplay());
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial byte SDL_GetClosestFullscreenDisplayMode(uint display, int width, int height, float refreshRate, [MarshalAs(UnmanagedType.Bool)] bool includeHighDensityMode, out DisplayMode displayMode);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static unsafe partial DisplayMode* SDL_GetCurrentDisplayMode(uint display);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static unsafe partial DisplayMode* SDL_GetDesktopDisplayMode(uint display);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial byte SDL_GetDisplayBounds(uint display, out Rectangle<int> bounds);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial byte SDL_GetDisplayUsableBounds(uint display, out Rectangle<int> bounds);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial float SDL_GetDisplayContentScale(uint display);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
-    private static partial string SDL_GetDisplayName(uint display);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial uint SDL_GetDisplayProperties(uint display);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static unsafe partial uint SDL_GetDisplayForPoint(Point<int>* point);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static unsafe partial uint SDL_GetDisplayForRect(Rectangle<int>* rectangle);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static unsafe partial uint* SDL_GetDisplays(out int count);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static unsafe partial DisplayMode** SDL_GetFullscreenDisplayModes(uint display, out int count);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial uint SDL_GetPrimaryDisplay();
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial DisplayOrientation SDL_GetCurrentDisplayOrientation(uint display);
-
-    [LibraryImport(SDL.NativeLibrary)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial DisplayOrientation SDL_GetNaturalDisplayOrientation(uint display);
+    public static Display GetPrimaryDisplay() => new(NativeMethods.SDL_GetPrimaryDisplay());
 }
