@@ -45,15 +45,21 @@ public sealed class SDLException : Exception
             Throw();
     }
 
-    internal static void ThrowIfZero<T>(T value) where T : INumber<T>
+    internal static void ThrowIfNegative<T>(T value) where T : INumber<T>
     {
-        if (T.IsZero(value))
+        if (T.IsNegative(value))
             Throw();
     }
 
     internal static void ThrowIfNullOrEmpty([NotNull] string? value)
     {
         if (string.IsNullOrEmpty(value))
+            Throw();
+    }
+
+    internal static void ThrowIfZero<T>(T value) where T : INumber<T>
+    {
+        if (T.IsZero(value))
             Throw();
     }
 

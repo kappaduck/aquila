@@ -23,12 +23,12 @@ internal static partial class NativeMethods
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_DestroyProperties(uint propertiesId);
 
-    [LibraryImport(SDL.NativeLibrary)]
+    [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
     internal static partial bool SDL_DisableScreenSaver();
 
-    [LibraryImport(SDL.NativeLibrary)]
+    [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
     internal static partial bool SDL_EnableScreenSaver();
@@ -51,7 +51,7 @@ internal static partial class NativeMethods
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial long SDL_GetNumberProperty(uint propertiesId, string name, long defaultValue);
 
-    [LibraryImport(SDL.NativeLibrary)]
+    [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial PowerState SDL_GetPowerInfo(out int seconds, out int percent);
 
@@ -89,7 +89,7 @@ internal static partial class NativeMethods
     [return: MarshalUsing(typeof(BoolMarshaller))]
     internal static partial bool SDL_SetStringProperty(uint propertiesId, string name, string value);
 
-    [LibraryImport(SDL.NativeLibrary)]
+    [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
     internal static partial bool SDL_ScreenSaverEnabled();

@@ -4,7 +4,7 @@
 namespace KappaDuck.Aquila.System;
 
 /// <summary>
-/// Subsystems to initialize using by <see cref="SDLEngine" />.
+/// Subsystems to initialize using by <see cref="SDL" />.
 /// </summary>
 [Flags]
 public enum SubSystem : uint

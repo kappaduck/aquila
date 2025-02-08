@@ -4,7 +4,7 @@
 using KappaDuck.Aquila;
 using KappaDuck.Aquila.System;
 
-using SDLEngine engine = SDLEngine.Init(SubSystem.Video);
+using SDL engine = SDL.Init(SubSystem.Video);
 
-Console.WriteLine($"SDL version: {SDLEngine.GetVersion()}");
+Console.WriteLine($"SDL version: {SDL.GetVersion()}");
 Console.WriteLine("Hello, Aquila!");
