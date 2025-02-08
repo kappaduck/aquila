@@ -83,14 +83,14 @@ public static class Event
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="minType"/> is greater than <paramref name="maxType"/>.</exception>
     /// <exception cref="SDLException">Failed while peeping events.</exception>
-    public static int Peek(Span<SdlEvent> events, EventType minType, EventType? maxType = null) => NativeMethods.Peek(events, minType, maxType);
+    public static int Peek(Span<SDLEvent> events, EventType minType, EventType? maxType = null) => NativeMethods.Peek(events, minType, maxType);
 
     /// <summary>
     /// Polls for currently pending events.
     /// </summary>
     /// <param name="e">The next filled event from the queue.</param>
     /// <returns><see langword="true"/> if this got an event or <see langword="false"/> if there are none available.</returns>
-    public static bool Poll(out SdlEvent e) => NativeMethods.SDL_PollEvent(out e);
+    public static bool Poll(out SDLEvent e) => NativeMethods.SDL_PollEvent(out e);
 
     /// <summary>
     /// Pump the event loop, gathering events from the input devices.
@@ -99,7 +99,7 @@ public static class Event
     /// This function updates the event queue and internal input device state.
     /// Gathers all the pending input information from devices and places it in the event queue.
     /// Without calls to <see cref="Pump"/> no events would ever be placed on the queue.
-    /// Often the need for calls to <see cref="Pump"/> is hidden from the user since <see cref="Poll(out SdlEvent)"/> and <see cref="Wait(out SdlEvent, TimeSpan?)"/>
+    /// Often the need for calls to <see cref="Pump"/> is hidden from the user since <see cref="Poll(out SDLEvent)"/> and <see cref="Wait(out SDLEvent, TimeSpan?)"/>
     /// implicitly call <see cref="Pump"/>. However, if you are not polling or waiting for events(e.g.you are filtering them),
     /// then you must call <see cref="Pump"/> to force an event queue update.
     /// </remarks>
@@ -112,7 +112,7 @@ public static class Event
     /// <returns><see langword="true"/> on success, <see langword="false"/> if the event was filtered or on failure.
     /// A common reason for error is the event queue being full.
     /// </returns>
-    public static bool Push(ref SdlEvent e) => NativeMethods.SDL_PushEvent(ref e);
+    public static bool Push(ref SDLEvent e) => NativeMethods.SDL_PushEvent(ref e);
 
     /// <summary>
     /// Add events to the back of the event queue.
@@ -120,7 +120,7 @@ public static class Event
     /// <param name="events">Added events to the event queue.</param>
     /// <returns>The number of events actually added.</returns>
     /// <exception cref="SDLException">Failed while added events.</exception>"
-    public static int Push(Span<SdlEvent> events) => NativeMethods.Push(events);
+    public static int Push(Span<SDLEvent> events) => NativeMethods.Push(events);
 
     /// <summary>
     /// Retrieve events from the event queue by removing them.
@@ -134,7 +134,7 @@ public static class Event
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="minType"/> is greater than <paramref name="maxType"/>.</exception>
     /// <exception cref="SDLException">Failed while retrieving events.</exception>
-    public static int? Retrieve(Span<SdlEvent> events, EventType minType, EventType? maxType = null) => NativeMethods.Retrieve(events, minType, maxType);
+    public static int? Retrieve(Span<SDLEvent> events, EventType minType, EventType? maxType = null) => NativeMethods.Retrieve(events, minType, maxType);
 
     /// <summary>
     /// Wait until the specified timeout (in milliseconds) for the next available event.
@@ -145,7 +145,7 @@ public static class Event
     /// <remarks>
     /// The timeout is not guaranteed, the actual wait time could be longer due to system scheduling.
     /// </remarks>
-    public static bool Wait(out SdlEvent e, TimeSpan? timeSpan = null)
+    public static bool Wait(out SDLEvent e, TimeSpan? timeSpan = null)
     {
         if (timeSpan is null || timeSpan == Timeout.InfiniteTimeSpan)
             return NativeMethods.SDL_WaitEvent(out e);

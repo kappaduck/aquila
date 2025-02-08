@@ -13,7 +13,7 @@ namespace KappaDuck.Aquila.Interop;
 
 internal static partial class NativeMethods
 {
-    internal static int Peek(Span<SdlEvent> events, EventType minType, EventType? maxType = null)
+    internal static int Peek(Span<SDLEvent> events, EventType minType, EventType? maxType = null)
     {
         ThrowIfGreaterThan(minType > maxType, nameof(minType));
 
@@ -24,7 +24,7 @@ internal static partial class NativeMethods
         return peekedEvents;
     }
 
-    internal static int Push(Span<SdlEvent> events)
+    internal static int Push(Span<SDLEvent> events)
     {
         int added = SDL_PeepEvents(events, events.Length, EventAction.Add, EventType.None, EventType.LastEvent);
 
@@ -33,7 +33,7 @@ internal static partial class NativeMethods
         return added;
     }
 
-    internal static int Retrieve(Span<SdlEvent> events, EventType minType, EventType? maxType = null)
+    internal static int Retrieve(Span<SDLEvent> events, EventType minType, EventType? maxType = null)
     {
         ThrowIfGreaterThan(minType > maxType, nameof(minType));
 
@@ -69,12 +69,12 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial int SDL_PeepEvents(Span<SdlEvent> events, int count, EventAction action, EventType minType, EventType maxType);
+    private static partial int SDL_PeepEvents(Span<SDLEvent> events, int count, EventAction action, EventType minType, EventType maxType);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
-    internal static partial bool SDL_PollEvent(out SdlEvent e);
+    internal static partial bool SDL_PollEvent(out SDLEvent e);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -83,7 +83,7 @@ internal static partial class NativeMethods
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
-    internal static partial bool SDL_PushEvent(ref SdlEvent e);
+    internal static partial bool SDL_PushEvent(ref SDLEvent e);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -92,12 +92,12 @@ internal static partial class NativeMethods
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
-    internal static partial bool SDL_WaitEvent(out SdlEvent e);
+    internal static partial bool SDL_WaitEvent(out SDLEvent e);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
-    internal static partial bool SDL_WaitEventTimeout(out SdlEvent e, int timeout);
+    internal static partial bool SDL_WaitEventTimeout(out SDLEvent e, int timeout);
 
     private static void ThrowIfGreaterThan([DoesNotReturnIf(true)] bool condition, string paramName)
     {
