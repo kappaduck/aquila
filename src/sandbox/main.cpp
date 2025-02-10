@@ -16,11 +16,18 @@ using window_ptr = std::unique_ptr<SDL_Window, deleter<SDL_Window, SDL_DestroyWi
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
+    window_ptr window(SDL_CreateWindow("Aquila sandbox", 1080, 720, SDL_WINDOW_RESIZABLE | SDL_WINDOW_MINIMIZED));
 
-    int version = SDL_GetVersion();
+    bool isOpen = true;
+    SDL_Event event;
 
-    std::cout << "SDL version: " << SDL_VERSIONNUM_MAJOR(version) << "." << SDL_VERSIONNUM_MINOR(version) << "." << SDL_VERSIONNUM_MICRO(version) << std::endl;
-    std::cout << "Hello, Aquila in C++!" << std::endl;
+    while (isOpen) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_EventType::SDL_EVENT_QUIT) {
+                isOpen = false;
+            }
+        }
+    }
 
     SDL_QuitSubSystem(SDL_INIT_VIDEO);
     SDL_Quit();

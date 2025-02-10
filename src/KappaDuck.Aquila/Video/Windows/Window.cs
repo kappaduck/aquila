@@ -1,245 +1,539 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
-using KappaDuck.Aquila.Handles;
+using KappaDuck.Aquila.Geometry;
+using KappaDuck.Aquila.Graphics;
+using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.Handles;
 using KappaDuck.Aquila.Video.Displays;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 namespace KappaDuck.Aquila.Video.Windows;
 
 /// <summary>
 /// Represents a basic window.
 /// </summary>
-public partial class Window : IDisposable
+public class Window : IDisposable
 {
     private WindowHandle _handle;
 
-    private string _title = string.Empty;
     private bool _disposed;
+    private WindowState _state;
+    private Point<int> _position;
+    private int _width;
+    private int _height;
+    private string _title = string.Empty;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
-    /// <remarks>
-    /// Use <see cref="Create(string, int, int, WindowState)"/> to create the window.
-    /// </remarks>
-    public Window() => _handle = new WindowHandle();
+    public Window()
+    {
+        _handle = new WindowHandle();
+        Opacity = 1.0f;
+    }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Window"/> class.
+    /// Initializes a create the window.
     /// </summary>
-    /// <remarks>
-    /// It will show the window. If you want to prepare the window before showing it, use <see cref="WindowState.Hidden"/> to hide it.
-    /// Then use <see cref="Show"/> to show it.
-    /// </remarks>
     /// <param name="title">The title of the window.</param>
     /// <param name="width">The width of the window.</param>
     /// <param name="height">The height of the window.</param>
-    /// <param name="state">The state of the window.</param>
-    /// <exception cref="SDLException">Failed to create the window.</exception>
+    /// <param name="state">The initial state of the window.</param>
+    /// <exception cref="SDLException">An error occurred while creating the window.</exception>
     public Window(string title, int width, int height, WindowState state = WindowState.None)
-        => _handle = CreateWindow(title, width, height, state);
+    {
+        _handle = CreateWindow(title, width, height, state);
+        IsOpen = true;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the window is always on top.
     /// </summary>
+    /// <remarks>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window always on top.</exception>
     public bool AlwaysOnTop
     {
-        get => (State & WindowState.AlwaysOnTop) != WindowState.None;
+        get => (_state & WindowState.AlwaysOnTop) != WindowState.None;
         set
         {
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            State = value ? (State | WindowState.AlwaysOnTop) : (State & ~WindowState.AlwaysOnTop);
+            _state = value ? (_state | WindowState.AlwaysOnTop) : (_state & ~WindowState.AlwaysOnTop);
 
-            NativeMethods.SDL_SetWindowAlwaysOnTop(_handle, value);
+            if (!NativeMethods.SDL_SetWindowAlwaysOnTop(_handle, value))
+                SDLException.Throw();
         }
     }
 
     /// <summary>
-    /// Gets or sets the aspect ratio of the window.
+    /// Gets or sets the aspect ratio of the window's client area.
     /// </summary>
-    /// <remarks>
-    /// The aspect ratio is the ratio of width divided by height, e.g. 2560x1600 would be 1.6.
-    /// Larger aspect ratios are wider and smaller aspect ratios are narrower.
-    /// </remarks>
-    /// <exception cref="ArgumentOutOfRangeException">The minimum or maximum aspect ratio is less than 0.0.</exception>
-    public (float Min, float Max) AspectRatio
+    /// <exception cref="ArgumentOutOfRangeException">Minimum or maximum is negative.</exception>
+    /// <exception cref="SDLException">An error occurred while setting the window aspect ratio.</exception>
+    public (float Minimum, float Maximum) AspectRatio
     {
         get;
         set
         {
-            ArgumentOutOfRangeException.ThrowIfNegative(value.Min);
-            ArgumentOutOfRangeException.ThrowIfNegative(value.Max);
+            ArgumentOutOfRangeException.ThrowIfNegative(value.Minimum);
+            ArgumentOutOfRangeException.ThrowIfNegative(value.Maximum);
 
             field = value;
 
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            NativeMethods.SDL_SetWindowAspectRatio(_handle, value.Min, value.Max);
+            if (!NativeMethods.SDL_SetWindowAspectRatio(_handle, value.Minimum, value.Maximum))
+                SDLException.Throw();
         }
     }
 
     /// <summary>
     /// Gets or sets a value indicating whether the window is borderless.
     /// </summary>
+    /// <remarks>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window borderless.</exception>
     public bool Borderless
     {
-        get => (State & WindowState.Borderless) != WindowState.None;
+        get => (_state & WindowState.Borderless) != WindowState.None;
         set
         {
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            State = value ? (State | WindowState.Borderless) : (State & ~WindowState.Borderless);
+            _state = value ? (_state | WindowState.Borderless) : (_state & ~WindowState.Borderless);
 
-            NativeMethods.SDL_SetWindowBordered(_handle, !value);
+            if (!NativeMethods.SDL_SetWindowBordered(_handle, !value))
+                SDLException.Throw();
         }
     }
 
     /// <summary>
-    /// Gets the size of the window borders.
+    /// Gets the size of the window's borders (decorations) around the client area.
     /// </summary>
     /// <remarks>
-    /// If the window is <see cref="WindowState.Borderless"/> or the window is not created. The borders size will be 0.
+    /// <para>If the window is not open or borderless, it will return (0, 0, 0, 0).</para>
+    /// <para>
+    /// It is possible that failed to get the border size because the window has not yet been decorated by the display server
+    /// or the information is not supported.
+    /// </para>
     /// </remarks>
     public (int Top, int Left, int Bottom, int Right) BordersSize
     {
         get
         {
-            if (_handle.IsInvalid)
-                return (0, 0, 0, 0);
+            if (!IsOpen || Borderless)
+                return default;
 
             NativeMethods.SDL_GetWindowBordersSize(_handle, out int top, out int left, out int bottom, out int right);
-
             return (top, left, bottom, right);
         }
     }
 
     /// <summary>
-    /// Gets the display the window is on.
+    /// Gets the display associated with the window.
     /// </summary>
-    /// <exception cref="SDLException">Failed to get the display for the window.</exception>
+    /// <remarks>
+    /// If the window is not open, it will return the primary display.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while getting the window display.</exception>
     public Display Display
     {
         get
         {
+            if (!IsOpen)
+                return Display.GetPrimaryDisplay();
+
             uint displayId = NativeMethods.SDL_GetDisplayForWindow(_handle);
+
+            SDLException.ThrowIfZero(displayId);
 
             return Display.GetDisplay(displayId);
         }
     }
 
     /// <summary>
-    /// Gets the content display scale relative to a window's pixel size.
+    /// Gets the content display scale relative to the window's pixel size.
     /// </summary>
     /// <remarks>
-    /// This is a combination of the window pixel density and the display content scale, and is the expected scale for displaying content in this window.
-    /// For example, if a 3840x2160 window had a display scale of 2.0, the user expects the content to take twice as many pixels and
-    /// be the same physical size as if it were being displayed in a 1920x1080 window with a display scale of 1.0.
-    /// Conceptually this value corresponds to the scale display setting, and is updated when that setting is changed,
-    /// or the window moves to a display with a different scale setting.
+    /// <para>If the window is not open, it will return 0.0f.</para>
+    /// <para>
+    /// This is a combination of the window pixel density and the display content scale,
+    /// and is the expected scale for displaying content in this window.
+    /// For example, if a 3840x2160 window had a display scale of 2.0,
+    /// the user expects the content to take twice as many pixels and be the same physical size
+    /// as if it were being displayed in a 1920x1080 window with a display scale of 1.0.
+    /// </para>
+    /// <para>Conceptually this value corresponds to the scale display setting, and is updated when that setting is changed, or the window moves to a display with a different scale setting.</para>
     /// </remarks>
+    /// <exception cref="SDLException">An error occurred while getting the window display scale.</exception>
     public float DisplayScale
     {
         get
         {
-            if (_handle.IsInvalid)
-                return 1.0f;
+            if (!IsOpen)
+                return 0.0f;
 
-            return NativeMethods.SDL_GetWindowDisplayScale(_handle);
+            float scale = NativeMethods.SDL_GetWindowDisplayScale(_handle);
+
+            SDLException.ThrowIfZero(scale);
+
+            return scale;
         }
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the window have input focus.
+    /// Gets or sets a value indicating whether the window is focusable.
     /// </summary>
+    /// <remarks>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window focusable.</exception>
     public bool Focusable
     {
-        get => (State & ~WindowState.NotFocusable) != WindowState.None;
+        get => (_state & ~WindowState.NotFocusable) != WindowState.None;
         set
         {
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            State = value ? (State & ~WindowState.NotFocusable) : (State | WindowState.NotFocusable);
+            _state = value ? (_state & ~WindowState.NotFocusable) : (_state | WindowState.NotFocusable);
 
-            NativeMethods.SDL_SetWindowFocusable(_handle, value);
+            if (!NativeMethods.SDL_SetWindowFocusable(_handle, value))
+                SDLException.Throw();
         }
     }
 
     /// <summary>
-    /// Gets the fullscreen mode when using <see cref="WindowState.Fullscreen"/>
-    /// otherwise <see langword="null"/> which use borderless fullscreen desktop mode.
+    /// Gets or sets a value indicating whether the window is fullscreen.
     /// </summary>
+    /// <remarks>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while settings the window fullscreen.</exception>
+    public bool Fullscreen
+    {
+        get => (_state & WindowState.Fullscreen) != WindowState.None;
+        set
+        {
+            if (!IsOpen)
+                return;
+
+            _state = value ? (_state | WindowState.Fullscreen) : (_state & ~WindowState.Fullscreen);
+
+            if (!NativeMethods.SDL_SetWindowFullscreen(_handle, value))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the fullscreen display mode to use when
+    /// the window is in <see cref="WindowState.Fullscreen"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Setting to <see langword="null"/> will use borderless fullscreen desktop mode,
+    /// or one of the fullscreen modes from <see cref="Display.GetFullScreenModes"/> to set an exclusive fullscreen mode.
+    /// </para>
+    /// <para>
+    /// If the window is currently in <see cref="WindowState.Fullscreen"/> state, this request is asynchronous on some windowing
+    /// systems and the new mode dimensions may not be applied immediately. If an immediate change is needed, call <see cref="Sync"/> to block
+    /// until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the new mode takes effect, an <see cref="EventType.WindowResized"/> and/or
+    /// an <see cref="EventType.WindowPixelSizeChanged"/> event will be emitted with the new mode dimensions.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window fullscreen mode.</exception>
     public DisplayMode? FullscreenMode
     {
-        get
+        get;
+        set
         {
-            if (_handle.IsInvalid)
-                return default;
-
-            unsafe
+            if (!IsOpen)
             {
-                DisplayMode* mode = NativeMethods.SDL_GetWindowFullscreenMode(_handle);
-
-                return mode is null ? null : *mode;
+                field = null;
+                return;
             }
+
+            if (!NativeMethods.SetWindowFullscreenMode(_handle, value))
+                SDLException.Throw();
+
+            field = value;
         }
     }
 
     /// <summary>
-    /// Gets the unique ID of the window.
+    /// Gets a value indicating whether the window has keyboard focus.
     /// </summary>
+    public bool HasKeyboardFocus => (_state & WindowState.InputFocus) != WindowState.None;
+
+    /// <summary>
+    /// Gets a value indicating whether the window has mouse focus.
+    /// </summary>
+    public bool HasMouseFocus => (_state & WindowState.MouseFocus) != WindowState.None;
+
+    /// <summary>
+    /// Gets or sets the height of the window.
+    /// </summary>
+    /// <remarks>
+    /// <para>Setting the height if the window is in <see cref="WindowState.Fullscreen"/> or <see cref="WindowState.Maximized"/> state will be ignored.</para>
+    /// <para>To change the exclusive fullscreen mode dimensions, use <see cref="FullscreenMode"/>.</para>
+    /// <para>It will be restricted by <see cref="MinimumSize"/> and <see cref="MaximumSize"/>.</para>
+    /// <para>
+    /// On some windowing systems this request is asynchronous and the new window state may not have been applied immediately.
+    /// If an immediate change is required, call <see cref="Sync"/> to block until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the window size changes, an <see cref="EventType.WindowResized"/> event will be emitted with the new dimensions.
+    /// Note that the new dimensions may not be the same as those requested, as the windowing system may impose its own constraints.
+    /// (e.g constraining the size of the content area to remain within the usable desktop bounds). Additionally,
+    /// as this is just a request, the windowing system can deny the state change.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Height is less than or equal to 0.</exception>
+    /// <exception cref="SDLException">An error occurred while setting the window height.</exception>
+    public int Height
+    {
+        get => _height;
+        set
+        {
+            if (Fullscreen || Maximized)
+                return;
+
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, 0);
+
+            _height = value;
+
+            if (!IsOpen)
+                return;
+
+            if (!NativeMethods.SDL_SetWindowSize(_handle, _width, value))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets the height of the window in pixels.
+    /// </summary>
+    public int HeightInPixel { get; private set; }
+
+    /// <summary>
+    /// Gets a value indicating whether the window is hidden.
+    /// </summary>
+    public bool Hidden => (_state & WindowState.Hidden) != WindowState.None;
+
+    /// <summary>
+    /// Gets the window's identifier.
+    /// </summary>
+    /// <remarks>
+    /// The identifier is what <see cref="WindowEvent"/> references.
+    /// </remarks>
     public uint Id { get; private set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the window has grabbed keyboard input.
+    /// Gets a value indicating whether the window uses high pixel density.
     /// </summary>
-    public bool IsKeyboardGrabbed
-    {
-        get => (State & WindowState.KeyboardGrabbed) != WindowState.None;
-        set
-        {
-            if (_handle.IsInvalid)
-                return;
-
-            State = value ? (State | WindowState.KeyboardGrabbed) : (State & ~WindowState.KeyboardGrabbed);
-
-            NativeMethods.SDL_SetWindowKeyboardGrab(_handle, value);
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the window has grabbed mouse input.
-    /// </summary>
-    public bool IsMouseGrabbed
-    {
-        get => (State & WindowState.MouseGrabbed) != WindowState.None;
-        set
-        {
-            if (_handle.IsInvalid)
-                return;
-
-            State = value ? (State | WindowState.MouseGrabbed) : (State & ~WindowState.MouseGrabbed);
-
-            NativeMethods.SDL_SetWindowMouseGrab(_handle, value);
-        }
-    }
+    public bool HighPixelDensity => (_state & WindowState.HighPixelDensity) != WindowState.None;
 
     /// <summary>
     /// Gets a value indicating whether the window is open.
     /// </summary>
-    public bool IsOpen { get; private set; }
+    public bool IsOpen
+    {
+        get => !_handle.IsInvalid && field;
+        private set;
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the window has grabbed keyboard input.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </para>
+    /// <para>
+    /// Keyboard grab enables capture of system keyboard shortcuts like Alt+Tab or the Meta/Super key.
+    /// Important to note that not all system keyboard shortcuts can be captured by applications (one example is Ctrl+Alt+Del on Windows).
+    /// </para>
+    /// <para>
+    /// This is primarily intended for specialized applications such as VNC clients or VM frontends. Normal games should not use keyboard grab.
+    /// </para>
+    /// <para>
+    /// When keyboard is enabled, SDL will continue to handle Alt+Tab when
+    /// the window is fullscreen to ensure the user is not trapped in your application.
+    /// </para>
+    /// <para>If the caller enables a grab while another window is currently grabbed, the other window loses its grab in favor of the caller's window.</para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window keyboard grab.</exception>
+    public bool KeyboardGrabbed
+    {
+        get => (_state & WindowState.KeyboardGrabbed) != WindowState.None;
+        set
+        {
+            if (!IsOpen)
+                return;
+
+            _state = value ? (_state | WindowState.KeyboardGrabbed) : (_state & ~WindowState.KeyboardGrabbed);
+
+            if (!NativeMethods.SDL_SetWindowKeyboardGrab(_handle, value))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the window is maximized.
+    /// </summary>
+    public bool Maximized => (_state & WindowState.Maximized) != WindowState.None;
+
+    /// <summary>
+    /// Gets or sets the maximum size of the window's client area.
+    /// </summary>
+    /// <remarks>
+    /// <para>Setting to (0, 0) removes the maximum size limit.</para>
+    /// <para>It will influence the window's size when resizing or using <see cref="Maximize"/>.</para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Width or height is negative.</exception>
+    /// <exception cref="SDLException">An error occurred while setting the window maximum size.</exception>
+    public (int Width, int Height) MaximumSize
+    {
+        get;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(value.Width);
+            ArgumentOutOfRangeException.ThrowIfNegative(value.Height);
+
+            field = value;
+
+            if (!IsOpen)
+                return;
+
+            if (!NativeMethods.SDL_SetWindowMaximumSize(_handle, value.Width, value.Height))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the window is minimized.
+    /// </summary>
+    public bool Minimized => (_state & WindowState.Minimized) != WindowState.None;
+
+    /// <summary>
+    /// Gets or sets the minimum size of the window's client area.
+    /// </summary>
+    /// <remarks>
+    /// <para>Setting to (0, 0) removes the maximum size limit.</para>
+    /// <para>It will influence the window's size when resizing.</para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Width or height is negative.</exception>
+    /// <exception cref="SDLException">An error occurred while setting the window minimum size.</exception>
+    public (int Width, int Height) MinimumSize
+    {
+        get;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(value.Width);
+            ArgumentOutOfRangeException.ThrowIfNegative(value.Height);
+
+            field = value;
+
+            if (!IsOpen)
+                return;
+
+            if (!NativeMethods.SDL_SetWindowMinimumSize(_handle, value.Width, value.Height))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the window has captured mouse input.
+    /// </summary>
+    /// <remarks>
+    /// It is not related to <see cref="MouseGrabbed"/> (<see cref="WindowState.MouseGrabbed"/>).
+    /// </remarks>
+    public bool MouseCaptured => (_state & WindowState.MouseCapture) != WindowState.None;
+
+    /// <summary>
+    /// Gets or sets the confined area of the mouse in the window.
+    /// </summary>
+    /// <remarks>
+    /// <para>Setting to <see langword="null"/> or an empty <see cref="Rectangle{T}"/> removes the confined area.</para>
+    /// <para>This will not grab the cursor, it only defines the area a cursor is restricted to when the window has mouse focus.</para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window mouse clip.</exception>
+    public Rectangle<int>? MouseClip
+    {
+        get;
+        set
+        {
+            if (!IsOpen)
+            {
+                field = null;
+                return;
+            }
+
+            if (!NativeMethods.SetWindowMouseRect(_handle, value))
+                SDLException.Throw();
+
+            field = value;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the window has mouse input grabbed.
+    /// </summary>
+    /// <remarks>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window mouse grab.</exception>
+    public bool MouseGrabbed
+    {
+        get => (_state & WindowState.MouseGrabbed) != WindowState.None;
+        set
+        {
+            if (!IsOpen)
+                return;
+
+            _state = value ? (_state | WindowState.MouseGrabbed) : (_state & ~WindowState.MouseGrabbed);
+
+            if (!NativeMethods.SDL_SetWindowMouseGrab(_handle, value))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the window has relative mouse mode enabled.
+    /// </summary>
+    public bool MouseRelativeMode => (_state & WindowState.MouseRelativeMode) != WindowState.None;
+
+    /// <summary>
+    /// Gets a value indicating whether the window is occluded.
+    /// </summary>
+    public bool Occluded => (_state & WindowState.Occluded) != WindowState.None;
 
     /// <summary>
     /// Gets or sets the opacity of the window.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException">The opacity is less than 0.0 or greater than 1.0.</exception>
+    /// <remarks>
+    /// <para>The default value is 1.0f.</para>
+    /// <para>The opacity value should be in the range 0.0f - 1.0f.</para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Opacity is negative or greater than 1.0f.</exception>
+    /// <exception cref="SDLException">An error occurred while setting the window opacity.</exception>
     public float Opacity
     {
         get;
@@ -250,38 +544,148 @@ public partial class Window : IDisposable
 
             field = value;
 
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            NativeMethods.SDL_SetWindowOpacity(_handle, value);
+            if (!NativeMethods.SDL_SetWindowOpacity(_handle, value))
+                SDLException.Throw();
         }
     }
 
     /// <summary>
-    /// Gets the state of the window.
+    /// Gets the pixel density of the window.
     /// </summary>
-    public WindowState State { get; private set; }
+    /// <remarks>
+    /// <para>If the window is not open, it will return 0.0f.</para>
+    /// <para>
+    /// This is a ratio of pixel size to window size. For example, if the window is 1920x1080 and it has a
+    /// high density back buffer of 3840x2160 pixels, it would have a pixel density of 2.0.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while getting the window pixel density.</exception>
+    public float PixelDensity
+    {
+        get
+        {
+            if (!IsOpen)
+                return 0.0f;
+
+            float density = NativeMethods.SDL_GetWindowPixelDensity(_handle);
+
+            SDLException.ThrowIfZero(density);
+
+            return density;
+        }
+    }
+
+    /// <summary>
+    /// Gets the pixel format associated with the window.
+    /// </summary>
+    /// <exception cref="SDLException">An error occurred while getting the window pixel format.</exception>
+    public PixelFormat PixelFormat
+    {
+        get
+        {
+            if (!IsOpen)
+                return PixelFormat.Unknown;
+
+            PixelFormat format = NativeMethods.SDL_GetWindowPixelFormat(_handle);
+
+            SDLException.ThrowIf(format == PixelFormat.Unknown);
+
+            return format;
+        }
+    }
+
+    /// <summary>
+    /// Gets or sets the position of the window.
+    /// </summary>
+    /// <remarks>
+    /// <para>Setting the position if the window is in <see cref="WindowState.Fullscreen"/> or <see cref="WindowState.Maximized"/> state will be ignored.</para>
+    /// <para>
+    /// This can be used to reposition fullscreen desktop windows onto a different display,
+    /// however, as exclusive fullscreen windows are locked to a specific display, they can only be repositioned via <see cref="FullscreenMode"/>.
+    /// </para>
+    /// <para>
+    /// On some windowing systems this request is asynchronous and the new window state may not have been applied immediately.
+    /// If an immediate change is required, call <see cref="Sync"/> to block until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the window position changes, an <see cref="EventType.WindowMoved"/> event will be emitted with the new coordinates.
+    /// Note that the new coordinates may not be the same as those requested, as the windowing system may impose its own constraints.
+    /// (e.g constraining the size of the content area to remain within the usable desktop bounds). Additionally,
+    /// as this is just a request, the windowing system can deny the state change.
+    /// </para>
+    /// <para>This is the current position of the window as last reported by the windowing system.</para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window position.</exception>
+    public Point<int> Position
+    {
+        get => _position;
+        set
+        {
+            if (!IsOpen || Fullscreen || Maximized)
+                return;
+
+            if (!NativeMethods.SDL_SetWindowPosition(_handle, value.X, value.Y))
+                SDLException.Throw();
+
+            _position = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether the window is resizable.
     /// </summary>
+    /// <remarks>
+    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// Use <see cref="WindowState"/> parameter instead.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while setting the window resizable.</exception>
     public bool Resizable
     {
-        get => (State & WindowState.Resizable) != WindowState.None;
+        get => (_state & WindowState.Resizable) != WindowState.None;
         set
         {
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            State = value ? (State | WindowState.Resizable) : (State & ~WindowState.Resizable);
+            _state = value ? (_state | WindowState.Resizable) : (_state & ~WindowState.Resizable);
 
-            NativeMethods.SDL_SetWindowResizable(_handle, value);
+            if (!NativeMethods.SDL_SetWindowResizable(_handle, value))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets the safe area for the window.
+    /// </summary>
+    /// <remarks>
+    /// Some devices have portions of the screen which are partially obscured or not interactive,
+    /// possibly due to on-screen controls, curved edges, camera notches, TV over scan, etc.
+    /// This provides the area of the window which is safe to have interactable content.
+    /// You should continue rendering into the rest of the window,
+    /// but it should not contain visually important or interactable content.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while getting the window safe area.</exception>
+    public Rectangle<int> SafeArea
+    {
+        get
+        {
+            if (!IsOpen)
+                return default;
+
+            if (!NativeMethods.SDL_GetWindowSafeArea(_handle, out Rectangle<int> area))
+                SDLException.Throw();
+
+            return area;
         }
     }
 
     /// <summary>
     /// Gets or sets the title of the window.
     /// </summary>
+    /// <exception cref="SDLException">An error occurred while setting the window title.</exception>
     public string Title
     {
         get => _title;
@@ -289,43 +693,99 @@ public partial class Window : IDisposable
         {
             _title = value;
 
-            if (_handle.IsInvalid)
+            if (!IsOpen)
                 return;
 
-            NativeMethods.SDL_SetWindowTitle(_handle, value);
+            if (!NativeMethods.SDL_SetWindowTitle(_handle, value))
+                SDLException.Throw();
         }
     }
+
+    /// <summary>
+    /// Gets or sets the width of the window.
+    /// </summary>
+    /// <remarks>
+    /// <para>Setting the width if the window is in <see cref="WindowState.Fullscreen"/> or <see cref="WindowState.Maximized"/> state will be ignored.</para>
+    /// <para>To change the exclusive fullscreen mode dimensions, use <see cref="FullscreenMode"/>.</para>
+    /// <para>It will be restricted by <see cref="MinimumSize"/> and <see cref="MaximumSize"/>.</para>
+    /// <para>
+    /// On some windowing systems this request is asynchronous and the new window state may not have been applied immediately.
+    /// If an immediate change is required, call <see cref="Sync"/> to block until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the window size changes, an <see cref="EventType.WindowResized"/> event will be emitted with the new dimensions.
+    /// Note that the new dimensions may not be the same as those requested, as the windowing system may impose its own constraints.
+    /// (e.g constraining the size of the content area to remain within the usable desktop bounds). Additionally,
+    /// as this is just a request, the windowing system can deny the state change.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Width is less than or equal to 0.</exception>
+    /// <exception cref="SDLException">An error occurred while setting the window width.</exception>
+    public int Width
+    {
+        get => _width;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(value, 0);
+
+            _width = value;
+
+            if (!IsOpen)
+                return;
+
+            if (!NativeMethods.SDL_SetWindowSize(_handle, value, _height))
+                SDLException.Throw();
+        }
+    }
+
+    /// <summary>
+    /// Gets the width of the window in pixels.
+    /// </summary>
+    public int WidthInPixel { get; private set; }
 
     /// <summary>
     /// Closes the window.
     /// </summary>
     /// <remarks>
-    /// It will release the resources used by the window. Use <see cref="Create"/> to recreate the window.
+    /// If the window is already closed or not created, It does nothing.
     /// </remarks>
-    public void Close() => Dispose();
+    public void Close()
+    {
+        if (!IsOpen)
+            return;
+
+        IsOpen = false;
+    }
 
     /// <summary>
     /// Creates the window.
     /// </summary>
     /// <remarks>
-    /// It will set other properties for the window such as <see cref="AspectRatio"/>, <see cref="Opacity"/>, etc..
+    /// If the window is already open, it does nothing.
     /// </remarks>
     /// <param name="title">The title of the window.</param>
     /// <param name="width">The width of the window.</param>
     /// <param name="height">The height of the window.</param>
-    /// <param name="state">The state of the window.</param>
+    /// <param name="state">The initial state of the window.</param>
+    /// <exception cref="SDLException">An error occurred while creating the window.</exception>
     public void Create(string title, int width, int height, WindowState state = WindowState.None)
     {
-        if (!_handle.IsInvalid)
+        if (IsOpen)
             return;
 
         _handle = CreateWindow(title, width, height, state);
 
-        NativeMethods.SDL_SetWindowAspectRatio(_handle, AspectRatio.Min, AspectRatio.Max);
+        NativeMethods.SDL_SetWindowAspectRatio(_handle, AspectRatio.Minimum, AspectRatio.Maximum);
+        NativeMethods.SetWindowFullscreenMode(_handle, FullscreenMode);
+        NativeMethods.SDL_SetWindowMaximumSize(_handle, MaximumSize.Width, MaximumSize.Height);
+        NativeMethods.SDL_SetWindowMinimumSize(_handle, MinimumSize.Width, MinimumSize.Height);
+        NativeMethods.SetWindowMouseRect(_handle, MouseClip);
         NativeMethods.SDL_SetWindowOpacity(_handle, Opacity);
+
+        IsOpen = true;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Dispose()
     {
         Dispose(disposing: true);
@@ -335,65 +795,246 @@ public partial class Window : IDisposable
     /// <summary>
     /// Request the window to demand attention from the user.
     /// </summary>
-    /// <param name="state">The flash state.</param>
+    /// <param name="state">The state of the flash.</param>
+    /// <exception cref="SDLException">An error occurred while flashing the window.</exception>
     public void Flash(FlashState state)
     {
-        if (NativeMethods.SDL_FlashWindow(_handle, state) == 0)
+        if (!IsOpen)
+            return;
+
+        if (!NativeMethods.SDL_FlashWindow(_handle, state))
             SDLException.Throw();
     }
 
     /// <summary>
-    /// Hides the window.
+    /// Hides the window. It can be shown again with <see cref="Show"/>.
     /// </summary>
-    /// <exception cref="SDLException">Failed to hide the window.</exception>
+    /// <exception cref="SDLException">An error occurred while hiding the window.</exception>
     public void Hide()
     {
-        State |= WindowState.Hidden;
+        if (!IsOpen)
+            return;
 
-        if (NativeMethods.SDL_HideWindow(_handle) == 0)
+        if (!NativeMethods.SDL_HideWindow(_handle))
             SDLException.Throw();
+
+        _state |= WindowState.Hidden;
+    }
+
+    /// <summary>
+    /// Request that the window be made as large as possible.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Non-resizable windows can't be maximized. The window must have the <see cref="WindowState.Resizable"/> state set.
+    /// </para>
+    /// <para>
+    /// On some windowing systems this request is asynchronous and the new window state may not have been applied immediately.
+    /// If an immediate change is required, call <see cref="Sync"/> to block until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the window state changes, an <see cref="EventType.WindowMaximized"/> event will be emitted.
+    /// Note that, as this is just a request, the windowing system can deny the state change.
+    /// </para>
+    /// <para>
+    /// When maximizing a window, whether the constraints set via <see cref="MaximumSize"/> are honored depends on the policy of the window manager.
+    /// Win32 enforce the constraints when maximizing, while X11 and Wayland window managers may vary.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while maximizing the window.</exception>
+    public void Maximize()
+    {
+        if (!IsOpen || Maximized || !Resizable)
+            return;
+
+        if (!NativeMethods.SDL_MaximizeWindow(_handle))
+            SDLException.Throw();
+
+        _state &= ~WindowState.Minimized;
+        _state |= WindowState.Maximized;
+    }
+
+    /// <summary>
+    /// Request that the window be minimized to an iconic representation.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// If the window is in <see cref="WindowState.Fullscreen"/> state, it will has no direct effect.
+    /// It may alter the state the window is restored to when leaving fullscreen.
+    /// </para>
+    /// <para>
+    /// On some windowing systems this request is asynchronous and the new window state may not have been applied immediately.
+    /// If an immediate change is required, call <see cref="Sync"/> to block until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the window state changes, an <see cref="EventType.WindowMinimized"/> event will be emitted.
+    /// Note that, as this is just a request, the windowing system can deny the state change.
+    /// </para>
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while minimizing the window.</exception>
+    public void Minimize()
+    {
+        if (!IsOpen || Minimized)
+            return;
+
+        if (!NativeMethods.SDL_MinimizeWindow(_handle))
+            SDLException.Throw();
+
+        _state &= ~WindowState.Maximized;
+        _state |= WindowState.Minimized;
+    }
+
+    /// <summary>
+    /// Polls for currently pending events.
+    /// </summary>
+    /// <remarks>
+    /// <para>Some events are processed internally by the window.</para>
+    /// Will return <see langword="false"/> and empty <see cref="SDLEvent"/> if the window is not open.
+    /// </remarks>
+    /// <param name="e">The next filled event from the queue.</param>
+    /// <returns><see langword="true"/> if this got an event or <see langword="false"/> if there are none available.</returns>
+    public bool Poll(out SDLEvent e)
+    {
+        if (!IsOpen)
+        {
+            e = default;
+            return false;
+        }
+
+        bool hasEvent = Event.Poll(out e);
+
+        if (!IsOpen || e.Window.Id != Id)
+            return hasEvent;
+
+        if (e.Type == EventType.WindowExposed)
+            _state &= ~WindowState.Occluded;
+
+        if (e.Type == EventType.WindowOccluded)
+            _state |= WindowState.Occluded;
+
+        if (e.Type == EventType.WindowResized)
+        {
+            _width = e.Window.Data1;
+            _height = e.Window.Data2;
+        }
+
+        if (e.Type == EventType.WindowPixelSizeChanged)
+        {
+            WidthInPixel = e.Window.Data1;
+            HeightInPixel = e.Window.Data2;
+        }
+
+        if (e.Type == EventType.WindowMoved)
+        {
+            _position.X = e.Window.Data1;
+            _position.Y = e.Window.Data2;
+        }
+
+        if (e.Type == EventType.MouseEnter)
+            _state |= WindowState.MouseFocus;
+
+        if (e.Type == EventType.MouseLeave)
+            _state &= ~WindowState.MouseFocus;
+
+        if (e.Type == EventType.FocusGained)
+            _state |= WindowState.InputFocus;
+
+        if (e.Type == EventType.FocusLost)
+            _state &= ~WindowState.InputFocus;
+
+        if (e.Type == EventType.WindowRestored)
+            _state &= ~(WindowState.Minimized | WindowState.Maximized);
+
+        return hasEvent;
+    }
+
+    /// <summary>
+    /// Request that the window be raised above other windows and gain the input focus.
+    /// </summary>
+    /// <remarks>
+    /// The result of this request is subject to desktop window manager policy, particularly if raising
+    /// the requested window would result in stealing focus from another application.
+    /// If the window is successfully raised and gains input focus,
+    /// an <see cref="EventType.FocusGained"/> event will be emitted,
+    /// and the window will have <see cref="WindowState.InputFocus"/> state set.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while raising the window.</exception>
+    public void Raise()
+    {
+        if (!IsOpen)
+            return;
+
+        if (!NativeMethods.SDL_RaiseWindow(_handle))
+            SDLException.Throw();
+
+        _state |= WindowState.InputFocus;
     }
 
     /// <summary>
     /// Request that the size and position of a minimized or maximized window be restored.
     /// </summary>
     /// <remarks>
-    /// Restore will not be called if the window is <see cref="WindowState.Fullscreen"/>.
+    /// <para>
+    /// If the window is in <see cref="WindowState.Fullscreen"/> state, it will has no direct effect.
+    /// It may alter the state the window is restored to when leaving fullscreen.
+    /// </para>
+    /// <para>
+    /// On some windowing systems this request is asynchronous and the new window state may not have been applied immediately.
+    /// If an immediate change is required, call <see cref="Sync"/> to block until the changes have taken effect.
+    /// </para>
+    /// <para>
+    /// When the window state changes, an <see cref="EventType.WindowRestored"/> event will be emitted.
+    /// Note that, as this is just a request, the windowing system can deny the state change.
+    /// </para>
     /// </remarks>
+    /// <exception cref="SDLException">An error occurred while restoring the window.</exception>
     public void Restore()
     {
-        if ((State & WindowState.Fullscreen) != WindowState.None)
+        if (!IsOpen)
             return;
 
-        if (NativeMethods.SDL_RestoreWindow(_handle) == 0)
+        if (!NativeMethods.SDL_RestoreWindow(_handle))
             SDLException.Throw();
     }
 
     /// <summary>
-    /// Shows the window.
+    /// Show the window.
     /// </summary>
-    /// <exception cref="SDLException">Failed to show the window.</exception>
+    /// <remarks>
+    /// It's only the way to show a window that has been hidden
+    /// with <see cref="Hide"/> or using <see cref="WindowState.Hidden"/> state.
+    /// </remarks>
+    /// <exception cref="SDLException">An error occurred while showing the window.</exception>
     public void Show()
     {
-        State &= ~WindowState.Hidden;
+        if (!IsOpen)
+            return;
 
-        if (NativeMethods.SDL_ShowWindow(_handle) == 0)
+        if (!NativeMethods.SDL_ShowWindow(_handle))
             SDLException.Throw();
+
+        _state &= ~WindowState.Hidden;
     }
 
     /// <summary>
     /// Block until any pending window state is finalized.
     /// </summary>
     /// <remarks>
+    /// <para>On windowing systems where changes are immediate, this does nothing.</para>
+    /// <para>
     /// On asynchronous windowing systems, this acts as a synchronization barrier for pending window state.
     /// It will attempt to wait until any pending window state has been applied and is guaranteed to return within finite time.
     /// Note that for how long it can potentially block depends on the underlying window system,
     /// as window state changes may involve somewhat lengthy animations that must complete before the window is in its final requested state.
-    /// On windowing systems where changes are immediate, this does nothing.
+    /// </para>
     /// </remarks>
+    /// <exception cref="SDLException">Failed to sync the window.</exception>
     public void Sync()
     {
-        if (NativeMethods.SDL_SyncWindow(_handle) == 0)
+        if (!IsOpen)
+            return;
+
+        if (!NativeMethods.SDL_SyncWindow(_handle))
             SDLException.Throw();
     }
 
@@ -410,7 +1051,6 @@ public partial class Window : IDisposable
             _handle.Dispose();
 
         _disposed = true;
-        IsOpen = false;
     }
 
     private WindowHandle CreateWindow(string title, int width, int height, WindowState state)
@@ -421,102 +1061,17 @@ public partial class Window : IDisposable
             SDLException.Throw();
 
         Id = NativeMethods.SDL_GetWindowID(handle);
+        SDLException.ThrowIfZero(Id);
 
-        if (Id == 0)
-            SDLException.Throw();
+        _state = state;
 
         _title = title;
+        _width = width;
+        _height = height;
 
-        State = state;
-        IsOpen = true;
+        NativeMethods.SDL_GetWindowPosition(handle, out int x, out int y);
+        _position = new Point<int>(x, y);
 
         return handle;
-    }
-
-    private static partial class NativeMethods
-    {
-        [LibraryImport(SDL.NativeLibrary, StringMarshalling = StringMarshalling.Utf8)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial WindowHandle SDL_CreateWindow(string title, int width, int height, WindowState flags);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_FlashWindow(WindowHandle window, FlashState state);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial uint SDL_GetDisplayForWindow(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_GetWindowBordersSize(WindowHandle window, out int top, out int left, out int bottom, out int right);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowAspectRatio(WindowHandle window, float min, float max);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial float SDL_GetWindowDisplayScale(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static unsafe partial DisplayMode* SDL_GetWindowFullscreenMode(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static unsafe partial byte SDL_SetWindowFullscreenMode(WindowHandle window, ref DisplayMode mode);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_SyncWindow(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial uint SDL_GetWindowID(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowOpacity(WindowHandle window, float opacity);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowResizable(WindowHandle window, [MarshalAs(UnmanagedType.Bool)] bool resizable);
-
-        [LibraryImport(SDL.NativeLibrary, StringMarshalling = StringMarshalling.Utf8)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowTitle(WindowHandle window, string title);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_HideWindow(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_ShowWindow(WindowHandle window);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_SetWindowMouseGrab(WindowHandle window, [MarshalAs(UnmanagedType.Bool)] bool grabbed);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_SetWindowKeyboardGrab(WindowHandle window, [MarshalAs(UnmanagedType.Bool)] bool grabbed);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowFocusable(WindowHandle window, [MarshalAs(UnmanagedType.Bool)] bool focusable);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowBordered(WindowHandle window, [MarshalAs(UnmanagedType.Bool)] bool bordered);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial void SDL_SetWindowAlwaysOnTop(WindowHandle window, [MarshalAs(UnmanagedType.Bool)] bool onTop);
-
-        [LibraryImport(SDL.NativeLibrary)]
-        [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-        internal static partial byte SDL_RestoreWindow(WindowHandle window);
     }
 }

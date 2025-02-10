@@ -14,7 +14,9 @@ internal sealed class WindowHandle() : SafeHandle(nint.Zero, ownsHandle: true)
         if (!IsInvalid)
         {
             NativeMethods.SDL_DestroyWindow(handle);
+
             SetHandle(nint.Zero);
+            SetHandleAsInvalid();
         }
 
         return true;

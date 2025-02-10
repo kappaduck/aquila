@@ -8,5 +8,16 @@ using KappaDuck.Aquila.Video.Windows;
 
 using SDL engine = SDL.Init(SubSystem.Video);
 
-Console.WriteLine($"SDL version: {SDL.GetVersion()}");
-Console.WriteLine("Hello, Aquila!");
+using Window window = new("Aquila Demo", 1080, 720, WindowState.Resizable);
+
+while (window.IsOpen)
+{
+    while (window.Poll(out SDLEvent e))
+    {
+        if (e.Type is EventType.Quit or EventType.KeyDown)
+        {
+            window.Close();
+            return;
+        }
+    }
+}
