@@ -9,7 +9,7 @@ namespace KappaDuck.Aquila.Events;
 public enum EventType
 {
     /// <summary>
-    /// No event. Do not use this value. It purpose is to used for <see cref="Event.Push(Span{SdlEvent})"/>.
+    /// No event. Do not use this value. It purpose is to used for <see cref="Event.Push(Span{SDLEvent})"/>.
     /// </summary>
     None = 0x0,
 

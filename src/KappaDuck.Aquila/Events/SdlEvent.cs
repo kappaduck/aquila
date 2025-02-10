@@ -9,7 +9,7 @@ namespace KappaDuck.Aquila.Events;
 /// Represents an SDL event.
 /// </summary>
 [StructLayout(LayoutKind.Explicit)]
-public struct SdlEvent
+public struct SDLEvent
 {
     /// <summary>
     /// The type of the event.
@@ -22,6 +22,12 @@ public struct SdlEvent
     /// </summary>
     [FieldOffset(0)]
     public DisplayEvent Display;
+
+    /// <summary>
+    /// The window event data.
+    /// </summary>
+    [FieldOffset(0)]
+    public WindowEvent Window;
 
     [FieldOffset(0)]
     private unsafe fixed byte _padding[128];
