@@ -202,4 +202,8 @@ internal static partial class NativeMethods
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(BoolMarshaller))]
     internal static partial bool SDL_SyncWindow(WindowHandle window);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void SDL_WarpMouseInWindow(WindowHandle handle, float x, float y);
 }

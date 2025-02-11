@@ -1,13 +1,201 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Events;
+using KappaDuck.Aquila.Exceptions;
+using KappaDuck.Aquila.Geometry;
+using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Video.Windows;
+using System.Runtime.InteropServices;
+
 namespace KappaDuck.Aquila.Inputs;
 
 /// <summary>
 /// A mouse input.
 /// </summary>
-public static class Mouse
+public sealed class Mouse
 {
+    internal Mouse(uint id)
+    {
+        Id = id;
+        Name = NativeMethods.SDL_GetMouseNameForID(id);
+    }
+
+    /// <summary>
+    /// Gets SDL's cache for the synchronous mouse button state and the window-relative SDL-cursor position.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It returns the cached synchronous state as SDL understands it from the last pump of the event queue.
+    /// </para>
+    /// <para>To query the platform for immediate asynchronous state, use <see cref="GlobalState"/>.</para>
+    /// <para>
+    /// In relative mode, the platform-cursor's position usually contradicts the SDL-cursor's position as
+    /// manually calculated from <see cref="CachedState"/> and <see cref="Window.Position"/>.
+    /// </para>
+    /// </remarks>
+    public static State CachedState
+    {
+        get
+        {
+            ButtonState buttons = NativeMethods.SDL_GetMouseState(out float x, out float y);
+            return new State(buttons, new Point<float>(x, y));
+        }
+    }
+
+    /// <summary>
+    /// Gets the asynchronous mouse button state and the desktop-relative platform-cursor position.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It immediately queries the platform for the most recent asynchronous state,
+    /// more costly than retrieving <see cref="CachedState"/>.
+    /// </para>
+    /// <para>
+    /// In relative mode, the platform-cursor's position usually contradicts the SDL-cursor's position as
+    /// manually calculated from <see cref="CachedState"/> and <see cref="Window.Position"/>.
+    /// </para>
+    /// </remarks>
+    public static State GlobalState
+    {
+        get
+        {
+            ButtonState buttons = NativeMethods.SDL_GetGlobalMouseState(out float x, out float y);
+            return new State(buttons, new Point<float>(x, y));
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether a mouse is currently connected.
+    /// </summary>
+    public static bool HasMouse => NativeMethods.SDL_HasMouse();
+
+    /// <summary>
+    /// Gets the instance id of the mouse.
+    /// </summary>
+    public uint Id { get; }
+
+    /// <summary>
+    /// Gets the name of the mouse.
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Gets SDL's cache for the synchronous mouse button state and accumulated mouse delta since last call.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// It returns the cached synchronous state as SDL understands it from the last pump of the event queue.
+    /// </para>
+    /// <para>To query the platform for immediate asynchronous state, use <see cref="GlobalState"/>.</para>
+    /// <para>
+    /// It is useful for reducing overhead by processing relative mouse inputs in one go per-frame
+    /// instead of individually per-event, at the expense of losing the order between events within the frame
+    /// (e.g. quickly pressing and releasing a button within the same frame).
+    /// </para>
+    /// </remarks>
+    public static State RelativeState
+    {
+        get
+        {
+            ButtonState buttons = NativeMethods.SDL_GetRelativeMouseState(out float x, out float y);
+            return new State(buttons, new Point<float>(x, y));
+        }
+    }
+
+    /// <summary>
+    /// Get a list of currently connected mice.
+    /// </summary>
+    /// <remarks>
+    /// This will include any device or virtual driver that includes mouse functionality,
+    /// including some game controllers, KVM switches, etc. You should wait for input from a device
+    /// before you consider it actively in use.
+    /// </remarks>
+    /// <returns>The list of connected mice.</returns>
+    public static Mouse[] GetMice()
+    {
+        Mouse[] mice;
+
+        unsafe
+        {
+            uint* ids = NativeMethods.SDL_GetMice(out int length);
+
+            if (ids is null)
+                return [];
+
+            mice = new Mouse[length];
+
+            for (int i = 0; i < length; i++)
+                mice[i] = new Mouse(ids[i]);
+
+            NativeMethods.Free(ids);
+        }
+
+        return mice;
+    }
+
+    /// <summary>
+    /// Move the mouse to the given position in global screen space.
+    /// </summary>
+    /// <remarks>
+    /// <para>It generates a <see cref="EventType.MouseMotion"/> event.</para>
+    /// <para>It will not move the mouse when used over Microsoft Remote Desktop.</para>
+    /// </remarks>
+    /// <param name="x">The x-coordinate in global screen space.</param>
+    /// <param name="y">The y-coordinate in global screen space.</param>
+    /// <exception cref="SDLException">An error occurred while moving the mouse.</exception>
+    public static void Warp(float x, float y)
+    {
+        if (!NativeMethods.SDL_WarpMouseGlobal(x, y))
+            SDLException.Throw();
+    }
+
+    /// <summary>
+    /// Move the mouse to the given position in global screen space.
+    /// </summary>
+    /// <remarks>
+    /// <para>It generates a <see cref="EventType.MouseMotion"/> event.</para>
+    /// <para>It will not move the mouse when used over Microsoft Remote Desktop.</para>
+    /// </remarks>
+    /// <param name="position">The position in global screen space.</param>
+    /// <exception cref="SDLException">An error occurred while moving the mouse.</exception>
+    public static void Warp(Point<float> position) => Warp(position.X, position.Y);
+
+    /// <summary>
+    /// Represents the state of the mouse.
+    /// </summary>
+    [StructLayout(LayoutKind.Auto)]
+    public readonly struct State
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="State"/> struct.
+        /// </summary>
+        /// <param name="buttons">The state of the mouse buttons.</param>
+        /// <param name="position">The current position of the mouse.</param>
+        internal State(ButtonState buttons, Point<float> position)
+        {
+            Buttons = buttons;
+            Position = position;
+        }
+
+        /// <summary>
+        /// Gets the state of the mouse buttons.
+        /// </summary>
+        public readonly ButtonState Buttons { get; }
+
+        /// <summary>
+        /// Gets the current position of the mouse.
+        /// </summary>
+        public readonly Point<float> Position { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the button is pressed.
+        /// </summary>
+        /// <param name="button">The mouse button.</param>
+        /// <returns><see langword="true"/> if the button is pressed; otherwise, <see langword="false"/>.</returns>
+        public bool IsButtonDown(Button button) => (Buttons & (ButtonState)(1 << ((int)button - 1))) != ButtonState.None;
+    }
+
     /// <summary>
     /// Represents a mouse button.
     /// </summary>
@@ -48,6 +236,9 @@ public static class Mouse
     /// <summary>
     /// Represents the state of the mouse buttons.
     /// </summary>
+    /// <remarks>
+    /// It is a mask of the current button state.
+    /// </remarks>
     [Flags]
     public enum ButtonState : uint
     {
