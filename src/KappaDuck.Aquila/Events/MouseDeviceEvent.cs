@@ -6,27 +6,17 @@ using System.Runtime.InteropServices;
 namespace KappaDuck.Aquila.Events;
 
 /// <summary>
-/// Display state change event data.
+/// Represents a mouse device event.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public readonly struct DisplayEvent
+public readonly struct MouseDeviceEvent
 {
     private readonly EventType _type;
     private readonly uint _reserved;
     private readonly ulong _timestamp;
 
     /// <summary>
-    /// The associated display.
+    /// The mouse instance id which was added or removed.
     /// </summary>
-    public readonly uint Id;
-
-    /// <summary>
-    /// The event data1.
-    /// </summary>
-    public readonly int Data1;
-
-    /// <summary>
-    /// The event data2.
-    /// </summary>
-    public readonly int Data2;
+    public readonly uint Which;
 }

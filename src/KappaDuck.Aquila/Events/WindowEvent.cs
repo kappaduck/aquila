@@ -9,7 +9,7 @@ namespace KappaDuck.Aquila.Events;
 /// Represents a window event.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public struct WindowEvent
+public readonly struct WindowEvent
 {
     private readonly EventType _type;
     private readonly uint _reserved;
@@ -18,15 +18,15 @@ public struct WindowEvent
     /// <summary>
     /// The associated display.
     /// </summary>
-    public uint Id;
+    public readonly uint Id;
 
     /// <summary>
     /// The event data1.
     /// </summary>
-    public int Data1;
+    public readonly int Data1;
 
     /// <summary>
     /// The event data2.
     /// </summary>
-    public int Data2;
+    public readonly int Data2;
 }

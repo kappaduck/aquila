@@ -1039,6 +1039,27 @@ public class Window : IDisposable
     }
 
     /// <summary>
+    /// Move the mouse cursor to the given position withing the window.
+    /// </summary>
+    /// <remarks>
+    /// <para>It generates a <see cref="EventType.MouseMotion"/> event if relative mode is not enabled.</para>
+    /// <para>It will not move the mouse when used over Microsoft Remote Desktop.</para>
+    /// </remarks>
+    /// <param name="x">The x-coordinate within the window.</param>
+    /// <param name="y">The y-coordinate within the window.</param>
+    public void WarpMouse(float x, float y) => NativeMethods.SDL_WarpMouseInWindow(_handle, x, y);
+
+    /// <summary>
+    /// Move the mouse cursor to the given position withing the window.
+    /// </summary>
+    /// <remarks>
+    /// <para>It generates a <see cref="EventType.MouseMotion"/> event if relative mode is not enabled.</para>
+    /// <para>It will not move the mouse when used over Microsoft Remote Desktop.</para>
+    /// </remarks>
+    /// <param name="position">The position within the window.</param>
+    public void WarpMouse(Point<float> position) => WarpMouse(position.X, position.Y);
+
+    /// <summary>
     /// Releases the unmanaged resources used by the <see cref="Window"/> and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>

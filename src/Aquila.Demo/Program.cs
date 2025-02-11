@@ -14,7 +14,7 @@ while (window.IsOpen)
 {
     while (window.Poll(out SDLEvent e))
     {
-        if (e.Type is EventType.Quit or EventType.KeyDown)
+        if (e.Type is EventType.Quit)
         {
             window.Close();
             return;
