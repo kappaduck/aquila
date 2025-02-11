@@ -30,6 +30,24 @@ public struct SDLEvent
     public readonly MouseButtonEvent Mouse;
 
     /// <summary>
+    /// The mouse device event data.
+    /// </summary>
+    [FieldOffset(0)]
+    public readonly MouseDeviceEvent MouseDevice;
+
+    /// <summary>
+    /// The mouse motion event data.
+    /// </summary>
+    [FieldOffset(0)]
+    public readonly MouseMotionEvent Motion;
+
+    /// <summary>
+    /// The mouse wheel event data.
+    /// </summary>
+    [FieldOffset(0)]
+    public readonly MouseWheelEvent Wheel;
+
+    /// <summary>
     /// The window event data.
     /// </summary>
     [FieldOffset(0)]
