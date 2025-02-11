@@ -15,19 +15,25 @@ public struct SDLEvent
     /// The type of the event.
     /// </summary>
     [FieldOffset(0)]
-    public EventType Type;
+    public readonly EventType Type;
 
     /// <summary>
     /// The display event data.
     /// </summary>
     [FieldOffset(0)]
-    public DisplayEvent Display;
+    public readonly DisplayEvent Display;
+
+    /// <summary>
+    /// The mouse button event data.
+    /// </summary>
+    [FieldOffset(0)]
+    public readonly MouseButtonEvent Mouse;
 
     /// <summary>
     /// The window event data.
     /// </summary>
     [FieldOffset(0)]
-    public WindowEvent Window;
+    public readonly WindowEvent Window;
 
     [FieldOffset(0)]
     private unsafe fixed byte _padding[128];

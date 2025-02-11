@@ -9,7 +9,7 @@ namespace KappaDuck.Aquila.Events;
 /// Display state change event data.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public struct DisplayEvent
+public readonly struct DisplayEvent
 {
     private readonly EventType _type;
     private readonly uint _reserved;
@@ -18,15 +18,15 @@ public struct DisplayEvent
     /// <summary>
     /// The associated display.
     /// </summary>
-    public uint Id;
+    public readonly uint Id;
 
     /// <summary>
     /// The event data1.
     /// </summary>
-    public int Data1;
+    public readonly int Data1;
 
     /// <summary>
     /// The event data2.
     /// </summary>
-    public int Data2;
+    public readonly int Data2;
 }
