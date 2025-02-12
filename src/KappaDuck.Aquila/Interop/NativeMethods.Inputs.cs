@@ -35,11 +35,11 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
+    [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_HasMouse();
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
+    [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_WarpMouseGlobal(float x, float y);
 }
