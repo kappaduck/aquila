@@ -554,9 +554,9 @@ public sealed partial class Keyboard
         Up = 0x40000052u,
 
         /// <summary>
-        /// Num lock clear.
+        /// Num lock.
         /// </summary>
-        NumLockClear = 0x40000053u,
+        NumLock = 0x40000053u,
 
         /// <summary>
         /// Keypad divide.

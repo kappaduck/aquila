@@ -16,7 +16,7 @@ public readonly struct WindowEvent
     private readonly ulong _timestamp;
 
     /// <summary>
-    /// The associated display.
+    /// The associated window.
     /// </summary>
     public readonly uint Id;
 
