@@ -1,11 +1,9 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Interop.Marshallers;
 using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila.Interop;
 
@@ -31,7 +29,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
+    [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_InitSubSystem(SubSystem subSystem);
 
     [LibraryImport(LibraryName)]

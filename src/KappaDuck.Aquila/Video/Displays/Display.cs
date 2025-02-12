@@ -255,22 +255,15 @@ public sealed class Display
     /// <exception cref="SDLException">Failed to get the displays.</exception>
     public static Display[] GetDisplays()
     {
-        Display[] displays;
+        ReadOnlySpan<uint> ids = NativeMethods.SDL_GetDisplays(out _);
 
-        unsafe
-        {
-            uint* ids = NativeMethods.SDL_GetDisplays(out int length);
+        if (ids.IsEmpty)
+            return [];
 
-            if (ids is null)
-                return [];
+        Display[] displays = new Display[ids.Length];
 
-            displays = new Display[length];
-
-            for (int i = 0; i < length; i++)
-                displays[i] = new Display(ids[i]);
-
-            NativeMethods.Free(ids);
-        }
+        for (int i = 0; i < ids.Length; i++)
+            displays[i] = new Display(ids[i]);
 
         return displays;
     }

@@ -14,8 +14,8 @@ internal static partial class NativeMethods
 {
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
-    internal static partial bool SDL_GetClosestFullscreenDisplayMode(uint display, int width, int height, float refreshRate, [MarshalUsing(typeof(BoolMarshaller))] bool includeHighDensityMode, out DisplayMode displayMode);
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_GetClosestFullscreenDisplayMode(uint display, int width, int height, float refreshRate, [MarshalAs(UnmanagedType.I1)] bool includeHighDensityMode, out DisplayMode displayMode);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -27,7 +27,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string SDL_GetCurrentVideoDriver();
 
     [LibraryImport(LibraryName)]
@@ -36,11 +36,12 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static unsafe partial uint* SDL_GetDisplays(out int count);
+    [return: MarshalUsing(typeof(CallerOwnedArrayMarshaller<,>), CountElementName = "length")]
+    internal static unsafe partial Span<uint> SDL_GetDisplays(out int length);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
+    [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_GetDisplayBounds(uint display, out Rectangle<int> bounds);
 
     [LibraryImport(LibraryName)]
@@ -57,7 +58,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string? SDL_GetDisplayName(uint display);
 
     [LibraryImport(LibraryName)]
@@ -66,7 +67,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(BoolMarshaller))]
+    [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_GetDisplayUsableBounds(uint display, out Rectangle<int> bounds);
 
     [LibraryImport(LibraryName)]
@@ -87,6 +88,6 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string SDL_GetVideoDriver(int index);
 }
