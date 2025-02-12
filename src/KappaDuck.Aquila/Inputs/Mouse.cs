@@ -114,22 +114,15 @@ public sealed class Mouse
     /// <returns>The list of connected mice.</returns>
     public static Mouse[] GetMice()
     {
-        Mouse[] mice;
+        ReadOnlySpan<uint> ids = NativeMethods.SDL_GetMice(out _);
 
-        unsafe
-        {
-            uint* ids = NativeMethods.SDL_GetMice(out int length);
+        if (ids.IsEmpty)
+            return [];
 
-            if (ids is null)
-                return [];
+        Mouse[] mice = new Mouse[ids.Length];
 
-            mice = new Mouse[length];
-
-            for (int i = 0; i < length; i++)
-                mice[i] = new Mouse(ids[i]);
-
-            NativeMethods.Free(ids);
-        }
+        for (int i = 0; i < ids.Length; i++)
+            mice[i] = new Mouse(ids[i]);
 
         return mice;
     }
