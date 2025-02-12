@@ -40,7 +40,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string SDL_GetError();
 
     [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
@@ -57,7 +57,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string SDL_GetStringProperty(uint propertiesId, string name, string defaultValue);
 
     [LibraryImport(LibraryName)]

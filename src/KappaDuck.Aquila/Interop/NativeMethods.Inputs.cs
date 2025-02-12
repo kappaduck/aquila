@@ -29,7 +29,7 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalUsing(typeof(OwnedStringMarshaller))]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string SDL_GetMouseNameForID(uint mouse);
 
     [LibraryImport(LibraryName)]
