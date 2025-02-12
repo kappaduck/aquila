@@ -72,17 +72,17 @@ public sealed partial class Keyboard
         /// <summary>
         /// The left meta key. (Windows key, Command key, etc...)
         /// </summary>
-        LeftMeta = 0x0400,
+        LeftGui = 0x0400,
 
         /// <summary>
         /// The right meta key. (Windows key, Command key, etc...)
         /// </summary>
-        RightMeta = 0x0800,
+        RightGui = 0x0800,
 
         /// <summary>
         /// Any Meta key.
         /// </summary>
-        Meta = LeftMeta | RightMeta,
+        Gui = LeftGui | RightGui,
 
         /// <summary>
         /// The num lock key (may be located on an extended keypad).
