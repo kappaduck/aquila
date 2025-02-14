@@ -358,6 +358,20 @@ public class Window : IDisposable
     }
 
     /// <summary>
+    /// Gets a value indicating whether the screen keyboard is visible.
+    /// </summary>
+    public bool IsScreenKeyboardVisible
+    {
+        get
+        {
+            if (!IsOpen)
+                return false;
+
+            return NativeMethods.SDL_ScreenKeyboardShown(_handle);
+        }
+    }
+
+    /// <summary>
     /// Gets or sets a value indicating whether the window has grabbed keyboard input.
     /// </summary>
     /// <remarks>
