@@ -114,6 +114,11 @@ internal static partial class NativeMethods
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_ScreenKeyboardShown(WindowHandle window);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_SetWindowAlwaysOnTop(WindowHandle window, [MarshalAs(UnmanagedType.I1)] bool onTop);
 
     [LibraryImport(LibraryName)]
@@ -134,7 +139,7 @@ internal static partial class NativeMethods
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static unsafe partial bool SDL_SetWindowFullscreen(WindowHandle window, [MarshalAs(UnmanagedType.I1)] bool mode);
+    internal static partial bool SDL_SetWindowFullscreen(WindowHandle window, [MarshalAs(UnmanagedType.I1)] bool mode);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
