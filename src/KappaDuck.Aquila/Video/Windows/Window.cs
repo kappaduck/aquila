@@ -1,6 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Components;
 using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
@@ -16,6 +17,10 @@ namespace KappaDuck.Aquila.Video.Windows;
 /// </summary>
 public class Window : IDisposable
 {
+    private const string Win32PropertyName = "SDL.window.win32.hwnd";
+
+    private readonly List<IComponent> _components = [];
+
     private WindowHandle _handle;
 
     private bool _disposed;
@@ -758,6 +763,21 @@ public class Window : IDisposable
     public int WidthInPixel { get; private set; }
 
     /// <summary>
+    /// Adds a component to the window.
+    /// </summary>
+    /// <remarks>
+    /// You don't need to dispose the component. It will be disposed when the window is disposed.
+    /// </remarks>
+    /// <param name="component">The component to add.</param>
+    public void AddComponent(IComponent component)
+    {
+        nint win32 = GetWin32Handle();
+        component.Attach(win32);
+
+        _components.Add(component);
+    }
+
+    /// <summary>
     /// Closes the window.
     /// </summary>
     /// <remarks>
@@ -985,6 +1005,20 @@ public class Window : IDisposable
     }
 
     /// <summary>
+    /// Removes a component from the window.
+    /// </summary>
+    /// <remarks>
+    /// You don't need to dispose the component. It will be disposed when the window is disposed
+    /// even if you remove it from the window.
+    /// </remarks>
+    /// <param name="component">The component to remove.</param>
+    public void RemoveComponent(IComponent component)
+    {
+        nint win32 = GetWin32Handle();
+        component.Detach(win32);
+    }
+
+    /// <summary>
     /// Request that the size and position of a minimized or maximized window be restored.
     /// </summary>
     /// <remarks>
@@ -1083,7 +1117,17 @@ public class Window : IDisposable
             return;
 
         if (disposing)
+        {
+            foreach (IComponent component in _components)
+            {
+                if (component is IDisposable disposable)
+                    disposable.Dispose();
+            }
+
+            _components.Clear();
+
             _handle.Dispose();
+        }
 
         _disposed = true;
     }
@@ -1108,5 +1152,11 @@ public class Window : IDisposable
         _position = new Point<int>(x, y);
 
         return handle;
+    }
+
+    private nint GetWin32Handle()
+    {
+        uint propertiesId = SDLNative.SDL_GetWindowProperties(_handle);
+        return SDLNative.SDL_GetPointerProperty(propertiesId, Win32PropertyName, nint.Zero);
     }
 }

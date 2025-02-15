@@ -83,6 +83,10 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial uint SDL_GetWindowProperties(WindowHandle window);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_GetWindowSafeArea(WindowHandle window, out Rectangle<int> area);
 

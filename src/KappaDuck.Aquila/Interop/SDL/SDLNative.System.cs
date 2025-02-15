@@ -51,6 +51,10 @@ internal static partial class SDLNative
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial long SDL_GetNumberProperty(uint propertiesId, string name, long defaultValue);
 
+    [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial nint SDL_GetPointerProperty(uint propertiesId, string name, nint defaultValue);
+
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial PowerState SDL_GetPowerInfo(out int seconds, out int percent);
