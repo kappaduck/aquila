@@ -1,7 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 
@@ -66,8 +66,8 @@ public sealed class SDLException : Exception
     [DoesNotReturn]
     internal static void Throw()
     {
-        string message = NativeMethods.SDL_GetError();
-        NativeMethods.SDL_ClearError();
+        string message = SDLNative.SDL_GetError();
+        SDLNative.SDL_ClearError();
 
         throw new SDLException(message);
     }

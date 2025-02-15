@@ -7,9 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace KappaDuck.Aquila.Interop;
+namespace KappaDuck.Aquila.Interop.SDL;
 
-internal static partial class NativeMethods
+internal static partial class SDLNative
 {
     internal static int Peek(Span<SDLEvent> events, EventType minType, EventType? maxType = null)
     {

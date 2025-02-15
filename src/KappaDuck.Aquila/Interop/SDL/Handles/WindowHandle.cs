@@ -3,7 +3,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace KappaDuck.Aquila.Interop.Handles;
+namespace KappaDuck.Aquila.Interop.SDL.Handles;
 
 internal sealed class WindowHandle() : SafeHandle(nint.Zero, ownsHandle: true)
 {
@@ -13,7 +13,7 @@ internal sealed class WindowHandle() : SafeHandle(nint.Zero, ownsHandle: true)
     {
         if (!IsInvalid)
         {
-            NativeMethods.SDL_DestroyWindow(handle);
+            SDLNative.SDL_DestroyWindow(handle);
 
             SetHandle(nint.Zero);
             SetHandleAsInvalid();

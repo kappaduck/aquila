@@ -4,7 +4,7 @@
 using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.Video.Windows;
 using System.Runtime.InteropServices;
 
@@ -18,7 +18,7 @@ public sealed class Mouse
     internal Mouse(uint id)
     {
         Id = id;
-        Name = NativeMethods.SDL_GetMouseNameForID(id);
+        Name = SDLNative.SDL_GetMouseNameForID(id);
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public sealed class Mouse
     {
         get
         {
-            ButtonState buttons = NativeMethods.SDL_GetMouseState(out float x, out float y);
+            ButtonState buttons = SDLNative.SDL_GetMouseState(out float x, out float y);
             return new State(buttons, new Point<float>(x, y));
         }
     }
@@ -60,7 +60,7 @@ public sealed class Mouse
     {
         get
         {
-            ButtonState buttons = NativeMethods.SDL_GetGlobalMouseState(out float x, out float y);
+            ButtonState buttons = SDLNative.SDL_GetGlobalMouseState(out float x, out float y);
             return new State(buttons, new Point<float>(x, y));
         }
     }
@@ -68,7 +68,7 @@ public sealed class Mouse
     /// <summary>
     /// Gets a value indicating whether a mouse is currently connected.
     /// </summary>
-    public static bool HasMouse => NativeMethods.SDL_HasMouse();
+    public static bool HasMouse => SDLNative.SDL_HasMouse();
 
     /// <summary>
     /// Gets the instance id of the mouse.
@@ -98,7 +98,7 @@ public sealed class Mouse
     {
         get
         {
-            ButtonState buttons = NativeMethods.SDL_GetRelativeMouseState(out float x, out float y);
+            ButtonState buttons = SDLNative.SDL_GetRelativeMouseState(out float x, out float y);
             return new State(buttons, new Point<float>(x, y));
         }
     }
@@ -114,7 +114,7 @@ public sealed class Mouse
     /// <returns>The list of connected mice.</returns>
     public static Mouse[] GetMice()
     {
-        ReadOnlySpan<uint> ids = NativeMethods.SDL_GetMice(out _);
+        ReadOnlySpan<uint> ids = SDLNative.SDL_GetMice(out _);
 
         if (ids.IsEmpty)
             return [];
@@ -139,7 +139,7 @@ public sealed class Mouse
     /// <exception cref="SDLException">An error occurred while moving the mouse.</exception>
     public static void Warp(float x, float y)
     {
-        if (!NativeMethods.SDL_WarpMouseGlobal(x, y))
+        if (!SDLNative.SDL_WarpMouseGlobal(x, y))
             SDLException.Throw();
     }
 

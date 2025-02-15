@@ -5,8 +5,8 @@ using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Graphics;
-using KappaDuck.Aquila.Interop;
-using KappaDuck.Aquila.Interop.Handles;
+using KappaDuck.Aquila.Interop.SDL;
+using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Video.Displays;
 
 namespace KappaDuck.Aquila.Video.Windows;
@@ -66,7 +66,7 @@ public class Window : IDisposable
 
             _state = value ? (_state | WindowState.AlwaysOnTop) : (_state & ~WindowState.AlwaysOnTop);
 
-            if (!NativeMethods.SDL_SetWindowAlwaysOnTop(_handle, value))
+            if (!SDLNative.SDL_SetWindowAlwaysOnTop(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -89,7 +89,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowAspectRatio(_handle, value.Minimum, value.Maximum))
+            if (!SDLNative.SDL_SetWindowAspectRatio(_handle, value.Minimum, value.Maximum))
                 SDLException.Throw();
         }
     }
@@ -112,7 +112,7 @@ public class Window : IDisposable
 
             _state = value ? (_state | WindowState.Borderless) : (_state & ~WindowState.Borderless);
 
-            if (!NativeMethods.SDL_SetWindowBordered(_handle, !value))
+            if (!SDLNative.SDL_SetWindowBordered(_handle, !value))
                 SDLException.Throw();
         }
     }
@@ -134,7 +134,7 @@ public class Window : IDisposable
             if (!IsOpen || Borderless)
                 return default;
 
-            NativeMethods.SDL_GetWindowBordersSize(_handle, out int top, out int left, out int bottom, out int right);
+            SDLNative.SDL_GetWindowBordersSize(_handle, out int top, out int left, out int bottom, out int right);
             return (top, left, bottom, right);
         }
     }
@@ -153,7 +153,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return Display.GetPrimaryDisplay();
 
-            uint displayId = NativeMethods.SDL_GetDisplayForWindow(_handle);
+            uint displayId = SDLNative.SDL_GetDisplayForWindow(_handle);
 
             SDLException.ThrowIfZero(displayId);
 
@@ -183,7 +183,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return 0.0f;
 
-            float scale = NativeMethods.SDL_GetWindowDisplayScale(_handle);
+            float scale = SDLNative.SDL_GetWindowDisplayScale(_handle);
 
             SDLException.ThrowIfZero(scale);
 
@@ -209,7 +209,7 @@ public class Window : IDisposable
 
             _state = value ? (_state & ~WindowState.NotFocusable) : (_state | WindowState.NotFocusable);
 
-            if (!NativeMethods.SDL_SetWindowFocusable(_handle, value))
+            if (!SDLNative.SDL_SetWindowFocusable(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -232,7 +232,7 @@ public class Window : IDisposable
 
             _state = value ? (_state | WindowState.Fullscreen) : (_state & ~WindowState.Fullscreen);
 
-            if (!NativeMethods.SDL_SetWindowFullscreen(_handle, value))
+            if (!SDLNative.SDL_SetWindowFullscreen(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -268,7 +268,7 @@ public class Window : IDisposable
                 return;
             }
 
-            if (!NativeMethods.SetWindowFullscreenMode(_handle, value))
+            if (!SDLNative.SetWindowFullscreenMode(_handle, value))
                 SDLException.Throw();
 
             field = value;
@@ -320,7 +320,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowSize(_handle, _width, value))
+            if (!SDLNative.SDL_SetWindowSize(_handle, _width, value))
                 SDLException.Throw();
         }
     }
@@ -367,7 +367,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return false;
 
-            return NativeMethods.SDL_ScreenKeyboardShown(_handle);
+            return SDLNative.SDL_ScreenKeyboardShown(_handle);
         }
     }
 
@@ -403,7 +403,7 @@ public class Window : IDisposable
 
             _state = value ? (_state | WindowState.KeyboardGrabbed) : (_state & ~WindowState.KeyboardGrabbed);
 
-            if (!NativeMethods.SDL_SetWindowKeyboardGrab(_handle, value))
+            if (!SDLNative.SDL_SetWindowKeyboardGrab(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -435,7 +435,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowMaximumSize(_handle, value.Width, value.Height))
+            if (!SDLNative.SDL_SetWindowMaximumSize(_handle, value.Width, value.Height))
                 SDLException.Throw();
         }
     }
@@ -467,7 +467,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowMinimumSize(_handle, value.Width, value.Height))
+            if (!SDLNative.SDL_SetWindowMinimumSize(_handle, value.Width, value.Height))
                 SDLException.Throw();
         }
     }
@@ -499,7 +499,7 @@ public class Window : IDisposable
                 return;
             }
 
-            if (!NativeMethods.SetWindowMouseRect(_handle, value))
+            if (!SDLNative.SetWindowMouseRect(_handle, value))
                 SDLException.Throw();
 
             field = value;
@@ -524,7 +524,7 @@ public class Window : IDisposable
 
             _state = value ? (_state | WindowState.MouseGrabbed) : (_state & ~WindowState.MouseGrabbed);
 
-            if (!NativeMethods.SDL_SetWindowMouseGrab(_handle, value))
+            if (!SDLNative.SDL_SetWindowMouseGrab(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -561,7 +561,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowOpacity(_handle, value))
+            if (!SDLNative.SDL_SetWindowOpacity(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -584,7 +584,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return 0.0f;
 
-            float density = NativeMethods.SDL_GetWindowPixelDensity(_handle);
+            float density = SDLNative.SDL_GetWindowPixelDensity(_handle);
 
             SDLException.ThrowIfZero(density);
 
@@ -603,7 +603,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return PixelFormat.Unknown;
 
-            PixelFormat format = NativeMethods.SDL_GetWindowPixelFormat(_handle);
+            PixelFormat format = SDLNative.SDL_GetWindowPixelFormat(_handle);
 
             SDLException.ThrowIf(format == PixelFormat.Unknown);
 
@@ -641,7 +641,7 @@ public class Window : IDisposable
             if (!IsOpen || Fullscreen || Maximized)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowPosition(_handle, value.X, value.Y))
+            if (!SDLNative.SDL_SetWindowPosition(_handle, value.X, value.Y))
                 SDLException.Throw();
 
             _position = value;
@@ -666,7 +666,7 @@ public class Window : IDisposable
 
             _state = value ? (_state | WindowState.Resizable) : (_state & ~WindowState.Resizable);
 
-            if (!NativeMethods.SDL_SetWindowResizable(_handle, value))
+            if (!SDLNative.SDL_SetWindowResizable(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -689,7 +689,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return default;
 
-            if (!NativeMethods.SDL_GetWindowSafeArea(_handle, out Rectangle<int> area))
+            if (!SDLNative.SDL_GetWindowSafeArea(_handle, out Rectangle<int> area))
                 SDLException.Throw();
 
             return area;
@@ -710,7 +710,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowTitle(_handle, value))
+            if (!SDLNative.SDL_SetWindowTitle(_handle, value))
                 SDLException.Throw();
         }
     }
@@ -747,7 +747,7 @@ public class Window : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!NativeMethods.SDL_SetWindowSize(_handle, value, _height))
+            if (!SDLNative.SDL_SetWindowSize(_handle, value, _height))
                 SDLException.Throw();
         }
     }
@@ -789,12 +789,12 @@ public class Window : IDisposable
 
         _handle = CreateWindow(title, width, height, state);
 
-        NativeMethods.SDL_SetWindowAspectRatio(_handle, AspectRatio.Minimum, AspectRatio.Maximum);
-        NativeMethods.SetWindowFullscreenMode(_handle, FullscreenMode);
-        NativeMethods.SDL_SetWindowMaximumSize(_handle, MaximumSize.Width, MaximumSize.Height);
-        NativeMethods.SDL_SetWindowMinimumSize(_handle, MinimumSize.Width, MinimumSize.Height);
-        NativeMethods.SetWindowMouseRect(_handle, MouseClip);
-        NativeMethods.SDL_SetWindowOpacity(_handle, Opacity);
+        SDLNative.SDL_SetWindowAspectRatio(_handle, AspectRatio.Minimum, AspectRatio.Maximum);
+        SDLNative.SetWindowFullscreenMode(_handle, FullscreenMode);
+        SDLNative.SDL_SetWindowMaximumSize(_handle, MaximumSize.Width, MaximumSize.Height);
+        SDLNative.SDL_SetWindowMinimumSize(_handle, MinimumSize.Width, MinimumSize.Height);
+        SDLNative.SetWindowMouseRect(_handle, MouseClip);
+        SDLNative.SDL_SetWindowOpacity(_handle, Opacity);
 
         IsOpen = true;
     }
@@ -816,7 +816,7 @@ public class Window : IDisposable
         if (!IsOpen)
             return;
 
-        if (!NativeMethods.SDL_FlashWindow(_handle, state))
+        if (!SDLNative.SDL_FlashWindow(_handle, state))
             SDLException.Throw();
     }
 
@@ -829,7 +829,7 @@ public class Window : IDisposable
         if (!IsOpen)
             return;
 
-        if (!NativeMethods.SDL_HideWindow(_handle))
+        if (!SDLNative.SDL_HideWindow(_handle))
             SDLException.Throw();
 
         _state |= WindowState.Hidden;
@@ -861,7 +861,7 @@ public class Window : IDisposable
         if (!IsOpen || Maximized || !Resizable)
             return;
 
-        if (!NativeMethods.SDL_MaximizeWindow(_handle))
+        if (!SDLNative.SDL_MaximizeWindow(_handle))
             SDLException.Throw();
 
         _state &= ~WindowState.Minimized;
@@ -891,7 +891,7 @@ public class Window : IDisposable
         if (!IsOpen || Minimized)
             return;
 
-        if (!NativeMethods.SDL_MinimizeWindow(_handle))
+        if (!SDLNative.SDL_MinimizeWindow(_handle))
             SDLException.Throw();
 
         _state &= ~WindowState.Maximized;
@@ -978,7 +978,7 @@ public class Window : IDisposable
         if (!IsOpen)
             return;
 
-        if (!NativeMethods.SDL_RaiseWindow(_handle))
+        if (!SDLNative.SDL_RaiseWindow(_handle))
             SDLException.Throw();
 
         _state |= WindowState.InputFocus;
@@ -1007,7 +1007,7 @@ public class Window : IDisposable
         if (!IsOpen)
             return;
 
-        if (!NativeMethods.SDL_RestoreWindow(_handle))
+        if (!SDLNative.SDL_RestoreWindow(_handle))
             SDLException.Throw();
     }
 
@@ -1024,7 +1024,7 @@ public class Window : IDisposable
         if (!IsOpen)
             return;
 
-        if (!NativeMethods.SDL_ShowWindow(_handle))
+        if (!SDLNative.SDL_ShowWindow(_handle))
             SDLException.Throw();
 
         _state &= ~WindowState.Hidden;
@@ -1048,7 +1048,7 @@ public class Window : IDisposable
         if (!IsOpen)
             return;
 
-        if (!NativeMethods.SDL_SyncWindow(_handle))
+        if (!SDLNative.SDL_SyncWindow(_handle))
             SDLException.Throw();
     }
 
@@ -1061,7 +1061,7 @@ public class Window : IDisposable
     /// </remarks>
     /// <param name="x">The x-coordinate within the window.</param>
     /// <param name="y">The y-coordinate within the window.</param>
-    public void WarpMouse(float x, float y) => NativeMethods.SDL_WarpMouseInWindow(_handle, x, y);
+    public void WarpMouse(float x, float y) => SDLNative.SDL_WarpMouseInWindow(_handle, x, y);
 
     /// <summary>
     /// Move the mouse cursor to the given position withing the window.
@@ -1090,12 +1090,12 @@ public class Window : IDisposable
 
     private WindowHandle CreateWindow(string title, int width, int height, WindowState state)
     {
-        WindowHandle handle = NativeMethods.SDL_CreateWindow(title, width, height, state);
+        WindowHandle handle = SDLNative.SDL_CreateWindow(title, width, height, state);
 
         if (handle.IsInvalid)
             SDLException.Throw();
 
-        Id = NativeMethods.SDL_GetWindowID(handle);
+        Id = SDLNative.SDL_GetWindowID(handle);
         SDLException.ThrowIfZero(Id);
 
         _state = state;
@@ -1104,7 +1104,7 @@ public class Window : IDisposable
         _width = width;
         _height = height;
 
-        NativeMethods.SDL_GetWindowPosition(handle, out int x, out int y);
+        SDLNative.SDL_GetWindowPosition(handle, out int x, out int y);
         _position = new Point<int>(x, y);
 
         return handle;

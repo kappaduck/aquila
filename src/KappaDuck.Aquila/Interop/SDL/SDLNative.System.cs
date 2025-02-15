@@ -1,15 +1,15 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Interop.Marshallers;
+using KappaDuck.Aquila.Interop.SDL.Marshallers;
 using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace KappaDuck.Aquila.Interop;
+namespace KappaDuck.Aquila.Interop.SDL;
 
-internal static partial class NativeMethods
+internal static partial class SDLNative
 {
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

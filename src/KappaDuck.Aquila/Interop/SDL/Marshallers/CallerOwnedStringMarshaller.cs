@@ -4,13 +4,13 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace KappaDuck.Aquila.Interop.Marshallers;
+namespace KappaDuck.Aquila.Interop.SDL.Marshallers;
 
 /// <summary>
 /// Marshaller for strings that are owned by the caller.
 /// </summary>
 /// <remarks>
-/// Caller responsible for freeing the memory. It uses the <see cref="NativeMethods.Free(nint)"/> method.
+/// Caller responsible for freeing the memory. It uses the <see cref="SDLNative.Free(nint)"/> method.
 /// </remarks>
 [CustomMarshaller(typeof(string), MarshalMode.ManagedToUnmanagedOut, typeof(CallerOwnedStringMarshaller))]
 internal static class CallerOwnedStringMarshaller
@@ -18,5 +18,5 @@ internal static class CallerOwnedStringMarshaller
     internal static string? ConvertToManaged(nint unmanaged)
         => Marshal.PtrToStringUTF8(unmanaged);
 
-    internal static void Free(nint unmanaged) => NativeMethods.Free(unmanaged);
+    internal static void Free(nint unmanaged) => SDLNative.Free(unmanaged);
 }

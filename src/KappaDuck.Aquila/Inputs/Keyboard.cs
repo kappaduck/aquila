@@ -3,7 +3,7 @@
 
 using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.Video.Windows;
 using System.Text;
 
@@ -17,18 +17,18 @@ public sealed partial class Keyboard
     internal Keyboard(uint id)
     {
         Id = id;
-        Name = NativeMethods.SDL_GetKeyboardNameForID(id);
+        Name = SDLNative.SDL_GetKeyboardNameForID(id);
     }
 
     /// <summary>
     /// Gets a value indicating whether a keyboard is currently connected.
     /// </summary>
-    public static bool HasKeyboard => NativeMethods.SDL_HasKeyboard();
+    public static bool HasKeyboard => SDLNative.SDL_HasKeyboard();
 
     /// <summary>
     /// Gets a value indicating whether the screen keyboard is supported.
     /// </summary>
-    public static bool HasScreenKeyboardSupport => NativeMethods.SDL_HasScreenKeyboardSupport();
+    public static bool HasScreenKeyboardSupport => SDLNative.SDL_HasScreenKeyboardSupport();
 
     /// <summary>
     /// Gets the instance id of the mouse.
@@ -49,8 +49,8 @@ public sealed partial class Keyboard
     /// </remarks>
     public static Modifier ModifierState
     {
-        get => NativeMethods.SDL_GetModState();
-        set => NativeMethods.SDL_SetModState(value);
+        get => SDLNative.SDL_GetModState();
+        set => SDLNative.SDL_SetModState(value);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public sealed partial class Keyboard
     /// <param name="modifier">The modifier state to use when translating the scancode to a keycode.</param>
     /// <returns>The key code that corresponds to the given <see cref="Scancode"/> or <see cref="Keycode.Unknown"/> if the scancode doesn't correspond to a key.</returns>
     public static Keycode GetKeyFromScancode(Scancode code, Modifier? modifier = null)
-        => NativeMethods.SDL_GetKeyFromScancode(code, modifier ?? Modifier.None, keyEvents: false);
+        => SDLNative.SDL_GetKeyFromScancode(code, modifier ?? Modifier.None, keyEvents: false);
 
     /// <summary>
     /// Get the human-readable name of a key code.
@@ -75,7 +75,7 @@ public sealed partial class Keyboard
     /// </remarks>
     /// <param name="code">The key code.</param>
     /// <returns>The human-readable name of the key code or <see cref="string.Empty"/> if the key code doesn't have a name.</returns>
-    public static string GetKeyName(Keycode code) => NativeMethods.SDL_GetKeyName(code);
+    public static string GetKeyName(Keycode code) => SDLNative.SDL_GetKeyName(code);
 
     /// <summary>
     /// Get a list of currently connected keyboards.
@@ -88,7 +88,7 @@ public sealed partial class Keyboard
     /// <returns>The list of connected keyboards.</returns>
     public static Keyboard[] GetKeyboards()
     {
-        ReadOnlySpan<uint> ids = NativeMethods.SDL_GetKeyboards(out _);
+        ReadOnlySpan<uint> ids = SDLNative.SDL_GetKeyboards(out _);
 
         if (ids.IsEmpty)
             return [];
@@ -106,7 +106,7 @@ public sealed partial class Keyboard
     /// </summary>
     /// <param name="name">The human-readable scancode name.</param>
     /// <returns>The scancode or <see cref="Scancode.Unknown"/> if the name wasn't recognized.</returns>
-    public static Scancode GetScancode(string name) => NativeMethods.SDL_GetScancodeFromName(name);
+    public static Scancode GetScancode(string name) => SDLNative.SDL_GetScancodeFromName(name);
 
     /// <summary>
     /// Get the scancode corresponding to the given key code according to the current keyboard layout.
@@ -115,7 +115,7 @@ public sealed partial class Keyboard
     /// <param name="modifier">The modifier state that would be used when the scancode generates this key.</param>
     /// <returns>The scancode that corresponds to the given <see cref="Keycode"/>.</returns>
     public static Scancode GetScancode(Keycode keycode, out Modifier modifier)
-        => NativeMethods.SDL_GetScancodeFromKey(keycode, out modifier);
+        => SDLNative.SDL_GetScancodeFromKey(keycode, out modifier);
 
     /// <summary>
     /// Gets the human-readable name of the scancode.
@@ -127,7 +127,7 @@ public sealed partial class Keyboard
     /// </remarks>
     /// <param name="scancode">The scancode.</param>
     /// <returns>The human-readable name or <see cref="string.Empty"/> if the scancode doesn't have a name.</returns>
-    public static string GetScancodeName(Scancode scancode) => NativeMethods.SDL_GetScancodeName(scancode);
+    public static string GetScancodeName(Scancode scancode) => SDLNative.SDL_GetScancodeName(scancode);
 
     /// <summary>
     /// Check if a key is pressed.
@@ -146,7 +146,7 @@ public sealed partial class Keyboard
     /// <returns><see langword="true"/> if the key is pressed; otherwise, <see langword="false"/>.</returns>
     public static bool IsPressed(Scancode code)
     {
-        ReadOnlySpan<byte> keys = NativeMethods.SDL_GetKeyboardState(out _);
+        ReadOnlySpan<byte> keys = SDLNative.SDL_GetKeyboardState(out _);
 
         return keys[(int)code] == 1;
     }
@@ -157,7 +157,7 @@ public sealed partial class Keyboard
     /// <remarks>
     /// It will generate <see cref="EventType.KeyUp"/> events for all pressed keys.
     /// </remarks>
-    public static void Reset() => NativeMethods.SDL_ResetKeyboard();
+    public static void Reset() => SDLNative.SDL_ResetKeyboard();
 
     /// <summary>
     /// Sets the human-readable name of the scancode.
@@ -167,7 +167,7 @@ public sealed partial class Keyboard
     /// <exception cref="SDLException">An error occurred while setting the scancode name.</exception>
     public static void SetScancodeName(Scancode scancode, string name)
     {
-        if (!NativeMethods.SDL_SetScancodeName(scancode, Encoding.UTF8.GetBytes(name)))
+        if (!SDLNative.SDL_SetScancodeName(scancode, Encoding.UTF8.GetBytes(name)))
             SDLException.Throw();
     }
 }

@@ -2,7 +2,7 @@
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Exceptions;
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.System;
 
 namespace KappaDuck.Aquila;
@@ -32,8 +32,8 @@ public sealed class SDL : IDisposable
             if (Interlocked.Decrement(ref _refCount) > 0)
                 return;
 
-            NativeMethods.SDL_QuitSubSystem(_subSystems);
-            NativeMethods.SDL_Quit();
+            SDLNative.SDL_QuitSubSystem(_subSystems);
+            SDLNative.SDL_Quit();
 
             Cleanup();
         }
@@ -45,7 +45,7 @@ public sealed class SDL : IDisposable
     /// <returns>The version of the linked library.</returns>
     public static string GetVersion()
     {
-        int version = NativeMethods.SDL_GetVersion();
+        int version = SDLNative.SDL_GetVersion();
 
         int major = version / 1000000;
         int minor = version / 1000 % 1000;
@@ -121,7 +121,7 @@ public sealed class SDL : IDisposable
             if (!Has(subSystem))
                 return;
 
-            NativeMethods.SDL_QuitSubSystem(subSystem);
+            SDLNative.SDL_QuitSubSystem(subSystem);
 
             _subSystems &= ~subSystem;
         }
@@ -132,7 +132,7 @@ public sealed class SDL : IDisposable
         if (Has(subSystem))
             return;
 
-        if (!NativeMethods.SDL_InitSubSystem(subSystem))
+        if (!SDLNative.SDL_InitSubSystem(subSystem))
             SDLException.Throw();
 
         Interlocked.Increment(ref _refCount);

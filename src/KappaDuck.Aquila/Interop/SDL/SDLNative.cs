@@ -5,15 +5,11 @@ using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace KappaDuck.Aquila.Interop;
+namespace KappaDuck.Aquila.Interop.SDL;
 
-internal static partial class NativeMethods
+internal static partial class SDLNative
 {
-#if Windows
-    internal const string LibraryName = "SDL3.dll";
-#elif Linux
-    internal const string LibraryName = "SDL3.so";
-#endif
+    internal const string LibraryName = "SDL3";
 
     internal static unsafe void Free<T>(T* memory) where T : unmanaged
         => Free((nint)memory);
