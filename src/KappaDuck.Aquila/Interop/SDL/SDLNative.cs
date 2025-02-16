@@ -1,19 +1,17 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Interop.Win32;
 using KappaDuck.Aquila.System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
-namespace KappaDuck.Aquila.Interop;
+namespace KappaDuck.Aquila.Interop.SDL;
 
-internal static partial class NativeMethods
+internal static partial class SDLNative
 {
-#if Windows
-    internal const string LibraryName = "SDL3.dll";
-#elif Linux
-    internal const string LibraryName = "SDL3.so";
-#endif
+    internal const string LibraryName = "SDL3";
 
     internal static unsafe void Free<T>(T* memory) where T : unmanaged
         => Free((nint)memory);
@@ -22,6 +20,10 @@ internal static partial class NativeMethods
         => Free((nint)memory);
 
     internal static void Free(nint memory) => SDL_free(memory);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    private static partial void SDL_free(nint memory);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -42,5 +44,6 @@ internal static partial class NativeMethods
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    private static partial void SDL_free(nint memory);
+    [SupportedOSPlatform("windows")]
+    internal static partial void SDL_SetWindowsMessageHook(Win32Native.WindowMessageHook callback, nint data = default);
 }

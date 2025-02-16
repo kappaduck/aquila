@@ -43,4 +43,5 @@ coverage*.info
 # SDL
 
 SDL/
+!src/**/SDL/
 SDL3/

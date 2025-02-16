@@ -2,7 +2,7 @@
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Exceptions;
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 using System.Diagnostics.CodeAnalysis;
 
 namespace KappaDuck.Aquila.Events;
@@ -16,13 +16,13 @@ public static class Event
     /// Disable events of a specific type.
     /// </summary>
     /// <param name="type">The event type to disable.</param>
-    public static void Disable(EventType type) => NativeMethods.SDL_SetEventEnabled(type, enabled: false);
+    public static void Disable(EventType type) => SDLNative.SDL_SetEventEnabled(type, enabled: false);
 
     /// <summary>
     /// enable events of a specific type.
     /// </summary>
     /// <param name="type">The event type to enable.</param>
-    public static void Enable(EventType type) => NativeMethods.SDL_SetEventEnabled(type, enabled: true);
+    public static void Enable(EventType type) => SDLNative.SDL_SetEventEnabled(type, enabled: true);
 
     /// <summary>
     /// Clear events of a range of types from the event queue.
@@ -40,7 +40,7 @@ public static class Event
     {
         ThrowIfGreaterThan(type > maxType, nameof(type));
 
-        NativeMethods.SDL_FlushEvents(type, maxType ?? type);
+        SDLNative.SDL_FlushEvents(type, maxType ?? type);
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public static class Event
     /// </summary>
     /// <param name="type">The type to check if exists.</param>
     /// <returns><see langword="true"/> if events matching type are present, or <see langword="false"/> if events matching type are not present.</returns>
-    public static bool Has(EventType type) => NativeMethods.SDL_HasEvent(type);
+    public static bool Has(EventType type) => SDLNative.SDL_HasEvent(type);
 
     /// <summary>
     /// Check for the existence of certain event types in the event queue.
@@ -61,7 +61,7 @@ public static class Event
     {
         ThrowIfGreaterThan(minType > maxType, nameof(minType));
 
-        return NativeMethods.SDL_HasEvents(minType, maxType);
+        return SDLNative.SDL_HasEvents(minType, maxType);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public static class Event
     /// </summary>
     /// <param name="type">The event type to check.</param>
     /// <returns><see langword="true"/> if the event is being processed, false otherwise.</returns>
-    public static bool IsEnabled(EventType type) => NativeMethods.SDL_EventEnabled(type);
+    public static bool IsEnabled(EventType type) => SDLNative.SDL_EventEnabled(type);
 
     /// <summary>
     /// Retrieve events from the event queue without removing them.
@@ -83,14 +83,14 @@ public static class Event
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="minType"/> is greater than <paramref name="maxType"/>.</exception>
     /// <exception cref="SDLException">Failed while peeping events.</exception>
-    public static int Peek(Span<SDLEvent> events, EventType minType, EventType? maxType = null) => NativeMethods.Peek(events, minType, maxType);
+    public static int Peek(Span<SDLEvent> events, EventType minType, EventType? maxType = null) => SDLNative.Peek(events, minType, maxType);
 
     /// <summary>
     /// Polls for currently pending events.
     /// </summary>
     /// <param name="e">The next filled event from the queue.</param>
     /// <returns><see langword="true"/> if this got an event or <see langword="false"/> if there are none available.</returns>
-    public static bool Poll(out SDLEvent e) => NativeMethods.SDL_PollEvent(out e);
+    public static bool Poll(out SDLEvent e) => SDLNative.SDL_PollEvent(out e);
 
     /// <summary>
     /// Pump the event loop, gathering events from the input devices.
@@ -103,7 +103,7 @@ public static class Event
     /// implicitly call <see cref="Pump"/>. However, if you are not polling or waiting for events(e.g.you are filtering them),
     /// then you must call <see cref="Pump"/> to force an event queue update.
     /// </remarks>
-    public static void Pump() => NativeMethods.SDL_PumpEvents();
+    public static void Pump() => SDLNative.SDL_PumpEvents();
 
     /// <summary>
     /// Add an event to the event queue.
@@ -112,7 +112,7 @@ public static class Event
     /// <returns><see langword="true"/> on success, <see langword="false"/> if the event was filtered or on failure.
     /// A common reason for error is the event queue being full.
     /// </returns>
-    public static bool Push(ref SDLEvent e) => NativeMethods.SDL_PushEvent(ref e);
+    public static bool Push(ref SDLEvent e) => SDLNative.SDL_PushEvent(ref e);
 
     /// <summary>
     /// Add events to the back of the event queue.
@@ -120,7 +120,7 @@ public static class Event
     /// <param name="events">Added events to the event queue.</param>
     /// <returns>The number of events actually added.</returns>
     /// <exception cref="SDLException">Failed while added events.</exception>"
-    public static int Push(Span<SDLEvent> events) => NativeMethods.Push(events);
+    public static int Push(Span<SDLEvent> events) => SDLNative.Push(events);
 
     /// <summary>
     /// Retrieve events from the event queue by removing them.
@@ -134,7 +134,7 @@ public static class Event
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="minType"/> is greater than <paramref name="maxType"/>.</exception>
     /// <exception cref="SDLException">Failed while retrieving events.</exception>
-    public static int? Retrieve(Span<SDLEvent> events, EventType minType, EventType? maxType = null) => NativeMethods.Retrieve(events, minType, maxType);
+    public static int? Retrieve(Span<SDLEvent> events, EventType minType, EventType? maxType = null) => SDLNative.Retrieve(events, minType, maxType);
 
     /// <summary>
     /// Wait until the specified timeout (in milliseconds) for the next available event.
@@ -148,9 +148,9 @@ public static class Event
     public static bool Wait(out SDLEvent e, TimeSpan? timeSpan = null)
     {
         if (timeSpan is null || timeSpan == Timeout.InfiniteTimeSpan)
-            return NativeMethods.SDL_WaitEvent(out e);
+            return SDLNative.SDL_WaitEvent(out e);
 
-        return NativeMethods.SDL_WaitEventTimeout(out e, (int)timeSpan.Value.TotalMilliseconds);
+        return SDLNative.SDL_WaitEventTimeout(out e, (int)timeSpan.Value.TotalMilliseconds);
     }
 
     private static void ThrowIfGreaterThan([DoesNotReturnIf(true)] bool condition, string paramName)

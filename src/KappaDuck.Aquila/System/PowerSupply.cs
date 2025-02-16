@@ -1,7 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 
 namespace KappaDuck.Aquila.System;
 
@@ -48,7 +48,7 @@ public sealed class PowerSupply
     /// <returns>The current power supply information.</returns>
     internal static PowerSupply GetPowerInfo()
     {
-        PowerState state = NativeMethods.SDL_GetPowerInfo(out int seconds, out int percent);
+        PowerState state = SDLNative.SDL_GetPowerInfo(out int seconds, out int percent);
 
         return new PowerSupply(seconds == -1 ? null : seconds, percent == -1 ? null : percent, state);
     }

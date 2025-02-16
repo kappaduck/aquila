@@ -3,7 +3,7 @@
 
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
-using KappaDuck.Aquila.Interop;
+using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.System;
 
 namespace KappaDuck.Aquila.Video.Displays;
@@ -30,7 +30,7 @@ public sealed class Display
     {
         get
         {
-            string? name = NativeMethods.SDL_GetDisplayName(Id);
+            string? name = SDLNative.SDL_GetDisplayName(Id);
 
             SDLException.ThrowIfNullOrEmpty(name);
 
@@ -46,7 +46,7 @@ public sealed class Display
     {
         get
         {
-            if (!NativeMethods.SDL_GetDisplayBounds(Id, out Rectangle<int> bounds))
+            if (!SDLNative.SDL_GetDisplayBounds(Id, out Rectangle<int> bounds))
                 SDLException.Throw();
 
             return bounds;
@@ -64,7 +64,7 @@ public sealed class Display
     {
         get
         {
-            if (!NativeMethods.SDL_GetDisplayUsableBounds(Id, out Rectangle<int> bounds))
+            if (!SDLNative.SDL_GetDisplayUsableBounds(Id, out Rectangle<int> bounds))
                 SDLException.Throw();
 
             return bounds;
@@ -91,7 +91,7 @@ public sealed class Display
     {
         get
         {
-            float scale = NativeMethods.SDL_GetDisplayContentScale(Id);
+            float scale = SDLNative.SDL_GetDisplayContentScale(Id);
 
             SDLException.ThrowIfZero(scale);
 
@@ -114,7 +114,7 @@ public sealed class Display
         {
             unsafe
             {
-                DisplayMode* mode = NativeMethods.SDL_GetCurrentDisplayMode(Id);
+                DisplayMode* mode = SDLNative.SDL_GetCurrentDisplayMode(Id);
 
                 SDLException.ThrowIf(mode is null);
 
@@ -138,7 +138,7 @@ public sealed class Display
         {
             unsafe
             {
-                DisplayMode* mode = NativeMethods.SDL_GetDesktopDisplayMode(Id);
+                DisplayMode* mode = SDLNative.SDL_GetDesktopDisplayMode(Id);
 
                 SDLException.ThrowIf(mode is null);
 
@@ -154,7 +154,7 @@ public sealed class Display
     {
         get
         {
-            uint properties = NativeMethods.SDL_GetDisplayProperties(Id);
+            uint properties = SDLNative.SDL_GetDisplayProperties(Id);
             return Properties.Get(properties, HdrEnabledProperty, defaultValue: false);
         }
     }
@@ -162,12 +162,12 @@ public sealed class Display
     /// <summary>
     /// Gets the orientation of a display.
     /// </summary>
-    public DisplayOrientation Orientation => NativeMethods.SDL_GetCurrentDisplayOrientation(Id);
+    public DisplayOrientation Orientation => SDLNative.SDL_GetCurrentDisplayOrientation(Id);
 
     /// <summary>
     /// Gets the orientation of a display when it is unrotated.
     /// </summary>
-    public DisplayOrientation NaturalOrientation => NativeMethods.SDL_GetNaturalDisplayOrientation(Id);
+    public DisplayOrientation NaturalOrientation => SDLNative.SDL_GetNaturalDisplayOrientation(Id);
 
     /// <summary>
     /// Get a list of fullscreen display modes available for the display.
@@ -180,7 +180,7 @@ public sealed class Display
 
         unsafe
         {
-            DisplayMode** modes = NativeMethods.SDL_GetFullscreenDisplayModes(Id, out int length);
+            DisplayMode** modes = SDLNative.SDL_GetFullscreenDisplayModes(Id, out int length);
 
             SDLException.ThrowIf(modes is null);
 
@@ -189,7 +189,7 @@ public sealed class Display
             for (int i = 0; i < length; i++)
                 displayModes[i] = *modes[i];
 
-            NativeMethods.Free(modes);
+            SDLNative.Free(modes);
         }
 
         return displayModes;
@@ -220,7 +220,7 @@ public sealed class Display
 
         unsafe
         {
-            display = NativeMethods.SDL_GetDisplayForPoint(&point);
+            display = SDLNative.SDL_GetDisplayForPoint(&point);
         }
 
         SDLException.ThrowIfZero(display);
@@ -240,7 +240,7 @@ public sealed class Display
 
         unsafe
         {
-            display = NativeMethods.SDL_GetDisplayForRect(&rectangle);
+            display = SDLNative.SDL_GetDisplayForRect(&rectangle);
         }
 
         SDLException.ThrowIfZero(display);
@@ -255,7 +255,7 @@ public sealed class Display
     /// <exception cref="SDLException">Failed to get the displays.</exception>
     public static Display[] GetDisplays()
     {
-        ReadOnlySpan<uint> ids = NativeMethods.SDL_GetDisplays(out _);
+        ReadOnlySpan<uint> ids = SDLNative.SDL_GetDisplays(out _);
 
         if (ids.IsEmpty)
             return [];
@@ -279,7 +279,7 @@ public sealed class Display
     /// <exception cref="SDLException">Failed to search the display mode.</exception>
     public DisplayMode SearchDisplayMode(int width, int height, float refreshRate, bool includeHighDensityMode)
     {
-        if (!NativeMethods.SDL_GetClosestFullscreenDisplayMode(Id, width, height, refreshRate, includeHighDensityMode, out DisplayMode displayMode))
+        if (!SDLNative.SDL_GetClosestFullscreenDisplayMode(Id, width, height, refreshRate, includeHighDensityMode, out DisplayMode displayMode))
             SDLException.Throw();
 
         return displayMode;
@@ -289,5 +289,5 @@ public sealed class Display
     /// Get the primary display.
     /// </summary>
     /// <returns>The primary display.</returns>
-    public static Display GetPrimaryDisplay() => new(NativeMethods.SDL_GetPrimaryDisplay());
+    public static Display GetPrimaryDisplay() => new(SDLNative.SDL_GetPrimaryDisplay());
 }

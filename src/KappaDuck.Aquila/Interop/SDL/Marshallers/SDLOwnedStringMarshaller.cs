@@ -4,7 +4,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 
-namespace KappaDuck.Aquila.Interop.Marshallers;
+namespace KappaDuck.Aquila.Interop.SDL.Marshallers;
 
 /// <summary>
 /// Marshaller for strings that are owned by SDL.

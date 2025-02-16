@@ -3,19 +3,19 @@
 
 using System.Runtime.InteropServices.Marshalling;
 
-namespace KappaDuck.Aquila.Interop.Marshallers;
+namespace KappaDuck.Aquila.Interop.SDL.Marshallers;
 
 /// <summary>
-/// Marshaller for C arrays that are owned by SDL.
+/// Marshaller for C arrays that are owned by the caller.
 /// </summary>
 /// <remarks>
-/// SDL responsible for freeing the memory.
+/// Caller responsible for freeing the memory. It uses the <see cref="SDLNative.Free{T}(T*)"/> method.
 /// </remarks>
 /// <typeparam name="T">The managed type.</typeparam>
 /// <typeparam name="TUnmanaged">The unmanaged type.</typeparam>
 [ContiguousCollectionMarshaller]
-[CustomMarshaller(typeof(Span<>), MarshalMode.Default, typeof(SDLOwnedArrayMarshaller<,>))]
-internal static unsafe class SDLOwnedArrayMarshaller<T, TUnmanaged> where TUnmanaged : unmanaged
+[CustomMarshaller(typeof(Span<>), MarshalMode.Default, typeof(CallerOwnedArrayMarshaller<,>))]
+internal static unsafe class CallerOwnedArrayMarshaller<T, TUnmanaged> where TUnmanaged : unmanaged
 {
     /// <summary>
     /// This method is not used because the marshaller is only used for unmanaged to managed conversions.
@@ -42,4 +42,6 @@ internal static unsafe class SDLOwnedArrayMarshaller<T, TUnmanaged> where TUnman
     public static ReadOnlySpan<TUnmanaged> GetUnmanagedValuesSource(TUnmanaged* unmanaged, int length) => new(unmanaged, length);
 
     public static Span<T> GetManagedValuesDestination(Span<T> managed) => managed;
+
+    public static void Free(TUnmanaged* unmanaged) => SDLNative.Free(unmanaged);
 }

@@ -3,15 +3,15 @@
 
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Graphics;
-using KappaDuck.Aquila.Interop.Handles;
+using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Video.Displays;
 using KappaDuck.Aquila.Video.Windows;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace KappaDuck.Aquila.Interop;
+namespace KappaDuck.Aquila.Interop.SDL;
 
-internal static partial class NativeMethods
+internal static partial class SDLNative
 {
     internal static unsafe bool SetWindowFullscreenMode(WindowHandle handle, DisplayMode? value)
     {
@@ -80,6 +80,10 @@ internal static partial class NativeMethods
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
     internal static partial bool SDL_GetWindowPosition(WindowHandle window, out int x, out int y);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial uint SDL_GetWindowProperties(WindowHandle window);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
