@@ -9,7 +9,7 @@ namespace KappaDuck.Aquila.Components.Menu;
 /// <param name="id">The identifier of the menu item.</param>
 /// <param name="label">The label of the menu item.</param>
 /// <param name="state">The state of the menu item.</param>
-public struct MenuItem(ushort id, string label, MenuItemState state = 0)
+public struct MenuItem(ushort id, string label, MenuItemState state = MenuItemState.None)
 {
     /// <summary>
     /// Gets the identifier of the menu item.

@@ -40,6 +40,11 @@ dotnet_diagnostic.MA0036.severity = none
 # https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0038.md
 dotnet_diagnostic.MA0038.severity = none
 
+# MA0046: The first parameter must be of type object
+# Some events aren't used by multiple objects
+# https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0046.md
+dotnet_diagnostic.MA0046.severity = none
+
 # MA0053: Make class sealed
 # Classes should be sealed when there is no inheritor.
 # https://github.com/meziantou/Meziantou.Analyzer/blob/main/docs/Rules/MA0053.md

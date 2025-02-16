@@ -11,6 +11,7 @@ using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Interop.Win32;
 using KappaDuck.Aquila.Interop.Win32.Extensions;
 using KappaDuck.Aquila.Video.Displays;
+using System.Runtime.Versioning;
 
 namespace KappaDuck.Aquila.Video.Windows;
 
@@ -1197,6 +1198,7 @@ public class Window : IDisposable
         return SDLNative.SDL_GetPointerProperty(propertiesId, Win32PropertyName, nint.Zero);
     }
 
+    [SupportedOSPlatform("windows")]
     private void HookWindowsMessage()
     {
         if (!OperatingSystem.IsWindows())
