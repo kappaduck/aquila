@@ -2,6 +2,7 @@
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Exceptions;
+using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Video.Windows;
 
@@ -12,6 +13,8 @@ namespace KappaDuck.Aquila.Graphics;
 /// </summary>
 public sealed class Window2D : BaseWindow
 {
+    private RendererHandle _renderer = RendererHandle.Zero;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Window2D"/> class.
     /// </summary>
@@ -31,7 +34,14 @@ public sealed class Window2D : BaseWindow
     {
     }
 
-    internal override void OnCreate(WindowHandle window)
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
     {
+        if (disposing)
+            _renderer.Dispose();
+
+        base.Dispose(disposing);
     }
+
+    internal override void OnCreate(WindowHandle window) => _renderer = SDLNative.SDL_CreateRenderer(window);
 }
