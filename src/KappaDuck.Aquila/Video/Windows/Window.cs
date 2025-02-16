@@ -1,13 +1,15 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Components;
+using KappaDuck.Aquila.Components.Menu;
 using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Graphics;
 using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.Interop.SDL.Handles;
+using KappaDuck.Aquila.Interop.Win32;
+using KappaDuck.Aquila.Interop.Win32.Extensions;
 using KappaDuck.Aquila.Video.Displays;
 
 namespace KappaDuck.Aquila.Video.Windows;
@@ -19,8 +21,6 @@ public class Window : IDisposable
 {
     private const string Win32PropertyName = "SDL.window.win32.hwnd";
 
-    private readonly List<IComponent> _components = [];
-
     private WindowHandle _handle;
 
     private bool _disposed;
@@ -29,6 +29,8 @@ public class Window : IDisposable
     private int _width;
     private int _height;
     private string _title = string.Empty;
+    private Action<Window, MenuItem>? _onMenuItemClick;
+    private bool _hasWindowsMessage;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Window"/> class.
@@ -419,6 +421,50 @@ public class Window : IDisposable
     public bool Maximized => (_state & WindowState.Maximized) != WindowState.None;
 
     /// <summary>
+    /// Gets or sets the horizontal menu bar at the top of the window.
+    /// </summary>
+    /// <remarks>
+    /// Only available on Windows.
+    /// </remarks>
+    /// <exception cref="PlatformNotSupportedException">Menu bar is only available on Windows.</exception>
+    public MenuBar? MenuBar
+    {
+        get;
+        set
+        {
+            if (!OperatingSystem.IsWindows())
+                throw new PlatformNotSupportedException("Menu bar is only available on Windows.");
+
+            if (!IsOpen)
+            {
+                field = value;
+                return;
+            }
+
+            nint win32Handle = GetWin32Handle();
+
+            if (value is null)
+            {
+                field?.Dispose();
+                MenuBar.Detach(win32Handle);
+
+                _onMenuItemClick = null;
+
+                return;
+            }
+
+            field = value;
+            field.Attach(win32Handle);
+
+            if (!_hasWindowsMessage)
+            {
+                HookWindowsMessage();
+                _hasWindowsMessage = true;
+            }
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the maximum size of the window's client area.
     /// </summary>
     /// <remarks>
@@ -543,6 +589,28 @@ public class Window : IDisposable
     /// Gets a value indicating whether the window is occluded.
     /// </summary>
     public bool Occluded => (_state & WindowState.Occluded) != WindowState.None;
+
+    /// <summary>
+    /// Event that occurs when a menu item is clicked from the window's menu bar.
+    /// </summary>
+    public event Action<Window, MenuItem>? OnMenuItemClick
+    {
+        add
+        {
+            if (_onMenuItemClick is not null)
+                _onMenuItemClick = null;
+
+            _onMenuItemClick = value;
+        }
+
+        remove
+        {
+            if (_onMenuItemClick is null)
+                return;
+
+            _onMenuItemClick = value;
+        }
+    }
 
     /// <summary>
     /// Gets or sets the opacity of the window.
@@ -763,21 +831,6 @@ public class Window : IDisposable
     public int WidthInPixel { get; private set; }
 
     /// <summary>
-    /// Adds a component to the window.
-    /// </summary>
-    /// <remarks>
-    /// You don't need to dispose the component. It will be disposed when the window is disposed.
-    /// </remarks>
-    /// <param name="component">The component to add.</param>
-    public void AddComponent(IComponent component)
-    {
-        nint win32 = GetWin32Handle();
-        component.Attach(win32);
-
-        _components.Add(component);
-    }
-
-    /// <summary>
     /// Closes the window.
     /// </summary>
     /// <remarks>
@@ -817,6 +870,9 @@ public class Window : IDisposable
         SDLNative.SDL_SetWindowOpacity(_handle, Opacity);
 
         IsOpen = true;
+
+        if (OperatingSystem.IsWindows())
+            MenuBar?.Attach(GetWin32Handle());
     }
 
     /// <inheritdoc />
@@ -1005,20 +1061,6 @@ public class Window : IDisposable
     }
 
     /// <summary>
-    /// Removes a component from the window.
-    /// </summary>
-    /// <remarks>
-    /// You don't need to dispose the component. It will be disposed when the window is disposed
-    /// even if you remove it from the window.
-    /// </remarks>
-    /// <param name="component">The component to remove.</param>
-    public void RemoveComponent(IComponent component)
-    {
-        nint win32 = GetWin32Handle();
-        component.Detach(win32);
-    }
-
-    /// <summary>
     /// Request that the size and position of a minimized or maximized window be restored.
     /// </summary>
     /// <remarks>
@@ -1118,13 +1160,8 @@ public class Window : IDisposable
 
         if (disposing)
         {
-            foreach (IComponent component in _components)
-            {
-                if (component is IDisposable disposable)
-                    disposable.Dispose();
-            }
-
-            _components.Clear();
+            if (OperatingSystem.IsWindows())
+                MenuBar?.Dispose();
 
             _handle.Dispose();
         }
@@ -1158,5 +1195,32 @@ public class Window : IDisposable
     {
         uint propertiesId = SDLNative.SDL_GetWindowProperties(_handle);
         return SDLNative.SDL_GetPointerProperty(propertiesId, Win32PropertyName, nint.Zero);
+    }
+
+    private void HookWindowsMessage()
+    {
+        if (!OperatingSystem.IsWindows())
+            return;
+
+        SDLNative.SDL_SetWindowsMessageHook((_, msg) =>
+        {
+            if (IsItemClicked(msg))
+            {
+                MenuItem item = MenuBar!.FindMenuItem(msg.WParam.Lower16bits());
+
+                _onMenuItemClick?.Invoke(this, item);
+                return false;
+            }
+
+            return true;
+        });
+
+        static bool IsItemClicked(in MSG msg)
+        {
+            const int wmCommand = 0x0111;
+            const int menu = 0;
+
+            return msg.Message == wmCommand && msg.WParam.Upper16bits() == menu;
+        }
     }
 }
