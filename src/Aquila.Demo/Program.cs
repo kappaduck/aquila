@@ -3,6 +3,7 @@
 
 using KappaDuck.Aquila;
 using KappaDuck.Aquila.Events;
+using KappaDuck.Aquila.Inputs;
 using KappaDuck.Aquila.System;
 using KappaDuck.Aquila.Video.Windows;
 
@@ -14,10 +15,16 @@ while (window.IsOpen)
 {
     while (window.Poll(out SDLEvent e))
     {
-        if (e.Type is EventType.Quit)
+        if (e.RequestQuit())
         {
             window.Close();
             return;
         }
+
+        if (e.IsKeyDown(Keyboard.Scancode.Space))
+            Console.WriteLine("Space");
+
+        if (e.IsMouseButtonDown(Mouse.Button.Left))
+            window.Title = $"Aquila Demo - Left Mouse Button Down at {e.Mouse.Position}";
     }
 }
