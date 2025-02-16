@@ -16,9 +16,12 @@ using System.Runtime.Versioning;
 namespace KappaDuck.Aquila.Video.Windows;
 
 /// <summary>
-/// Represents a basic window.
+/// Represents the base window.
 /// </summary>
-public class Window : IDisposable
+/// <remarks>
+/// It is recommended to use <see cref="Window2D"/> for 2D rendering.
+/// </remarks>
+public abstract class BaseWindow : IDisposable
 {
     private const string Win32PropertyName = "SDL.window.win32.hwnd";
 
@@ -30,15 +33,15 @@ public class Window : IDisposable
     private int _width;
     private int _height;
     private string _title = string.Empty;
-    private Action<Window, MenuItem>? _onMenuItemClick;
+    private Action<BaseWindow, MenuItem>? _onMenuItemClick;
     private bool _hasWindowsMessage;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Window"/> class.
+    /// Initializes a new instance of the <see cref="BaseWindow"/> class.
     /// </summary>
-    public Window()
+    protected BaseWindow()
     {
-        _handle = new WindowHandle();
+        _handle = WindowHandle.Zero;
         Opacity = 1.0f;
     }
 
@@ -50,7 +53,7 @@ public class Window : IDisposable
     /// <param name="height">The height of the window.</param>
     /// <param name="state">The initial state of the window.</param>
     /// <exception cref="SDLException">An error occurred while creating the window.</exception>
-    public Window(string title, int width, int height, WindowState state = WindowState.None)
+    protected BaseWindow(string title, int width, int height, WindowState state = WindowState.None)
     {
         _handle = CreateWindow(title, width, height, state);
         IsOpen = true;
@@ -60,7 +63,7 @@ public class Window : IDisposable
     /// Gets or sets a value indicating whether the window is always on top.
     /// </summary>
     /// <remarks>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window always on top.</exception>
@@ -106,7 +109,7 @@ public class Window : IDisposable
     /// Gets or sets a value indicating whether the window is borderless.
     /// </summary>
     /// <remarks>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window borderless.</exception>
@@ -203,7 +206,7 @@ public class Window : IDisposable
     /// Gets or sets a value indicating whether the window is focusable.
     /// </summary>
     /// <remarks>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window focusable.</exception>
@@ -226,7 +229,7 @@ public class Window : IDisposable
     /// Gets or sets a value indicating whether the window is fullscreen.
     /// </summary>
     /// <remarks>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while settings the window fullscreen.</exception>
@@ -384,7 +387,7 @@ public class Window : IDisposable
     /// </summary>
     /// <remarks>
     /// <para>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </para>
     /// <para>
@@ -562,7 +565,7 @@ public class Window : IDisposable
     /// Gets or sets a value indicating whether the window has mouse input grabbed.
     /// </summary>
     /// <remarks>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window mouse grab.</exception>
@@ -594,7 +597,7 @@ public class Window : IDisposable
     /// <summary>
     /// Event that occurs when a menu item is clicked from the window's menu bar.
     /// </summary>
-    public event Action<Window, MenuItem>? OnMenuItemClick
+    public event Action<BaseWindow, MenuItem>? OnMenuItemClick
     {
         add
         {
@@ -726,7 +729,7 @@ public class Window : IDisposable
     /// Gets or sets a value indicating whether the window is resizable.
     /// </summary>
     /// <remarks>
-    /// If you set this property during the creation of an empty <see cref="Window"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
+    /// If you set this property during the creation of an empty <see cref="BaseWindow"/> then using <see cref="Create(string, int, int, WindowState)"/>, it will be ignored.
     /// Use <see cref="WindowState"/> parameter instead.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window resizable.</exception>
@@ -1151,7 +1154,7 @@ public class Window : IDisposable
     public void WarpMouse(Point<float> position) => WarpMouse(position.X, position.Y);
 
     /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="Window"/> and optionally releases the managed resources.
+    /// Releases the unmanaged resources used by the <see cref="BaseWindow"/> and optionally releases the managed resources.
     /// </summary>
     /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
@@ -1170,12 +1173,20 @@ public class Window : IDisposable
         _disposed = true;
     }
 
+    /// <summary>
+    /// Called when the window is created.
+    /// </summary>
+    /// <param name="window">The created window handle.</param>
+    internal abstract void OnCreate(WindowHandle window);
+
     private WindowHandle CreateWindow(string title, int width, int height, WindowState state)
     {
         WindowHandle handle = SDLNative.SDL_CreateWindow(title, width, height, state);
 
         if (handle.IsInvalid)
             SDLException.Throw();
+
+        OnCreate(handle);
 
         Id = SDLNative.SDL_GetWindowID(handle);
         SDLException.ThrowIfZero(Id);

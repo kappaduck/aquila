@@ -3,13 +3,14 @@
 
 using KappaDuck.Aquila;
 using KappaDuck.Aquila.Events;
+using KappaDuck.Aquila.Graphics;
 using KappaDuck.Aquila.Inputs;
 using KappaDuck.Aquila.System;
 using KappaDuck.Aquila.Video.Windows;
 
 using SDL engine = SDL.Init(SubSystem.Video);
 
-using Window window = new("Aquila Demo", 1080, 720, WindowState.Resizable);
+using Window2D window = new("Aquila Demo", 1080, 720, WindowState.Resizable);
 
 while (window.IsOpen)
 {

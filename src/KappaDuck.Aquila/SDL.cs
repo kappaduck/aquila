@@ -23,7 +23,7 @@ public sealed class SDL : IDisposable
     }
 
     /// <summary>
-    /// Clean up all initialized subsystems.
+    /// Clean up all initialized subsystems and shuts down SDL.
     /// </summary>
     public void Dispose()
     {
@@ -40,9 +40,13 @@ public sealed class SDL : IDisposable
     }
 
     /// <summary>
-    /// Get the version of the SDL that is linked against your program.
+    /// Gets the version of the SDL library that is linked with your program.
     /// </summary>
-    /// <returns>The version of the linked library.</returns>
+    /// <remarks>
+    /// This method provides the version of the SDL library at runtime, which is useful for
+    /// debugging or ensuring compatibility with specific SDL versions.
+    /// </remarks>
+    /// <returns>The SDL version in the format "major.minor.patch" (e.g., "3.2.0").</returns>
     public static string GetVersion()
     {
         int version = SDLNative.SDL_GetVersion();

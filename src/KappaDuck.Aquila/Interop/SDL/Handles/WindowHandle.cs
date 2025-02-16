@@ -7,6 +7,8 @@ namespace KappaDuck.Aquila.Interop.SDL.Handles;
 
 internal sealed class WindowHandle() : SafeHandleZeroInvalid(ownsHandle: true)
 {
+    internal static WindowHandle Zero { get; } = new();
+
     protected override bool ReleaseHandle()
     {
         if (!IsInvalid)

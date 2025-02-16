@@ -134,7 +134,7 @@ public sealed partial class Keyboard
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Uses <see cref="Window.Poll(out SDLEvent)"/>, <see cref="Event.Poll(out SDLEvent)"/> or <see cref="Event.Pump"/>
+    /// Uses <see cref="BaseWindow.Poll(out SDLEvent)"/>, <see cref="Event.Poll(out SDLEvent)"/> or <see cref="Event.Pump"/>
     /// to update the keyboard state.
     /// </para>
     /// <para>
