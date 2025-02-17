@@ -20,4 +20,10 @@ public interface IRenderTarget
     /// </summary>
     /// <param name="color">The color to clear the render target with.</param>
     void Clear(Color color);
+
+    /// <summary>
+    /// Draws the specified drawable to the render target.
+    /// </summary>
+    /// <param name="drawable">The drawable to draw to the render target.</param>
+    void Draw(IDrawable drawable);
 }

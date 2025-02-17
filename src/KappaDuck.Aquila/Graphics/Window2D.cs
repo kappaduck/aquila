@@ -38,6 +38,7 @@ public sealed class Window2D : BaseWindow, IRenderTarget
     /// <inheritdoc/>
     /// <remarks>
     /// The render target is cleared with a black color.
+    /// If you want to clear the render target with a different color, use <see cref="Clear(Color)"/> instead.
     /// </remarks>
     public void Clear() => Clear(Color.Black);
 
@@ -47,6 +48,10 @@ public sealed class Window2D : BaseWindow, IRenderTarget
         SDLNative.SDL_SetRenderDrawColor(_renderer, color.R, color.G, color.B, color.A);
         SDLNative.SDL_RenderClear(_renderer);
     }
+
+    /// <inheritdoc/>
+    public void Draw(IDrawable drawable)
+        => drawable.Draw(this);
 
     /// <summary>
     /// Renders all the graphics to the window since the last call.
