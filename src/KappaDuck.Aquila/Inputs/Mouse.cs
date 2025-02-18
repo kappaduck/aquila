@@ -31,7 +31,7 @@ public sealed class Mouse
     /// <para>To query the platform for immediate asynchronous state, use <see cref="GlobalState"/>.</para>
     /// <para>
     /// In relative mode, the platform-cursor's position usually contradicts the SDL-cursor's position as
-    /// manually calculated from <see cref="CachedState"/> and <see cref="Window.Position"/>.
+    /// manually calculated from <see cref="CachedState"/> and <see cref="BaseWindow.Position"/>.
     /// </para>
     /// </remarks>
     public static State CachedState
@@ -53,7 +53,7 @@ public sealed class Mouse
     /// </para>
     /// <para>
     /// In relative mode, the platform-cursor's position usually contradicts the SDL-cursor's position as
-    /// manually calculated from <see cref="CachedState"/> and <see cref="Window.Position"/>.
+    /// manually calculated from <see cref="CachedState"/> and <see cref="BaseWindow.Position"/>.
     /// </para>
     /// </remarks>
     public static State GlobalState

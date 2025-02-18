@@ -5,15 +5,15 @@ using KappaDuck.Aquila.Interop.Handles;
 
 namespace KappaDuck.Aquila.Interop.SDL.Handles;
 
-internal sealed class WindowHandle() : SafeHandleZeroInvalid(ownsHandle: true)
+internal sealed class RendererHandle() : SafeHandleZeroInvalid(ownsHandle: true)
 {
-    internal static WindowHandle Zero { get; } = new();
+    internal static RendererHandle Zero { get; } = new();
 
     protected override bool ReleaseHandle()
     {
         if (!IsInvalid)
         {
-            SDLNative.SDL_DestroyWindow(handle);
+            SDLNative.SDL_DestroyRenderer(handle);
 
             SetHandle(nint.Zero);
             SetHandleAsInvalid();

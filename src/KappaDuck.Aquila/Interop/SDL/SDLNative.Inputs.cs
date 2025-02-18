@@ -104,7 +104,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static unsafe partial bool SDL_SetScancodeName(Keyboard.Scancode code, Span<byte> name);
+    internal static partial bool SDL_SetScancodeName(Keyboard.Scancode code, Span<byte> name);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

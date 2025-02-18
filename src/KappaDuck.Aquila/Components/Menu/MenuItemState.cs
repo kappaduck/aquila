@@ -10,6 +10,11 @@ namespace KappaDuck.Aquila.Components.Menu;
 public enum MenuItemState : uint
 {
     /// <summary>
+    /// Represents the default state of a menu item.
+    /// </summary>
+    None = 0x00000000,
+
+    /// <summary>
     /// Specifies the menu item is grayed.
     /// </summary>
     Grayed = 0x00000001,

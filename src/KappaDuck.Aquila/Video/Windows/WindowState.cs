@@ -33,7 +33,7 @@ public enum WindowState : ulong
     /// The window is hidden.
     /// </summary>
     /// <remarks>
-    /// Window is neither mapped on the desktop nor shown in the taskbar/window list; <see cref="Window.Show"/> is required for it to become visible.
+    /// Window is neither mapped on the desktop nor shown in the taskbar/window list; <see cref="BaseWindow.Show"/> is required for it to become visible.
     /// </remarks>
     Hidden = 0x0000000000000008,
 
