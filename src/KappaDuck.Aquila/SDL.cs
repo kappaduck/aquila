@@ -134,7 +134,10 @@ public sealed class SDL : IDisposable
     private static void InternalInit(SubSystem subSystem)
     {
         if (Has(subSystem))
+        {
+            Interlocked.Increment(ref _refCount);
             return;
+        }
 
         if (!SDLNative.SDL_InitSubSystem(subSystem))
             SDLException.Throw();

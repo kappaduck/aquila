@@ -6,7 +6,6 @@ using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Graphics;
 using KappaDuck.Aquila.System;
 using KappaDuck.Aquila.Video.Windows;
-using System.Drawing;
 
 using SDL engine = SDL.Init(SubSystem.Video);
 
@@ -23,6 +22,6 @@ while (window.IsOpen)
         }
     }
 
-    window.Clear(Color.Cyan);
+    window.Clear();
     window.Render();
 }

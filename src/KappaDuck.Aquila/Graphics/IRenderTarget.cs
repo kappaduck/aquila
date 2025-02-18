@@ -26,4 +26,17 @@ public interface IRenderTarget
     /// </summary>
     /// <param name="drawable">The drawable to draw to the render target.</param>
     void Draw(IDrawable drawable);
+
+    /// <summary>
+    /// Draws the specified vertices to the render target.
+    /// </summary>
+    /// <param name="vertices">The vertices to draw to the render target.</param>
+    void Draw(in ReadOnlySpan<Vertex> vertices);
+
+    /// <summary>
+    /// Draws the specified vertices to the render target.
+    /// </summary>
+    /// <param name="vertices">The vertices to draw to the render target.</param>
+    /// <param name="indices">The indices to draw the vertices in the specified order.</param>
+    void Draw(in ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices);
 }

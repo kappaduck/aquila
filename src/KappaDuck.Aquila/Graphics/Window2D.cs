@@ -53,6 +53,14 @@ public sealed class Window2D : BaseWindow, IRenderTarget
     public void Draw(IDrawable drawable)
         => drawable.Draw(this);
 
+    /// <inheritdoc/>
+    public void Draw(in ReadOnlySpan<Vertex> vertices)
+        => SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, [], 0);
+
+    /// <inheritdoc/>
+    public void Draw(in ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices)
+        => SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, indices, indices.Length);
+
     /// <summary>
     /// Renders all the graphics to the window since the last call.
     /// </summary>
