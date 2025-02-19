@@ -9,7 +9,7 @@ using KappaDuck.Aquila.Video.Windows;
 
 using SDL engine = SDL.Init(SubSystem.Video);
 
-using Window2D window = new("Aquila Demo", 1080, 720, WindowState.Resizable);
+using RenderWindow window = new("Aquila Demo", 1080, 720, WindowState.Resizable);
 
 while (window.IsOpen)
 {

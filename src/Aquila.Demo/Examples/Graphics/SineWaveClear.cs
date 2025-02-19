@@ -22,7 +22,7 @@ internal static class SineWaveClear
         using SDL engine = SDL.Init(SubSystem.Video);
 
         // Create the window
-        using Window2D window = new("Sine Wave", 1080, 720, WindowState.Resizable | WindowState.AlwaysOnTop);
+        using RenderWindow window = new("Sine Wave", 1080, 720, WindowState.Resizable | WindowState.AlwaysOnTop);
 
         // Start a stopwatch for the sine wave
         Stopwatch stopwatch = Stopwatch.StartNew();

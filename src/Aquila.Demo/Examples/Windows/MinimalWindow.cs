@@ -20,7 +20,7 @@ public static class MinimalWindow
         using SDL engine = SDL.Init(SubSystem.Video);
 
         // Create a resizable window with the title "Minimal Window" and size 1080x720
-        using Window2D window = new("Minimal Window", 1080, 720, WindowState.Resizable | WindowState.AlwaysOnTop);
+        using RenderWindow window = new("Minimal Window", 1080, 720, WindowState.Resizable | WindowState.AlwaysOnTop);
 
         // Run the main loop
         while (window.IsOpen)

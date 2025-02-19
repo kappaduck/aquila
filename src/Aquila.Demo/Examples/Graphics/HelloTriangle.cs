@@ -27,7 +27,7 @@ internal static class HelloTriangle
         Vertex[] vertices = CreateTriangle();
 
         // Create the window
-        using Window2D window = new("Hello Triangle!", Width, Height, WindowState.Resizable | WindowState.AlwaysOnTop);
+        using RenderWindow window = new("Hello Triangle!", Width, Height, WindowState.Resizable | WindowState.AlwaysOnTop);
 
         // Run the main loop
         while (window.IsOpen)

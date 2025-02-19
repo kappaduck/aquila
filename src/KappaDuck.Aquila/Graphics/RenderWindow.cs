@@ -10,16 +10,16 @@ using System.Drawing;
 namespace KappaDuck.Aquila.Graphics;
 
 /// <summary>
-/// Represents a window which can be used to render 2D graphics.
+/// Represents a window that can be used to render graphics.
 /// </summary>
-public sealed class Window2D : BaseWindow, IRenderTarget
+public sealed class RenderWindow : BaseWindow, IRenderTarget
 {
     private RendererHandle _renderer = RendererHandle.Zero;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Window2D"/> class.
+    /// Initializes a new instance of the <see cref="RenderWindow"/> class.
     /// </summary>
-    public Window2D()
+    public RenderWindow()
     {
     }
 
@@ -31,7 +31,7 @@ public sealed class Window2D : BaseWindow, IRenderTarget
     /// <param name="height">The height of the window.</param>
     /// <param name="state">The initial state of the window.</param>
     /// <exception cref="SDLException">An error occurred while creating the window.</exception>
-    public Window2D(string title, int width, int height, WindowState state = WindowState.None) : base(title, width, height, state)
+    public RenderWindow(string title, int width, int height, WindowState state = WindowState.None) : base(title, width, height, state)
     {
     }
 

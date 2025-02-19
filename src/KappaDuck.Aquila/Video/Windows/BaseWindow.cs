@@ -19,7 +19,7 @@ namespace KappaDuck.Aquila.Video.Windows;
 /// Represents the base window.
 /// </summary>
 /// <remarks>
-/// It is recommended to use <see cref="Window2D"/> for 2D rendering.
+/// It is recommended to use <see cref="RenderWindow"/> for 2D rendering.
 /// </remarks>
 public abstract class BaseWindow : IDisposable
 {
