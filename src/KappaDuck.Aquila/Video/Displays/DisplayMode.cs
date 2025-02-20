@@ -1,7 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Graphics;
+using KappaDuck.Aquila.Graphics.Pixels;
 using System.Runtime.InteropServices;
 
 namespace KappaDuck.Aquila.Video.Displays;

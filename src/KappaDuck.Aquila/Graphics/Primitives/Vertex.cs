@@ -2,10 +2,11 @@
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Geometry;
+using KappaDuck.Aquila.Graphics.Pixels;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
-namespace KappaDuck.Aquila.Graphics;
+namespace KappaDuck.Aquila.Graphics.Primitives;
 
 /// <summary>
 /// Represents a vertex with a position and color.

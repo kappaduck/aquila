@@ -1,7 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-namespace KappaDuck.Aquila.Graphics;
+namespace KappaDuck.Aquila.Graphics.Pixels;
 
 /// <summary>
 /// Represents the format of a pixel.

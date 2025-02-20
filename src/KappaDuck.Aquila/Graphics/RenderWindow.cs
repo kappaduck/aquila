@@ -1,9 +1,8 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using KappaDuck.Aquila.Exceptions;
-using KappaDuck.Aquila.Interop.SDL;
-using KappaDuck.Aquila.Interop.SDL.Handles;
+using KappaDuck.Aquila.Graphics.Primitives;
+using KappaDuck.Aquila.Graphics.Rendering;
 using KappaDuck.Aquila.Video.Windows;
 using System.Drawing;
 
@@ -14,13 +13,17 @@ namespace KappaDuck.Aquila.Graphics;
 /// </summary>
 public sealed class RenderWindow : BaseWindow, IRenderTarget
 {
-    private RendererHandle _renderer = RendererHandle.Zero;
+    private readonly IRenderEngine _engine;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RenderWindow"/> class.
     /// </summary>
-    public RenderWindow()
+    /// <param name="engine">The render engine to use for rendering. By default, a new instance of <see cref="Renderer"/> is used.</param>
+    public RenderWindow(IRenderEngine? engine = null)
     {
+        _engine = engine ?? new Renderer();
+
+        _engine.Setup(Handle);
     }
 
     /// <summary>
@@ -30,9 +33,12 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// <param name="width">The width of the window.</param>
     /// <param name="height">The height of the window.</param>
     /// <param name="state">The initial state of the window.</param>
-    /// <exception cref="SDLException">An error occurred while creating the window.</exception>
-    public RenderWindow(string title, int width, int height, WindowState state = WindowState.None) : base(title, width, height, state)
+    /// <param name="engine">The render engine to use for rendering. By default, a new instance of <see cref="Renderer"/> is used.</param>
+    public RenderWindow(string title, int width, int height, WindowState state = WindowState.None, IRenderEngine? engine = null) : base(title, width, height, state)
     {
+        _engine = engine ?? new Renderer();
+
+        _engine.Setup(Handle);
     }
 
     /// <inheritdoc/>
@@ -43,37 +49,29 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     public void Clear() => Clear(Color.Black);
 
     /// <inheritdoc/>
-    public void Clear(Color color)
-    {
-        SDLNative.SDL_SetRenderDrawColor(_renderer, color.R, color.G, color.B, color.A);
-        SDLNative.SDL_RenderClear(_renderer);
-    }
+    public void Clear(Color color) => _engine.Clear(color);
 
     /// <inheritdoc/>
     public void Draw(IDrawable drawable)
         => drawable.Draw(this);
 
     /// <inheritdoc/>
-    public void Draw(in ReadOnlySpan<Vertex> vertices)
-        => SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, [], 0);
+    public void Draw(in ReadOnlySpan<Vertex> vertices) => _engine.Draw(vertices);
 
     /// <inheritdoc/>
-    public void Draw(in ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices)
-        => SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, indices, indices.Length);
+    public void Draw(in ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices) => _engine.Draw(vertices, indices);
 
     /// <summary>
     /// Renders all the graphics to the window since the last call.
     /// </summary>
-    public void Render() => SDLNative.SDL_RenderPresent(_renderer);
+    public void Render() => _engine.Render();
 
     /// <inheritdoc/>
     protected override void Dispose(bool disposing)
     {
         if (disposing)
-            _renderer.Dispose();
+            _engine.Dispose();
 
         base.Dispose(disposing);
     }
-
-    internal override void OnCreate(WindowHandle window) => _renderer = SDLNative.SDL_CreateRenderer(window);
 }

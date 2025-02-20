@@ -1,10 +1,12 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Graphics.Rendering;
+
 namespace KappaDuck.Aquila.Graphics;
 
 /// <summary>
-/// Represents an object that can be drawn to a render target.
+/// Represents an object that self-draws to a render target.
 /// </summary>
 public interface IDrawable
 {
