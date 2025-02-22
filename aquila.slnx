@@ -35,7 +35,7 @@
   <Folder Name="/setup/" Id="53a53267-6abe-4d83-9b16-dd96060293ae">
     <File Path="setup.bat" />
     <File Path="setup.sh" />
-    <Project Path="src/Setup/Setup.csproj" Id="a945907e-95e7-4321-b1b2-df4e1f4d672e" />
+    <Project Path="src/Aquila.Setup/Aquila.Setup.csproj" Id="00deeb6d-dd90-4bba-b342-108d4d568092" />
   </Folder>
   <Folder Name="/workflows/" Id="95fddf99-d30a-4b1d-8811-bebff8d40760">
     <File Path=".github/dependabot.yml" />
