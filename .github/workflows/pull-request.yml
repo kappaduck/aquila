@@ -27,4 +27,3 @@ jobs:
       - name: Build SDL dependencies
         shell: cmd
         run: setup.bat sdl -c debug
-        continue-on-error: false
