@@ -1,0 +1,30 @@
+version: 2
+
+updates:
+  - package-ecosystem: nuget
+    target-branch: develop
+    directory: /
+    schedule:
+      interval: daily
+    commit-message:
+      prefix: 'NuGet packages'
+    labels: [ dependencies ]
+    assignees: [ beauchama ]
+    groups:
+      dotnet:
+        patterns:
+          - "*"
+  - package-ecosystem: github-actions
+    target-branch: develop
+    directory: /
+    schedule:
+      interval: weekly
+      day: tuesday
+    commit-message:
+      prefix: 'GitHub Actions'
+    labels: [ dependencies ]
+    assignees: [ beauchama ]
+    groups:
+      actions:
+        patterns:
+          - "*"

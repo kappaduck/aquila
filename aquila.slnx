@@ -37,6 +37,10 @@
     <File Path="setup.sh" />
     <Project Path="src/Setup/Setup.csproj" Id="a945907e-95e7-4321-b1b2-df4e1f4d672e" />
   </Folder>
+  <Folder Name="/workflows/" Id="95fddf99-d30a-4b1d-8811-bebff8d40760">
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/workflows/pull-request.yml" />
+  </Folder>
   <Project Path="src/Aquila.Demo/Aquila.Demo.csproj" Id="ba938d04-2e2c-4d78-88c3-bf1d265952e3" />
   <Project Path="src/KappaDuck.Aquila/KappaDuck.Aquila.csproj" />
 </Solution>
