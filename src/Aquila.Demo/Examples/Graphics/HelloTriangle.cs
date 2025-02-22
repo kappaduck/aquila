@@ -5,6 +5,7 @@ using KappaDuck.Aquila;
 using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Graphics;
+using KappaDuck.Aquila.Graphics.Primitives;
 using KappaDuck.Aquila.System;
 using KappaDuck.Aquila.Video.Windows;
 using System.Drawing;
@@ -27,7 +28,7 @@ internal static class HelloTriangle
         Vertex[] vertices = CreateTriangle();
 
         // Create the window
-        using Window2D window = new("Hello Triangle!", Width, Height, WindowState.Resizable | WindowState.AlwaysOnTop);
+        using RenderWindow window = new("Hello Triangle!", Width, Height, WindowState.Resizable | WindowState.AlwaysOnTop);
 
         // Run the main loop
         while (window.IsOpen)

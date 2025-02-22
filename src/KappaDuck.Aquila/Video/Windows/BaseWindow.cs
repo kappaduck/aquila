@@ -6,6 +6,7 @@ using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Exceptions;
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Graphics;
+using KappaDuck.Aquila.Graphics.Pixels;
 using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Interop.Win32;
@@ -19,13 +20,11 @@ namespace KappaDuck.Aquila.Video.Windows;
 /// Represents the base window.
 /// </summary>
 /// <remarks>
-/// It is recommended to use <see cref="Window2D"/> for 2D rendering.
+/// It is recommended to use <see cref="RenderWindow"/> for 2D rendering.
 /// </remarks>
 public abstract class BaseWindow : IDisposable
 {
     private const string Win32PropertyName = "SDL.window.win32.hwnd";
-
-    private WindowHandle _handle;
 
     private bool _disposed;
     private WindowState _state;
@@ -41,7 +40,7 @@ public abstract class BaseWindow : IDisposable
     /// </summary>
     protected BaseWindow()
     {
-        _handle = WindowHandle.Zero;
+        Handle = WindowHandle.Zero;
         Opacity = 1.0f;
     }
 
@@ -55,7 +54,7 @@ public abstract class BaseWindow : IDisposable
     /// <exception cref="SDLException">An error occurred while creating the window.</exception>
     protected BaseWindow(string title, int width, int height, WindowState state = WindowState.None)
     {
-        _handle = CreateWindow(title, width, height, state);
+        Handle = CreateWindow(title, width, height, state);
         IsOpen = true;
     }
 
@@ -77,7 +76,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state | WindowState.AlwaysOnTop) : (_state & ~WindowState.AlwaysOnTop);
 
-            if (!SDLNative.SDL_SetWindowAlwaysOnTop(_handle, value))
+            if (!SDLNative.SDL_SetWindowAlwaysOnTop(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -100,7 +99,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowAspectRatio(_handle, value.Minimum, value.Maximum))
+            if (!SDLNative.SDL_SetWindowAspectRatio(Handle, value.Minimum, value.Maximum))
                 SDLException.Throw();
         }
     }
@@ -123,7 +122,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state | WindowState.Borderless) : (_state & ~WindowState.Borderless);
 
-            if (!SDLNative.SDL_SetWindowBordered(_handle, !value))
+            if (!SDLNative.SDL_SetWindowBordered(Handle, !value))
                 SDLException.Throw();
         }
     }
@@ -145,7 +144,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen || Borderless)
                 return default;
 
-            SDLNative.SDL_GetWindowBordersSize(_handle, out int top, out int left, out int bottom, out int right);
+            SDLNative.SDL_GetWindowBordersSize(Handle, out int top, out int left, out int bottom, out int right);
             return (top, left, bottom, right);
         }
     }
@@ -164,7 +163,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return Display.GetPrimaryDisplay();
 
-            uint displayId = SDLNative.SDL_GetDisplayForWindow(_handle);
+            uint displayId = SDLNative.SDL_GetDisplayForWindow(Handle);
 
             SDLException.ThrowIfZero(displayId);
 
@@ -194,7 +193,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return 0.0f;
 
-            float scale = SDLNative.SDL_GetWindowDisplayScale(_handle);
+            float scale = SDLNative.SDL_GetWindowDisplayScale(Handle);
 
             SDLException.ThrowIfZero(scale);
 
@@ -220,7 +219,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state & ~WindowState.NotFocusable) : (_state | WindowState.NotFocusable);
 
-            if (!SDLNative.SDL_SetWindowFocusable(_handle, value))
+            if (!SDLNative.SDL_SetWindowFocusable(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -243,7 +242,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state | WindowState.Fullscreen) : (_state & ~WindowState.Fullscreen);
 
-            if (!SDLNative.SDL_SetWindowFullscreen(_handle, value))
+            if (!SDLNative.SDL_SetWindowFullscreen(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -279,12 +278,14 @@ public abstract class BaseWindow : IDisposable
                 return;
             }
 
-            if (!SDLNative.SetWindowFullscreenMode(_handle, value))
+            if (!SDLNative.SetWindowFullscreenMode(Handle, value))
                 SDLException.Throw();
 
             field = value;
         }
     }
+
+    internal WindowHandle Handle { get; private set; }
 
     /// <summary>
     /// Gets a value indicating whether the window has keyboard focus.
@@ -331,7 +332,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowSize(_handle, _width, value))
+            if (!SDLNative.SDL_SetWindowSize(Handle, _width, value))
                 SDLException.Throw();
         }
     }
@@ -364,7 +365,7 @@ public abstract class BaseWindow : IDisposable
     /// </summary>
     public bool IsOpen
     {
-        get => !_handle.IsInvalid && field;
+        get => !Handle.IsInvalid && field;
         private set;
     }
 
@@ -378,7 +379,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return false;
 
-            return SDLNative.SDL_ScreenKeyboardShown(_handle);
+            return SDLNative.SDL_ScreenKeyboardShown(Handle);
         }
     }
 
@@ -414,7 +415,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state | WindowState.KeyboardGrabbed) : (_state & ~WindowState.KeyboardGrabbed);
 
-            if (!SDLNative.SDL_SetWindowKeyboardGrab(_handle, value))
+            if (!SDLNative.SDL_SetWindowKeyboardGrab(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -490,7 +491,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowMaximumSize(_handle, value.Width, value.Height))
+            if (!SDLNative.SDL_SetWindowMaximumSize(Handle, value.Width, value.Height))
                 SDLException.Throw();
         }
     }
@@ -522,7 +523,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowMinimumSize(_handle, value.Width, value.Height))
+            if (!SDLNative.SDL_SetWindowMinimumSize(Handle, value.Width, value.Height))
                 SDLException.Throw();
         }
     }
@@ -554,7 +555,7 @@ public abstract class BaseWindow : IDisposable
                 return;
             }
 
-            if (!SDLNative.SetWindowMouseRect(_handle, value))
+            if (!SDLNative.SetWindowMouseRect(Handle, value))
                 SDLException.Throw();
 
             field = value;
@@ -579,7 +580,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state | WindowState.MouseGrabbed) : (_state & ~WindowState.MouseGrabbed);
 
-            if (!SDLNative.SDL_SetWindowMouseGrab(_handle, value))
+            if (!SDLNative.SDL_SetWindowMouseGrab(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -638,7 +639,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowOpacity(_handle, value))
+            if (!SDLNative.SDL_SetWindowOpacity(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -661,7 +662,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return 0.0f;
 
-            float density = SDLNative.SDL_GetWindowPixelDensity(_handle);
+            float density = SDLNative.SDL_GetWindowPixelDensity(Handle);
 
             SDLException.ThrowIfZero(density);
 
@@ -680,7 +681,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return PixelFormat.Unknown;
 
-            PixelFormat format = SDLNative.SDL_GetWindowPixelFormat(_handle);
+            PixelFormat format = SDLNative.SDL_GetWindowPixelFormat(Handle);
 
             SDLException.ThrowIf(format == PixelFormat.Unknown);
 
@@ -718,7 +719,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen || Fullscreen || Maximized)
                 return;
 
-            if (!SDLNative.SDL_SetWindowPosition(_handle, value.X, value.Y))
+            if (!SDLNative.SDL_SetWindowPosition(Handle, value.X, value.Y))
                 SDLException.Throw();
 
             _position = value;
@@ -743,7 +744,7 @@ public abstract class BaseWindow : IDisposable
 
             _state = value ? (_state | WindowState.Resizable) : (_state & ~WindowState.Resizable);
 
-            if (!SDLNative.SDL_SetWindowResizable(_handle, value))
+            if (!SDLNative.SDL_SetWindowResizable(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -766,7 +767,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return default;
 
-            if (!SDLNative.SDL_GetWindowSafeArea(_handle, out Rectangle<int> area))
+            if (!SDLNative.SDL_GetWindowSafeArea(Handle, out Rectangle<int> area))
                 SDLException.Throw();
 
             return area;
@@ -787,7 +788,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowTitle(_handle, value))
+            if (!SDLNative.SDL_SetWindowTitle(Handle, value))
                 SDLException.Throw();
         }
     }
@@ -824,7 +825,7 @@ public abstract class BaseWindow : IDisposable
             if (!IsOpen)
                 return;
 
-            if (!SDLNative.SDL_SetWindowSize(_handle, value, _height))
+            if (!SDLNative.SDL_SetWindowSize(Handle, value, _height))
                 SDLException.Throw();
         }
     }
@@ -864,14 +865,14 @@ public abstract class BaseWindow : IDisposable
         if (IsOpen)
             return;
 
-        _handle = CreateWindow(title, width, height, state);
+        Handle = CreateWindow(title, width, height, state);
 
-        SDLNative.SDL_SetWindowAspectRatio(_handle, AspectRatio.Minimum, AspectRatio.Maximum);
-        SDLNative.SetWindowFullscreenMode(_handle, FullscreenMode);
-        SDLNative.SDL_SetWindowMaximumSize(_handle, MaximumSize.Width, MaximumSize.Height);
-        SDLNative.SDL_SetWindowMinimumSize(_handle, MinimumSize.Width, MinimumSize.Height);
-        SDLNative.SetWindowMouseRect(_handle, MouseClip);
-        SDLNative.SDL_SetWindowOpacity(_handle, Opacity);
+        SDLNative.SDL_SetWindowAspectRatio(Handle, AspectRatio.Minimum, AspectRatio.Maximum);
+        SDLNative.SetWindowFullscreenMode(Handle, FullscreenMode);
+        SDLNative.SDL_SetWindowMaximumSize(Handle, MaximumSize.Width, MaximumSize.Height);
+        SDLNative.SDL_SetWindowMinimumSize(Handle, MinimumSize.Width, MinimumSize.Height);
+        SDLNative.SetWindowMouseRect(Handle, MouseClip);
+        SDLNative.SDL_SetWindowOpacity(Handle, Opacity);
 
         IsOpen = true;
 
@@ -896,7 +897,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen)
             return;
 
-        if (!SDLNative.SDL_FlashWindow(_handle, state))
+        if (!SDLNative.SDL_FlashWindow(Handle, state))
             SDLException.Throw();
     }
 
@@ -909,7 +910,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen)
             return;
 
-        if (!SDLNative.SDL_HideWindow(_handle))
+        if (!SDLNative.SDL_HideWindow(Handle))
             SDLException.Throw();
 
         _state |= WindowState.Hidden;
@@ -941,7 +942,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen || Maximized || !Resizable)
             return;
 
-        if (!SDLNative.SDL_MaximizeWindow(_handle))
+        if (!SDLNative.SDL_MaximizeWindow(Handle))
             SDLException.Throw();
 
         _state &= ~WindowState.Minimized;
@@ -971,7 +972,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen || Minimized)
             return;
 
-        if (!SDLNative.SDL_MinimizeWindow(_handle))
+        if (!SDLNative.SDL_MinimizeWindow(Handle))
             SDLException.Throw();
 
         _state &= ~WindowState.Maximized;
@@ -1058,7 +1059,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen)
             return;
 
-        if (!SDLNative.SDL_RaiseWindow(_handle))
+        if (!SDLNative.SDL_RaiseWindow(Handle))
             SDLException.Throw();
 
         _state |= WindowState.InputFocus;
@@ -1087,7 +1088,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen)
             return;
 
-        if (!SDLNative.SDL_RestoreWindow(_handle))
+        if (!SDLNative.SDL_RestoreWindow(Handle))
             SDLException.Throw();
     }
 
@@ -1104,7 +1105,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen)
             return;
 
-        if (!SDLNative.SDL_ShowWindow(_handle))
+        if (!SDLNative.SDL_ShowWindow(Handle))
             SDLException.Throw();
 
         _state &= ~WindowState.Hidden;
@@ -1128,7 +1129,7 @@ public abstract class BaseWindow : IDisposable
         if (!IsOpen)
             return;
 
-        if (!SDLNative.SDL_SyncWindow(_handle))
+        if (!SDLNative.SDL_SyncWindow(Handle))
             SDLException.Throw();
     }
 
@@ -1141,7 +1142,7 @@ public abstract class BaseWindow : IDisposable
     /// </remarks>
     /// <param name="x">The x-coordinate within the window.</param>
     /// <param name="y">The y-coordinate within the window.</param>
-    public void WarpMouse(float x, float y) => SDLNative.SDL_WarpMouseInWindow(_handle, x, y);
+    public void WarpMouse(float x, float y) => SDLNative.SDL_WarpMouseInWindow(Handle, x, y);
 
     /// <summary>
     /// Move the mouse cursor to the given position withing the window.
@@ -1167,17 +1168,11 @@ public abstract class BaseWindow : IDisposable
             if (OperatingSystem.IsWindows())
                 MenuBar?.Dispose();
 
-            _handle.Dispose();
+            Handle.Dispose();
         }
 
         _disposed = true;
     }
-
-    /// <summary>
-    /// Called when the window is created.
-    /// </summary>
-    /// <param name="window">The created window handle.</param>
-    internal abstract void OnCreate(WindowHandle window);
 
     private WindowHandle CreateWindow(string title, int width, int height, WindowState state)
     {
@@ -1185,8 +1180,6 @@ public abstract class BaseWindow : IDisposable
 
         if (handle.IsInvalid)
             SDLException.Throw();
-
-        OnCreate(handle);
 
         Id = SDLNative.SDL_GetWindowID(handle);
         SDLException.ThrowIfZero(Id);
@@ -1205,7 +1198,7 @@ public abstract class BaseWindow : IDisposable
 
     private nint GetWin32Handle()
     {
-        uint propertiesId = SDLNative.SDL_GetWindowProperties(_handle);
+        uint propertiesId = SDLNative.SDL_GetWindowProperties(Handle);
         return SDLNative.SDL_GetPointerProperty(propertiesId, Win32PropertyName, nint.Zero);
     }
 

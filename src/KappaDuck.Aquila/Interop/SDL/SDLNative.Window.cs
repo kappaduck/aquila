@@ -2,7 +2,7 @@
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Geometry;
-using KappaDuck.Aquila.Graphics;
+using KappaDuck.Aquila.Graphics.Pixels;
 using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Video.Displays;
 using KappaDuck.Aquila.Video.Windows;

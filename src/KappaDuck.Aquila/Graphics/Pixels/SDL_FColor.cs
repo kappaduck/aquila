@@ -1,9 +1,9 @@
-﻿// Copyright (c) KappaDuck. All rights reserved.
+// Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
 using System.Runtime.InteropServices;
 
-namespace KappaDuck.Aquila.Graphics;
+namespace KappaDuck.Aquila.Graphics.Pixels;
 
 [StructLayout(LayoutKind.Sequential)]
 internal readonly struct SDL_FColor
