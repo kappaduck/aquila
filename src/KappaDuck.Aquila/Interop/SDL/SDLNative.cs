@@ -26,6 +26,9 @@ internal static partial class SDLNative
     private static partial void SDL_free(nint memory);
 
     [LibraryImport(LibraryName)]
+    internal static partial ulong SDL_GetTicks();
+
+    [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial int SDL_GetVersion();
 

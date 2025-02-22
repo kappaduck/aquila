@@ -40,6 +40,16 @@ public sealed class SDL : IDisposable
     }
 
     /// <summary>
+    /// Get the number of milliseconds since the SDL library initialization.
+    /// </summary>
+    /// <returns>The timestamp in milliseconds.</returns>
+    public static TimeSpan GetTicks()
+    {
+        ulong ticks = SDLNative.SDL_GetTicks();
+        return TimeSpan.FromMilliseconds(ticks);
+    }
+
+    /// <summary>
     /// Gets the version of the SDL library that is linked with your program.
     /// </summary>
     /// <remarks>
