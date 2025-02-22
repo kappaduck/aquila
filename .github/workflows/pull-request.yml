@@ -1,0 +1,29 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [ develop, release/* ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration debug --no-restore
+
+      - name: Build SDL dependencies
+        shell: cmd
+        run: setup.bat sdl -s -c debug
