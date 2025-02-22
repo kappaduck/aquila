@@ -3,7 +3,7 @@ version: 2
 updates:
   - package-ecosystem: nuget
     target-branch: develop
-    directory: /
+    directory: /src
     schedule:
       interval: daily
     commit-message:
