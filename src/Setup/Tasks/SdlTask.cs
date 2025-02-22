@@ -33,13 +33,6 @@ public sealed class SdlTask : FrostingTask<SetupArguments>
     }
 
     /// <inheritdoc/>
-    public override void OnError(Exception exception, SetupArguments context)
-    {
-        context.Error("An error occurred while installing SDL3.");
-        context.Error(exception.Message);
-    }
-
-    /// <inheritdoc/>
     public override void Run(SetupArguments context)
     {
         if (context.DirectoryExists(InstallPath) && !context.Force)

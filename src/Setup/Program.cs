@@ -6,5 +6,5 @@ using Setup;
 
 CakeHost host = new();
 
-host.UseContext<SetupArguments>()
-    .Run(args);
+int exitCode = host.UseContext<SetupArguments>().Run(args);
+return exitCode;
