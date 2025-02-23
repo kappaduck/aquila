@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "aquila.setup": {
+      "version": "0.1.0",
+      "commands": [
+        "quack"
+      ],
+      "rollForward": false
+    }
+  }
+}

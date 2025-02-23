@@ -12,12 +12,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # include SDL3
 set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/../../SDL3" ${CMAKE_PREFIX_PATH})
 find_package(SDL3 REQUIRED)
+find_package(SDL3_image QUIET)
 
 # create the executable
 add_executable(sandbox "main.cpp")
 
 # link SDL3
 target_link_libraries(sandbox PRIVATE SDL3::SDL3)
+
+if (SDL3_IMAGE_FOUND)
+    target_link_libraries(sandbox PRIVATE SDL3_image::SDL3_image)
+endif()
 
 # copy SDL3 dlls to output directory
 file(GLOB dlls "${CMAKE_SOURCE_DIR}/../../SDL3/bin/*.dll")

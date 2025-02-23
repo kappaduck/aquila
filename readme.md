@@ -12,10 +12,14 @@ Aquila is a NuGet package build on top of [SDL3], designed to provide a clean an
   - [Usage](#usage)
   - [Development](#development)
     - [Prerequisites](#prerequisites)
+    - [Quack!](#quack)
+      - [Usage](#usage-1)
     - [SDL](#sdl)
-      - [Arguments](#arguments)
+      - [Usage](#usage-2)
+      - [Example](#example)
     - [Sandbox](#sandbox)
-      - [Arguments](#arguments-1)
+      - [Usage](#usage-3)
+      - [Example](#example-1)
   - [Acknowledgments](#acknowledgments)
 
 ## Compatibility
@@ -33,7 +37,7 @@ At the moment, Aquila is only supported on Windows. However, it is designed to b
 - Linux
 - Web (wasm)
 
-> It is possible that Aquila will support other platforms such as macOS, Android, iOS, and consoles but it is not planned at the moment.
+> It is possible that Aquila will support other platforms but it is not planned at the moment.
 
 ## Installation
 
@@ -59,61 +63,89 @@ To build Aquila from source, you need to have the following tools installed:
 >
 > You can install CMake using the following command `winget install Kitware.CMake`.
 
-### SDL
+### Quack!
 
-Aquila depends on the SDL3 library. It is not included in the repository. The project offers a script to download and build SDL from source.
+Quack is a simple dotnet tool that helps you to setup Aquila and its dependencies. You can install it using the following command which will install the tool locally.
 
 ```bash
-.setup.bat sdl --silent --configuration debug
+.setup.bat
 ```
 or
-```sh
-./setup.sh sdl --silent --configuration debug
-```
-or using aliases
 ```bash
-./setup.bat sdl -sf -c debug
+./setup.sh
 ```
 
-#### Arguments
+#### Usage
 
-Available arguments for the SDL setup script:
+```bash
+dotnet quack [OPTIONS] <COMMAND>
+```
 
-|     Argument      | Alias |           Description           |     Default     |
-| :---------------: | :---: | :-----------------------------: | :-------------: |
-|    `--branch`     | `-b`  | build a specific SDL branch/tag | `release-3.2.0` |
-| `--configuration` | `-c`  |       Build configuration       |    `release`    |
-|     `--force`     | `-f`  | Force the reinstallation of SDL |     `false`     |
-|    `--silent`     | `-s`  |           Silent mode           |     `false`     |
+Available Options:
+
+|   Option    | Alias |        Description         |
+| :---------: | :---: | :------------------------: |
+|  `--help`   | `-h`  |  Prints help information   |
+| `--version` | `-v`  | Prints version information |
+
+Available Commands:
+
+|  Command  |           Description           |
+| :-------: | :-----------------------------: |
+|   `sdl`   | Install SDL and his dependecies |
+| `sandbox` |    Build and run the sandbox    |
+
+### SDL
+
+Aquila depends on the SDL3 library. It is not included in the repository. Quack will execute the following command to download and build SDL and dependencies from source.
+
+#### Usage
+
+```bash
+dotnet quack sdl [OPTIONS]
+```
+
+|     Argument      | Alias |                 Description                 |  Default  |
+| :---------------: | :---: | :-----------------------------------------: | :-------: |
+|     `--help`      | `-h`  |           Prints help information           |           |
+|    `--version`    | `-v`  |           SDL3 version to install           |  `3.2.0`  |
+| `--configuration` | `-c`  |         Build configuration to use          | `release` |
+|     `--force`     | `-f`  | Indicating whether to force an installation |  `false`  |
+|    `--silent`     | `-s`  |   Indicating whether to silent the output   |  `false`  |
+|  `--with-image`   | `-i`  | Install SDL_image with an optional version  |  `3.2.0`  |
+
+#### Example
+
+```bash
+dotnet quack sdl -s -c debug
+dotnet quack sdl --silent --configuration debug --force
+dotnet quack sdl -s -c debug -v 3.2.4 --with-image 3.2.0
+```
 
 ### Sandbox
 
 The sandbox project is a simple C++ console application that experiments with the SDL3 library. It make sure that Aquila has the same behavior as the original SDL3 library.
 
-> Make sure to run the SDL setup script before building the sandbox.
+> Make sure to install SDL and his dependencies before using the sandbox.
 
-```console
-.setup.bat sandbox --silent --configuration debug
-```
-or
-```console
-./setup.sh sandbox --silent --configuration debug
-```
-or using aliases
-```console
-./setup.bat sandbox -sf -c debug
+#### Usage
+
+```sh
+dotnet quack sandbox [OPTIONS]
 ```
 
-#### Arguments
+|     Argument      | Alias |               Description               |  Default  |
+| :---------------: | :---: | :-------------------------------------: | :-------: |
+|     `--help`      | `-h`  |         Prints help information         |           |
+| `--configuration` | `-c`  |       Build configuration to use        | `release` |
+|    `--silent`     | `-s`  | Indicating whether to silent the output |  `true`   |
 
-Available arguments for the sandbox setup script:
+#### Example
 
-|     Argument      | Alias  |     Description     |  Default  |
-| :---------------: | :----: | :-----------------: | :-------: |
-| `--configuration` |  `-c`  | Build configuration | `release` |
-|     `--force`     |  `-f`  |  Force the rebuild  |  `false`  |
-|    `--no-run`     | `none` | Do not run the app  |  `false`  |
-|    `--silent`     |  `-s`  |     Silent mode     |  `false`  |
+```sh
+dotnet quack sandbox -c debug
+dotnet quack sandbox --silent false --configuration debug
+```
 
 ## Acknowledgments
 
