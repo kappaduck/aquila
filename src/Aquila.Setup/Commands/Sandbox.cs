@@ -1,67 +1,44 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-using Aquila.Setup.Extensions;
+using Aquila.Setup.Processes;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Aquila.Setup.Commands;
 
 internal sealed class Sandbox : Command<Sandbox.Settings>
 {
-    private const string BuildPath = "build";
-
-    private readonly DirectoryInfo _sandboxPath;
-
     public const string Name = "sandbox";
-
     public const string Description = "Build and run the sandbox";
 
-    public Sandbox()
-    {
-        string currentDirectory = Directory.GetCurrentDirectory();
-
-        _sandboxPath = new DirectoryInfo(Path.Combine(currentDirectory, "src/sandbox"));
-    }
+    private readonly DirectoryInfo _sandboxPath = new(Path.Combine(Directory.GetCurrentDirectory(), "src/sandbox"));
 
     public override int Execute(CommandContext context, Settings settings)
     {
-        Status status = AnsiConsole.Status()
-            .Spinner(Spinner.Known.BouncingBar)
-            .SpinnerStyle(Style.Parse("cyan"));
+        ProcessContext ctx = new()
+        {
+            SourcePath = _sandboxPath,
+            Configuration = settings.Configuration,
+            Silent = settings.Silent
+        };
 
-        status.Start("Building sandbox...", ctx => Build(ctx, settings));
+        ProcessHandler processes = new CMakeConfigure();
 
-        using Process process = Process.Start(new ProcessStartInfo { FileName = GetExecutable() })!;
+        processes.Next(new CMakeBuild())
+                 .Next(new RunSandbox(_sandboxPath.FullName, settings.Configuration));
 
+        ProcessResult result = processes.Run(ctx);
+
+        if (!result.IsSuccess)
+        {
+            AnsiConsole.MarkupLineInterpolated($"[red]{result.Error}[/]");
+            return 1;
+        }
+
+        AnsiConsole.MarkupLine("[green]Sandbox built successfully![/]");
         return 0;
-
-        string GetExecutable()
-        {
-            string currentDirectory = Directory.GetCurrentDirectory();
-
-            Path.Combine(_sandboxPath.FullName, BuildPath, settings.Configuration);
-
-            if (OperatingSystem.IsWindows())
-                return Path.Combine(_sandboxPath.FullName, BuildPath, settings.Configuration, "sandbox.exe");
-
-            return Path.Combine(_sandboxPath.FullName, BuildPath, settings.Configuration, "sandbox");
-        }
-    }
-
-    private void Build(StatusContext context, Settings settings)
-    {
-        using (Process setup = new())
-        {
-            setup.Cmake($"-S . -B {BuildPath}", _sandboxPath.FullName, settings.Silent);
-        }
-
-        context.Status("Building sandbox...");
-
-        using Process build = new();
-        build.Cmake($"--build {BuildPath} --config {settings.Configuration}", _sandboxPath.FullName, settings.Silent);
     }
 
     internal sealed class Settings : CommandSettings
@@ -73,6 +50,27 @@ internal sealed class Sandbox : Command<Sandbox.Settings>
 
         [CommandOption("-s|--silent")]
         [Description("Indicating whether to suppress the output of the installation")]
+        [DefaultValue(true)]
         public bool Silent { get; init; }
+    }
+
+    private sealed class RunSandbox(string projectPath, string configuration) : ProcessHandler(GetExecutable(projectPath, configuration))
+    {
+        public override ProcessResult Run(ProcessContext context)
+        {
+            if (Execute($"Building {context.SourcePath.Name}...", context.Silent, workingDirectory: context.SourcePath.FullName, wait: false))
+                return ProcessResult.Success();
+
+            return ProcessResult.Fail($"Failed to run {context.SourcePath.Name}");
+        }
+
+        private static string GetExecutable(string projectPath, string configuration)
+        {
+            string executablePath = Path.Combine(projectPath, "build", configuration);
+
+            string executable = OperatingSystem.IsWindows() ? "sandbox.exe" : "sandbox";
+
+            return Path.Combine(executablePath, executable);
+        }
     }
 }
