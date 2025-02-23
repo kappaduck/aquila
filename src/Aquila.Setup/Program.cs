@@ -14,23 +14,17 @@ app.Configure(config =>
     config.SetApplicationName("quack")
           .SetApplicationVersion($"{version.Major}.{version.Minor}.{version.Revision}");
 
-    config.AddBranch("install", AddInstallCommand).WithAlias("i");
+    config.AddCommand<SDLInstall>(SDLInstall.Name)
+          .WithDescription(SDLInstall.Description)
+          .WithExample("sdl -s -c debug")
+          .WithExample("sdl --silent --configuration debug")
+          .WithExample("sdl -s -c debug -v 3.2.4 --with-image 3.2.0");
+
     config.AddCommand<Sandbox>(Sandbox.Name)
           .WithDescription(Sandbox.Description)
-          .WithExample("sandbox -c debug");
+          .WithExample("sandbox -c debug")
+          .WithExample("sandbox --silent false --configuration debug");
 });
 
 int exitCode = await app.RunAsync(args).ConfigureAwait(false);
 return exitCode;
-
-static void AddInstallCommand(IConfigurator<CommandSettings> configurator)
-{
-    configurator.SetDescription("Install libraries");
-
-    configurator.AddCommand<SDLInstall>(SDLInstall.Name)
-        .WithDescription(SDLInstall.Description)
-        .WithExample("install sdl -s -c debug")
-        .WithExample("install sdl --with-image")
-        .WithExample("install sdl --all")
-        .WithExample("i sdl -s -c debug");
-}

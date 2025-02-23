@@ -86,7 +86,7 @@ internal sealed class SDLInstall : Command<SDLInstall.Settings>
             Silent = settings.Silent
         };
 
-        ProcessHandler processes = new GitClone(repository, $"release-{settings.Version}");
+        ProcessHandler processes = new GitClone(repository, $"release-{settings.WithImage.Value}");
 
         processes.Next(new CMakeConfigure($"-DSDL3_DIR={Path.Combine(_installPath, "cmake")} -DSDLIMAGE_VENDORED=OFF"))
                  .Next(new CMakeBuild())
@@ -135,7 +135,7 @@ internal sealed class SDLInstall : Command<SDLInstall.Settings>
     internal sealed class Settings : CommandSettings
     {
         [CommandOption("-v|--version")]
-        [Description("version to install")]
+        [Description("SDL3 version to install")]
         [DefaultValue("3.2.0")]
         public required string Version { get; init; }
 
@@ -149,11 +149,11 @@ internal sealed class SDLInstall : Command<SDLInstall.Settings>
         public bool Force { get; init; }
 
         [CommandOption("-s|--silent")]
-        [Description("Indicating whether to suppress the output of the installation")]
+        [Description("Indicating whether to suppress the output")]
         public bool Silent { get; init; }
 
         [CommandOption("--with-image [version]")]
-        [Description("Indicating whether to install SDL_image with an optional version")]
+        [Description("Install SDL_image with an optional version")]
         [DefaultValue("3.2.0")]
         public required FlagValue<string> WithImage { get; init; }
     }
