@@ -24,6 +24,9 @@ jobs:
       - name: Build
         run: dotnet build --configuration debug --no-restore
 
-      - name: Build SDL dependencies
+      - name: Install quack!
         shell: cmd
-        run: setup.bat sdl -c debug
+        run: setup.bat
+
+      - name: Build SDL dependencies
+        run: dotnet quack sdl --configuration debug --with-image
