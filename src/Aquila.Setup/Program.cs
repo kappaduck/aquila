@@ -3,27 +3,34 @@
 
 using Aquila.Setup.Commands;
 using Spectre.Console.Cli;
+using System.Reflection;
 
 CommandApp app = new();
 
-app.Configure(c =>
+app.Configure(config =>
 {
-    IBranchConfigurator install = c.AddBranch("install", ctx =>
-    {
-        ctx.AddCommand<SdlInstallation>(SdlInstallation.Name)
-           .WithDescription(SdlInstallation.Description)
-           .WithExample("install sdl -s -c debug")
-           .WithExample("install sdl --with-image")
-           .WithExample("install sdl --all")
-           .WithExample("i sdl -s -c debug");
-    });
+    Version version = Assembly.GetExecutingAssembly().GetName().Version!;
 
-    install.WithAlias("i");
+    config.SetApplicationName("quack")
+          .SetApplicationVersion($"{version.Major}.{version.Minor}.{version.Revision}");
 
-    c.AddCommand<Sandbox>(Sandbox.Name)
-        .WithDescription(Sandbox.Description)
-        .WithExample("sandbox -sc debug");
+    config.AddBranch("install", AddInstallCommand).WithAlias("i");
+    config.AddCommand<Sandbox>(Sandbox.Name)
+          .WithDescription(Sandbox.Description)
+          .WithExample("sandbox -c debug");
 });
 
 int exitCode = await app.RunAsync(args).ConfigureAwait(false);
 return exitCode;
+
+static void AddInstallCommand(IConfigurator<CommandSettings> configurator)
+{
+    configurator.SetDescription("Install libraries");
+
+    configurator.AddCommand<SDLInstall>(SDLInstall.Name)
+        .WithDescription(SDLInstall.Description)
+        .WithExample("install sdl -s -c debug")
+        .WithExample("install sdl --with-image")
+        .WithExample("install sdl --all")
+        .WithExample("i sdl -s -c debug");
+}
