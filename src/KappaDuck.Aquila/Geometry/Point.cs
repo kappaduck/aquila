@@ -35,6 +35,11 @@ public struct Point<T>(T x, T y) : IEquatable<Point<T>>, IAdditionOperators<Poin
     public T Y = y;
 
     /// <summary>
+    /// Gets a value indicating whether the point is zero.
+    /// </summary>
+    public readonly bool IsZero => T.IsZero(X) && T.IsZero(Y);
+
+    /// <summary>
     /// Checks if two points are equal.
     /// </summary>
     /// <remarks>

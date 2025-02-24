@@ -277,16 +277,13 @@ public abstract class BaseWindow : IDisposable
         get;
         set
         {
+            field = value;
+
             if (!IsOpen)
-            {
-                field = null;
                 return;
-            }
 
             if (!SDLNative.SetWindowFullscreenMode(_handle, value))
                 SDLException.Throw();
-
-            field = value;
         }
     }
 
@@ -565,16 +562,13 @@ public abstract class BaseWindow : IDisposable
         get;
         set
         {
+            field = value;
+
             if (!IsOpen)
-            {
-                field = null;
                 return;
-            }
 
             if (!SDLNative.SetWindowMouseRect(_handle, value))
                 SDLException.Throw();
-
-            field = value;
         }
     }
 
@@ -732,13 +726,16 @@ public abstract class BaseWindow : IDisposable
         get => _position;
         set
         {
-            if (!IsOpen || Fullscreen || Maximized)
+            if (Fullscreen || Maximized)
+                return;
+
+            _position = value;
+
+            if (!IsOpen)
                 return;
 
             if (!SDLNative.SDL_SetWindowPosition(_handle, value.X, value.Y))
                 SDLException.Throw();
-
-            _position = value;
         }
     }
 
@@ -1191,12 +1188,19 @@ public abstract class BaseWindow : IDisposable
         _disposed = true;
     }
 
+    /// <summary>
+    /// Called when the window is created.
+    /// </summary>
+    /// <param name="window">The handle of the window.</param>
+    protected abstract void OnWindowCreated(WindowHandle window);
+
     private WindowHandle CreateWindow(string title, int width, int height, WindowState state)
     {
         WindowHandle handle = SDLNative.SDL_CreateWindow(title, width, height, state);
 
-        if (handle.IsInvalid)
-            SDLException.Throw();
+        SDLException.ThrowIf(handle.IsInvalid);
+
+        OnWindowCreated(handle);
 
         Id = SDLNative.SDL_GetWindowID(handle);
         SDLException.ThrowIfZero(Id);
@@ -1207,8 +1211,15 @@ public abstract class BaseWindow : IDisposable
         _width = width;
         _height = height;
 
-        SDLNative.SDL_GetWindowPosition(handle, out int x, out int y);
-        _position = new Point<int>(x, y);
+        if (_position.IsZero)
+        {
+            SDLNative.SDL_GetWindowPosition(handle, out int x, out int y);
+            _position = new Point<int>(x, y);
+        }
+        else
+        {
+            SDLNative.SDL_SetWindowPosition(handle, _position.X, _position.Y);
+        }
 
         return handle;
     }

@@ -1,7 +1,10 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Geometry;
+using KappaDuck.Aquila.Graphics.Drawing;
 using KappaDuck.Aquila.Graphics.Primitives;
+using KappaDuck.Aquila.Graphics.Rendering;
 using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Interop.SDL.Marshallers;
 using System.Runtime.CompilerServices;
@@ -12,6 +15,15 @@ namespace KappaDuck.Aquila.Interop.SDL;
 
 internal static partial class SDLNative
 {
+    internal static unsafe bool SetRenderClip(RendererHandle renderer, Rectangle<int>? value)
+    {
+        if (value is null)
+            return SDL_SetRenderClipRect(renderer, rect: null);
+
+        Rectangle<int> rect = value.Value;
+        return SDL_SetRenderClipRect(renderer, &rect);
+    }
+
     [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial RendererHandle SDL_CreateRenderer(WindowHandle window, string? name = null);
@@ -19,6 +31,11 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_DestroyRenderer(nint renderer);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_GetCurrentRenderOutputSize(RendererHandle renderer, out int w, out int h);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -31,8 +48,23 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_GetRenderLogicalPresentationRect(RendererHandle renderer, out Rectangle<float> rect);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_GetRenderOutputSize(RendererHandle renderer, out int w, out int h);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
     internal static partial string SDL_GetRendererName(RendererHandle renderer);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_GetRenderSafeArea(RendererHandle renderer, out Rectangle<int> rect);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -44,9 +76,47 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void SDL_RenderPoint(RendererHandle renderer, float x, float y);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void SDL_RenderPoints(RendererHandle renderer, ReadOnlySpan<Point<float>> points, int count);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_RenderPresent(RendererHandle renderer);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static unsafe partial bool SDL_SetRenderClipRect(RendererHandle renderer, Rectangle<int>* rect);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_SetRenderColorScale(RendererHandle renderer, float scale);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_SetRenderDrawBlendMode(RendererHandle renderer, BlendMode blendMode);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_SetRenderDrawColor(RendererHandle renderer, byte r, byte g, byte b, byte a);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_SetRenderLogicalPresentation(RendererHandle renderer, int w, int h, LogicalPresentation mode);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_SetRenderScale(RendererHandle renderer, float scaleX, float scaleY);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalAs(UnmanagedType.I1)]
+    internal static partial bool SDL_SetRenderVSync(RendererHandle renderer, int vsync);
 }
