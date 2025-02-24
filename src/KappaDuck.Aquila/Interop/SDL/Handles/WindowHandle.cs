@@ -5,10 +5,24 @@ using KappaDuck.Aquila.Interop.Handles;
 
 namespace KappaDuck.Aquila.Interop.SDL.Handles;
 
-internal sealed class WindowHandle() : SafeHandleZeroInvalid(ownsHandle: true)
+/// <summary>
+/// Represents a handle to a window.
+/// </summary>
+public sealed class WindowHandle : SafeHandleZeroInvalid
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="WindowHandle"/> class.
+    /// </summary>
+    public WindowHandle() : base(ownsHandle: true)
+    {
+    }
+
+    internal WindowHandle(WindowHandle window) : base(ownsHandle: false)
+        => SetHandle(window.handle);
+
     internal static WindowHandle Zero { get; } = new();
 
+    /// <inheritdoc/>
     protected override bool ReleaseHandle()
     {
         if (!IsInvalid)
