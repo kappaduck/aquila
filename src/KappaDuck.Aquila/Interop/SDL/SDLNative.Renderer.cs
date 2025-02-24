@@ -3,8 +3,10 @@
 
 using KappaDuck.Aquila.Graphics.Primitives;
 using KappaDuck.Aquila.Interop.SDL.Handles;
+using KappaDuck.Aquila.Interop.SDL.Marshallers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace KappaDuck.Aquila.Interop.SDL;
 
@@ -17,6 +19,20 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_DestroyRenderer(nint renderer);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial int SDL_GetNumRenderDrivers();
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
+    internal static partial string SDL_GetRenderDriver(int index);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    [return: MarshalUsing(typeof(SDLOwnedStringMarshaller))]
+    internal static partial string SDL_GetRendererName(RendererHandle renderer);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

@@ -26,4 +26,18 @@ public static class VideoDriver
     /// <param name="index">The index of a video driver.</param>
     /// <returns>Name of the video driver with the given index.</returns>
     public static string Get(int index) => SDLNative.SDL_GetVideoDriver(index);
+
+    /// <summary>
+    /// Get all available video drivers.
+    /// </summary>
+    /// <returns>The names of all available video drivers.</returns>
+    public static string[] GetAll()
+    {
+        string[] drivers = new string[Count];
+
+        for (int i = 0; i < Count; i++)
+            drivers[i] = Get(i);
+
+        return drivers;
+    }
 }
