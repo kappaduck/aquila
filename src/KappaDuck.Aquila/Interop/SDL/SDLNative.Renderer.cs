@@ -12,7 +12,7 @@ internal static partial class SDLNative
 {
     [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static partial RendererHandle SDL_CreateRenderer(WindowHandle window, string name = "");
+    internal static partial RendererHandle SDL_CreateRenderer(WindowHandle window, string? name = null);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
