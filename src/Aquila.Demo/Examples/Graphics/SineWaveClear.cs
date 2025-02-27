@@ -3,7 +3,7 @@
 
 using KappaDuck.Aquila;
 using KappaDuck.Aquila.Events;
-using KappaDuck.Aquila.Graphics;
+using KappaDuck.Aquila.Graphics.Rendering;
 using KappaDuck.Aquila.System;
 using KappaDuck.Aquila.Video.Windows;
 using System.Diagnostics;
