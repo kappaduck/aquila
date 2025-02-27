@@ -3,7 +3,7 @@
 
 using KappaDuck.Aquila.Interop.SDL;
 
-namespace KappaDuck.Aquila.Graphics.Rendering;
+namespace KappaDuck.Aquila.System;
 
 /// <summary>
 /// A collection of rendering drivers available for the current display.
@@ -12,7 +12,7 @@ namespace KappaDuck.Aquila.Graphics.Rendering;
 /// A render driver is a set of code that handles rendering and texture management on a particular display.
 /// Normally there is only one, but some drivers may have several available with different capabilities.
 /// </remarks>
-public static class RendererDriver
+public static class Renderer
 {
     /// <summary>
     /// Gets the number of 2D rendering drivers available for the current display.

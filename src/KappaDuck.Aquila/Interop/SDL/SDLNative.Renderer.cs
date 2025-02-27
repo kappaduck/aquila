@@ -1,10 +1,10 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Geometry;
 using KappaDuck.Aquila.Graphics.Drawing;
 using KappaDuck.Aquila.Graphics.Primitives;
-using KappaDuck.Aquila.Graphics.Rendering;
 using KappaDuck.Aquila.Interop.SDL.Handles;
 using KappaDuck.Aquila.Interop.SDL.Marshallers;
 using System.Runtime.CompilerServices;
@@ -23,6 +23,10 @@ internal static partial class SDLNative
         Rectangle<int> rect = value.Value;
         return SDL_SetRenderClipRect(renderer, &rect);
     }
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void SDL_ConvertEventToRenderCoordinates(RendererHandle renderer, ref SDLEvent e);
 
     [LibraryImport(LibraryName, StringMarshalling = StringMarshalling.Utf8)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -63,24 +67,19 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.I1)]
-    internal static partial bool SDL_GetRenderSafeArea(RendererHandle renderer, out Rectangle<int> rect);
-
-    [LibraryImport(LibraryName)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_RenderClear(RendererHandle renderer);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void SDL_RenderCoordinatesFromWindow(RendererHandle renderer, float windowX, float windowY, out float x, out float y);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
+    internal static partial void SDL_RenderCoordinatesToWindow(RendererHandle renderer, float x, float y, out float windowX, out float windowY);
+
+    [LibraryImport(LibraryName)]
+    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     internal static partial void SDL_RenderGeometry(RendererHandle renderer, nint texture, ReadOnlySpan<Vertex> vertices, int numVertices, ReadOnlySpan<int> indices, int numIndices);
-
-    [LibraryImport(LibraryName)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static partial void SDL_RenderPoint(RendererHandle renderer, float x, float y);
-
-    [LibraryImport(LibraryName)]
-    [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static partial void SDL_RenderPoints(RendererHandle renderer, ReadOnlySpan<Point<float>> points, int count);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

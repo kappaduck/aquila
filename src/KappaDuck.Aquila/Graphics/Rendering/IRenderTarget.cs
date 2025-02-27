@@ -1,7 +1,9 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using KappaDuck.Aquila.Events;
 using KappaDuck.Aquila.Geometry;
+using KappaDuck.Aquila.Graphics.Drawing;
 using KappaDuck.Aquila.Graphics.Primitives;
 using System.Drawing;
 
@@ -30,35 +32,98 @@ public interface IRenderTarget
     void Draw(IDrawable drawable);
 
     /// <summary>
-    /// Draws a collection of drawable to the render target.
+    /// Draws the specified drawable to the render target.
     /// </summary>
-    /// <param name="drawable">The collection of drawable to draw to the render target.</param>
-    void Draw(ReadOnlySpan<IDrawable> drawable);
+    /// <param name="drawable">The drawable to draw to the render target.</param>
+    /// <param name="state">The render state to use when drawing the object.</param>
+    void Draw(IDrawable drawable, in RenderState state);
 
     /// <summary>
     /// Draws the specified vertices to the render target.
     /// </summary>
     /// <param name="vertices">The vertices to draw to the render target.</param>
-    void Draw(in ReadOnlySpan<Vertex> vertices);
+    void Draw(ReadOnlySpan<Vertex> vertices);
 
     /// <summary>
     /// Draws the specified vertices to the render target.
     /// </summary>
     /// <param name="vertices">The vertices to draw to the render target.</param>
-    /// <param name="indices">The indices to draw the vertices in the specified order.</param>
-    void Draw(in ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices);
+    /// <param name="state">The render state to use when drawing the object.</param>
+    void Draw(ReadOnlySpan<Vertex> vertices, in RenderState state);
 
     /// <summary>
-    /// Draws a point to the render target.
+    /// Draws the specified vertices to the render target.
     /// </summary>
-    /// <param name="point">The point to draw to the render target.</param>
-    /// <param name="color">The color to draw the points with.</param>
-    void Draw(Point<float> point, Color? color);
+    /// <param name="vertices">The vertices to draw to the render target.</param>
+    /// <param name="indices">The indices to draw the vertices in the correct order.</param>
+    void Draw(ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices);
 
     /// <summary>
-    /// Draws a collection of points to the render target.
+    /// Draws the specified vertices to the render target.
     /// </summary>
-    /// <param name="points">The points to draw to the render target.</param>
-    /// <param name="color">The color to draw the points with.</param>
-    void Draw(in ReadOnlySpan<Point<float>> points, Color? color);
+    /// <param name="vertices">The vertices to draw to the render target.</param>
+    /// <param name="indices">The indices to draw the vertices in the correct order.</param>
+    /// <param name="state">The render state to use when drawing the object.</param>
+    void Draw(ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices, in RenderState state);
+
+    /// <summary>
+    /// Maps the event coordinates to the render target coordinates.
+    /// </summary>
+    /// <remarks>
+    /// This takes into account several states:
+    /// <list type="bullet">
+    /// <item>The window dimensions</item>
+    /// <item>The logical presentation settings</item>
+    /// <item>The scale</item>
+    /// <item>The viewport</item>
+    /// </list>
+    /// <para>
+    /// Various event types are converted with this function: mouse, touch, pen, etc.
+    /// </para>
+    /// <para>
+    /// Touch coordinates are converted from normalized coordinates in the window to non-normalized rendering coordinates.
+    /// </para>
+    /// <para>
+    /// Relative mouse coordinates (x relative and y relative event fields) are also converted.
+    /// Applications that do not want these fields converted should use <see cref="MapPixelsToCoordinates(Point{float})"/>
+    /// on the specific event fields instead of converting the entire event structure.
+    /// </para>
+    /// <para>
+    /// Once converted, coordinates may be outside the rendering area.
+    /// </para>
+    /// </remarks>
+    /// <param name="e">The event to map the coordinates for.</param>
+    void MapEventToCoordinates(ref SDLEvent e);
+
+    /// <summary>
+    /// Maps a point in pixel coordinates to the render target coordinates.
+    /// </summary>
+    /// <remarks>
+    /// This takes into account several states:
+    /// <list type="bullet">
+    /// <item>The window dimensions</item>
+    /// <item>The logical presentation settings</item>
+    /// <item>The scale</item>
+    /// <item>The viewport</item>
+    /// </list>
+    /// </remarks>
+    /// <param name="point">The point in pixel coordinates.</param>
+    /// <returns>The point in render target coordinates.</returns>
+    Point<float> MapPixelsToCoordinates(Point<float> point);
+
+    /// <summary>
+    /// Maps a point in render target coordinates to pixel coordinates.
+    /// </summary>
+    /// <remarks>
+    /// This takes into account several states:
+    /// <list type="bullet">
+    /// <item>The window dimensions</item>
+    /// <item>The logical presentation settings</item>
+    /// <item>The scale</item>
+    /// <item>The viewport</item>
+    /// </list>
+    /// </remarks>
+    /// <param name="point">The point in render target coordinates.</param>
+    /// <returns>The point in pixel coordinates.</returns>
+    Point<float> MapCoordinatesToPixels(Point<float> point);
 }

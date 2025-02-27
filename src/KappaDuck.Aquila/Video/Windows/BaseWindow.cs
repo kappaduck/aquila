@@ -1188,19 +1188,11 @@ public abstract class BaseWindow : IDisposable
         _disposed = true;
     }
 
-    /// <summary>
-    /// Called when the window is created.
-    /// </summary>
-    /// <param name="window">The handle of the window.</param>
-    protected abstract void OnWindowCreated(WindowHandle window);
-
     private WindowHandle CreateWindow(string title, int width, int height, WindowState state)
     {
         WindowHandle handle = SDLNative.SDL_CreateWindow(title, width, height, state);
 
         SDLException.ThrowIf(handle.IsInvalid);
-
-        OnWindowCreated(handle);
 
         Id = SDLNative.SDL_GetWindowID(handle);
         SDLException.ThrowIfZero(Id);

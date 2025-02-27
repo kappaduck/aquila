@@ -8,6 +8,7 @@ using KappaDuck.Aquila.Graphics.Drawing;
 using KappaDuck.Aquila.Graphics.Primitives;
 using KappaDuck.Aquila.Interop.SDL;
 using KappaDuck.Aquila.Interop.SDL.Handles;
+using KappaDuck.Aquila.System;
 using KappaDuck.Aquila.Video.Windows;
 using System.Drawing;
 
@@ -26,9 +27,7 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// <remarks>
     /// Use <see cref="BaseWindow.Create(string, int, int, WindowState)"/> to create a window.
     /// </remarks>
-    public RenderWindow()
-    {
-    }
+    public RenderWindow() => CreateRenderer();
 
     /// <summary>
     /// Creates a new window with the specified title, width, height, and state.
@@ -38,85 +37,7 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// <param name="height">The height of the window.</param>
     /// <param name="state">The state of the window.</param>
     public RenderWindow(string title, int width, int height, WindowState state = WindowState.None) : base(title, width, height, state)
-    {
-    }
-
-    /// <summary>
-    /// Gets or sets the blend mode for drawing operations (fill and line).
-    /// </summary>
-    /// <remarks>
-    /// If the blend mode is not supported by the renderer, the closest supported mode is chosen.
-    /// </remarks>
-    /// <exception cref="SDLException">An error occurred while setting the renderer blend mode.</exception>
-    public BlendMode BlendMode
-    {
-        get;
-        set
-        {
-            field = value;
-
-            if (_renderer.IsInvalid)
-                return;
-
-            if (!SDLNative.SDL_SetRenderDrawBlendMode(_renderer, value))
-                SDLException.Throw();
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the clipping rectangle for rendering.
-    /// </summary>
-    /// <remarks>
-    /// Setting the clipping rectangle to <see langword="null"/> will disable clipping.
-    /// </remarks>
-    /// <exception cref="SDLException">An error occurred while setting the renderer clip.</exception>
-    public Rectangle<int>? Clip
-    {
-        get;
-        set
-        {
-            field = value;
-
-            if (_renderer.IsInvalid)
-                return;
-
-            if (!SDLNative.SetRenderClip(_renderer, value))
-                SDLException.Throw();
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the color scale used by the renderer.
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// The color scale is an additional scale multiplied into the pixel color value while rendering. This can be used
-    /// to adjust the brightness of colors during HDR rendering, or changing HDR video brightness when playing on an SDR display.
-    /// </para>
-    /// <para>
-    /// It does not affect the alpha channel, only the color brightness.
-    /// </para>
-    /// </remarks>
-    /// <exception cref="ArgumentOutOfRangeException">The value is negative.</exception>
-    /// <exception cref="SDLException">An error occurred while setting the renderer color scale.</exception>
-    public float ColorScale
-    {
-        get;
-        set
-        {
-            ArgumentOutOfRangeException.ThrowIfNegative(value);
-
-            field = value;
-
-            if (_renderer.IsInvalid)
-                return;
-
-            if (!SDLNative.SDL_SetRenderColorScale(_renderer, value))
-                SDLException.Throw();
-        }
-    }
-
-    = 1f;
+        => CreateRenderer();
 
     /// <summary>
     /// Gets the current output size in pixels of a rendering context.
@@ -140,33 +61,6 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
             return (w, h);
         }
     }
-
-    /// <summary>
-    /// Gets or sets the color used for drawing operations.
-    /// </summary>
-    /// <remarks>
-    /// Set the color used for drawing operations (rect, line, points, and clear).
-    /// </remarks>
-    public Color DrawColor
-    {
-        get;
-        set
-        {
-            field = value;
-
-            if (_renderer.IsInvalid)
-                return;
-
-            SDLNative.SDL_SetRenderDrawColor(_renderer, value.R, value.G, value.B, value.A);
-        }
-    }
-
-    = Color.Black;
-
-    /// <summary>
-    /// Gets a value indicating whether the renderer has a clipping rectangle set.
-    /// </summary>
-    public bool HasClip => Clip.HasValue;
 
     /// <summary>
     /// Gets the output size in pixels of a rendering context.
@@ -202,7 +96,7 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// it is safe to toggle logical presentation during the rendering of a frame: perhaps most of the rendering is done to specific dimensions
     /// but to make fonts look sharp, the app turns off logical presentation while drawing text.
     /// Letterboxing will only happen if logical presentation is enabled during <see cref="Render"/>; be sure to reenable it first if you were using it.
-    /// You can convert coordinates in an event into rendering coordinates using <see cref="ConvertEventToCoordinates(SDLEvent)"/>.
+    /// You can convert coordinates in an event into rendering coordinates using <see cref="MapEventToCoordinates(ref SDLEvent)"/> or <see cref="MapPixelsToCoordinates(Point{float})"/>.
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">The width or height is negative.</exception>
     /// <exception cref="SDLException">An error occurred while setting the logical presentation.</exception>
@@ -251,7 +145,7 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// Gets the name of the rendering driver used by the renderer.
     /// </summary>
     /// <remarks>
-    /// A list of available renderers can be obtained by calling <see cref="RendererDriver.GetAll"/>.
+    /// A list of available renderers can be obtained by calling <see cref="Renderer.GetAll"/>.
     /// </remarks>
     public string? RendererName
     {
@@ -264,56 +158,6 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
         }
         init;
     }
-
-    /// <summary>
-    /// Gets the safe area for rendering within the current viewport.
-    /// </summary>
-    /// <remarks>
-    /// Some devices have portions of the screen which are partially obscured or not interactive,
-    /// possibly due to on-screen controls, curved edges, camera notches, TV overscan, etc.
-    /// This function provides the area of the current viewport which is safe to have interactable content.
-    /// You should continue rendering into the rest of the render target, but it should not contain visually important or interactable content.
-    /// </remarks>
-    /// <exception cref="SDLException">An error occurred while getting the renderer safe area.</exception>
-    public Rectangle<int> RenderingSafeArea
-    {
-        get
-        {
-            if (_renderer.IsInvalid)
-                return default;
-
-            if (!SDLNative.SDL_GetRenderSafeArea(_renderer, out Rectangle<int> rect))
-                SDLException.Throw();
-
-            return rect;
-        }
-    }
-
-    /// <summary>
-    /// Gets or sets the drawing scale for rendering on the current target.
-    /// </summary>
-    /// <remarks>
-    /// The drawing coordinates are scaled by the x/y scaling factors before they are used by the renderer.
-    /// This allows resolution independent drawing with a single coordinate system.
-    /// If this results in scaling or subpixel drawing by the rendering backend,
-    /// it will be handled using the appropriate quality hints.For best results use integer scaling factors.
-    /// </remarks>
-    public Point<float> Scale
-    {
-        get;
-        set
-        {
-            field = value;
-
-            if (_renderer.IsInvalid)
-                return;
-
-            if (!SDLNative.SDL_SetRenderScale(_renderer, value.X, value.Y))
-                SDLException.Throw();
-        }
-    }
-
-    = new Point<float>(1, 1);
 
     /// <summary>
     /// Gets or sets the vertical synchronization (VSync) of the renderer.
@@ -358,44 +202,50 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     {
         SDLNative.SDL_SetRenderDrawColor(_renderer, color.R, color.G, color.B, color.A);
         SDLNative.SDL_RenderClear(_renderer);
-
-        DrawColor = color;
     }
 
     /// <inheritdoc/>
-    public void Draw(IDrawable drawable) => drawable.Draw(this);
+    public void Draw(IDrawable drawable) => Draw(drawable, RenderState.Default);
 
     /// <inheritdoc/>
-    public void Draw(ReadOnlySpan<IDrawable> drawable)
+    public void Draw(IDrawable drawable, in RenderState state) => drawable.Draw(this, state);
+
+    /// <inheritdoc/>
+    public void Draw(ReadOnlySpan<Vertex> vertices) => Draw(vertices, RenderState.Default);
+
+    /// <inheritdoc/>
+    public void Draw(ReadOnlySpan<Vertex> vertices, in RenderState state)
     {
-        foreach (IDrawable item in drawable)
-            item.Draw(this);
+        ApplyState(state);
+        SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, [], 0);
     }
 
     /// <inheritdoc/>
-    public void Draw(in ReadOnlySpan<Vertex> vertices)
-        => SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, [], 0);
+    public void Draw(ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices) => Draw(vertices, indices, RenderState.Default);
 
     /// <inheritdoc/>
-    public void Draw(in ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices)
-        => SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, indices, indices.Length);
-
-    /// <inheritdoc/>
-    public void Draw(Point<float> point, Color? color)
+    public void Draw(ReadOnlySpan<Vertex> vertices, ReadOnlySpan<int> indices, in RenderState state)
     {
-        if (color.HasValue)
-            SDLNative.SDL_SetRenderDrawColor(_renderer, color.Value.R, color.Value.G, color.Value.B, color.Value.A);
-
-        SDLNative.SDL_RenderPoint(_renderer, point.X, point.Y);
+        ApplyState(state);
+        SDLNative.SDL_RenderGeometry(_renderer, nint.Zero, vertices, vertices.Length, indices, indices.Length);
     }
 
     /// <inheritdoc/>
-    public void Draw(in ReadOnlySpan<Point<float>> points, Color? color)
-    {
-        if (color.HasValue)
-            SDLNative.SDL_SetRenderDrawColor(_renderer, color.Value.R, color.Value.G, color.Value.B, color.Value.A);
+    public void MapEventToCoordinates(ref SDLEvent e)
+        => SDLNative.SDL_ConvertEventToRenderCoordinates(_renderer, ref e);
 
-        SDLNative.SDL_RenderPoints(_renderer, points, points.Length);
+    /// <inheritdoc/>
+    public Point<float> MapPixelsToCoordinates(Point<float> point)
+    {
+        SDLNative.SDL_RenderCoordinatesFromWindow(_renderer, point.X, point.Y, out float x, out float y);
+        return new Point<float>(x, y);
+    }
+
+    /// <inheritdoc/>
+    public Point<float> MapCoordinatesToPixels(Point<float> point)
+    {
+        SDLNative.SDL_RenderCoordinatesToWindow(_renderer, point.X, point.Y, out float x, out float y);
+        return new Point<float>(x, y);
     }
 
     /// <summary>
@@ -412,19 +262,30 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
         base.Dispose(disposing);
     }
 
-    /// <inheritdoc/>
-    protected override void OnWindowCreated(WindowHandle window)
+    private void CreateRenderer()
     {
-        _renderer = SDLNative.SDL_CreateRenderer(window, RendererName);
+        _renderer = SDLNative.SDL_CreateRenderer(Handle, RendererName);
 
         SDLException.ThrowIf(_renderer.IsInvalid);
 
-        SDLNative.SDL_SetRenderVSync(_renderer, VSync);
-        SDLNative.SetRenderClip(_renderer, Clip);
-        SDLNative.SDL_SetRenderDrawBlendMode(_renderer, BlendMode);
-        SDLNative.SDL_SetRenderColorScale(_renderer, ColorScale);
-        SDLNative.SDL_SetRenderDrawColor(_renderer, DrawColor.R, DrawColor.G, DrawColor.B, DrawColor.A);
-        SDLNative.SDL_SetRenderLogicalPresentation(_renderer, Presentation.Width, Presentation.Height, Presentation.Mode);
-        SDLNative.SDL_SetRenderScale(_renderer, Scale.X, Scale.Y);
+        SDLException.ThrowIf(!SDLNative.SDL_SetRenderVSync(_renderer, VSync));
+        SDLException.ThrowIf(!SDLNative.SDL_SetRenderLogicalPresentation(_renderer, Presentation.Width, Presentation.Height, Presentation.Mode));
+    }
+
+    private void ApplyState(RenderState state)
+    {
+        if (state.BlendMode.HasValue)
+            SDLNative.SDL_SetRenderDrawBlendMode(_renderer, state.BlendMode.Value);
+
+        if (state.Scale.HasValue)
+        {
+            Point<float> scale = state.Scale.Value;
+            SDLNative.SDL_SetRenderScale(_renderer, scale.X, scale.Y);
+        }
+
+        if (state.ColorScale.HasValue)
+            SDLNative.SDL_SetRenderColorScale(_renderer, state.ColorScale.Value);
+
+        SDLNative.SetRenderClip(_renderer, state.Clip);
     }
 }
