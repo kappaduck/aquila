@@ -1,6 +1,7 @@
 name: Bug
 description: File a bug found in Aquila.
 labels: ['bug', 'triage']
+type: Bug
 assignees:
   - beauchama
 body:
