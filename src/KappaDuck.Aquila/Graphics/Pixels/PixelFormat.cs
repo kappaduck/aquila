@@ -176,17 +176,12 @@ public enum PixelFormat
     ABGR32 = RGBA8888,
 
     /// <summary>
-    /// Alias for <see cref="XBGR8888"/>.
+    /// Alias for XBGR8888 pixel format.
     /// </summary>
     /// <remarks>
     /// This is based on SDL with little-endian byte order.
     /// </remarks>
-    RGBX32 = XBGR8888,
-
-    /// <summary>
-    /// XBGR8888 pixel format.
-    /// </summary>
-    XBGR8888 = 0x16561804,
+    RGBX32 = 0x16561804,
 
     /// <summary>
     /// XBGR2101010 pixel format.
@@ -194,30 +189,20 @@ public enum PixelFormat
     XBGR2101010 = 0x16572004,
 
     /// <summary>
-    /// Alias for <see cref="BGRX8888"/>.
+    /// Alias for BGRX8888 pixel format.
     /// </summary>
     /// <remarks>
     /// This is based on SDL with little-endian byte order.
     /// </remarks>
-    XRGB32 = BGRX8888,
+    XRGB32 = 0x16661804,
 
     /// <summary>
-    /// BGRX8888 pixel format.
-    /// </summary>
-    BGRX8888 = 0x16661804,
-
-    /// <summary>
-    /// Alias for <see cref="ABGR8888"/>.
+    /// Alias for ABGR8888 pixel format.
     /// </summary>
     /// <remarks>
     /// This is based on SDL with little-endian byte order.
     /// </remarks>
-    RGBA32 = ABGR8888,
-
-    /// <summary>
-    /// ABGR8888 pixel format.
-    /// </summary>
-    ABGR8888 = 0x16762004,
+    RGBA32 = 0x16762004,
 
     /// <summary>
     /// ABGR2101010 pixel format.
@@ -225,17 +210,12 @@ public enum PixelFormat
     ABGR2101010 = 0x16772004,
 
     /// <summary>
-    /// Alias for <see cref="BGRA8888"/>.
+    /// Alias for BGRA8888 pixel format.
     /// </summary>
     /// <remarks>
     /// This is based on SDL with little-endian byte order.
     /// </remarks>
-    ARGB32 = BGRA8888,
-
-    /// <summary>
-    /// BGRA8888 pixel format.
-    /// </summary>
-    BGRA8888 = 0x16862004,
+    ARGB32 = 0x16862004,
 
     /// <summary>
     /// RGB24 pixel format.

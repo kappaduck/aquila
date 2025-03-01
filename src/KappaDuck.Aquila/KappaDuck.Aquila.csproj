@@ -8,27 +8,10 @@
   <PropertyGroup Label="Package info">
     <Title>$(MSBuildProjectName)</Title>
     <Description>$(MSBuildProjectName) is a NuGet package build on top of SDL3, designed to provide a clean and modern .NET 9.0 API.$(MSBuildProjectName) ensures high performance and flexibility for game development and multimedia applications, while abstracting away the low-level details of SDL3 API. It's offers window management, input handling, audio, rendering and more.</Description>
-    <Version>0.1.0</Version>
-
-    <Authors>KappaDuck</Authors>
-    <Company>$(Authors)</Company>
-
     <PackageTags>SDL;SDL3;Wrapper;Game;Multimedia</PackageTags>
-    <PackageReadmeFile>readme.md</PackageReadmeFile>
-    <PackageLicenseFile>license</PackageLicenseFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$([System.OperatingSystem]::IsWindows())'=='true'">
-    <DefineConstants>Windows</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$([System.OperatingSystem]::IsLinux())'=='true'">
-    <DefineConstants>Linux</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup Label="Files to include into the package">
-    <None Include="$(MSBuildStartupDirectory)\readme.md" Pack="true" PackagePath="" Visible="false" />
-    <None Include="$(MSBuildStartupDirectory)\license" Pack="true" PackagePath="" Visible="false" />
     <None Include="$(MSBuildStartupDirectory)\SDL3\bin\*.dll" Pack="true" PackagePath="build\" IncludeInPackage="false" Visible="false" />
     <None Include="$(MSBuildStartupDirectory)\$(MSBuildProjectName).targets" Pack="true" PackagePath="build\" IncludeInPackage="false" Visible="false" />
   </ItemGroup>

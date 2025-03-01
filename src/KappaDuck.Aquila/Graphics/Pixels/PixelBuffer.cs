@@ -112,8 +112,8 @@ public sealed class PixelBuffer<T> : IDisposable where T : unmanaged
             PixelFormat.RGB24 or PixelFormat.BGR24 => 3,
 
             PixelFormat.XRGB8888 or PixelFormat.RGBX8888 or PixelFormat.ARGB8888
-            or PixelFormat.RGBA8888 or PixelFormat.XBGR8888 or PixelFormat.BGRX8888
-            or PixelFormat.ABGR8888 or PixelFormat.BGRA8888 or PixelFormat.XRGB2101010
+            or PixelFormat.RGBA8888 or PixelFormat.RGBX32 or PixelFormat.XRGB32
+            or PixelFormat.RGBA32 or PixelFormat.ARGB32 or PixelFormat.XRGB2101010
             or PixelFormat.ARGB2101010 or PixelFormat.XBGR2101010 or PixelFormat.ABGR2101010 => 4,
 
             PixelFormat.RGB48 or PixelFormat.BGR48 => 6,

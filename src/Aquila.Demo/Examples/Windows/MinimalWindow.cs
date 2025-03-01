@@ -12,7 +12,7 @@ namespace Aquila.Demo.Examples.Windows;
 /// <summary>
 /// Demonstrates how to create a minimal window.
 /// </summary>
-public static class MinimalWindow
+internal static class MinimalWindow
 {
     internal static void Run()
     {
