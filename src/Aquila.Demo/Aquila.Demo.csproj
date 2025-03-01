@@ -1,18 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net9.0-windows</TargetFramework>
     <OutputType>Exe</OutputType>
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup Label="Link SDL3">
-    <None Include="$(MSBuildStartupDirectory)\SDL3\**\*.dll" Link="%(FileName)%(Extension)" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\SDL3\**\*.dll" Link="%(FileName)%(Extension)" CopyToOutputDirectory="PreserveNewest" Visible="false" Condition="$([System.OperatingSystem]::IsWindows())" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\KappaDuck.Aquila\KappaDuck.Aquila.csproj" />
   </ItemGroup>
-
 </Project>

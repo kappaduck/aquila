@@ -1,5 +1,10 @@
 is_global = true
 
+# SA0001: XML comment analysis is disabled
+# Disabled because some project don't need documentation
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA0001.md
+dotnet_diagnostic.SA0001.severity = none
+
 # SA1101: Prefix local calls with this
 # No need to use 'this' because of underscore field style
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1101.md

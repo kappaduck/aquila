@@ -53,8 +53,8 @@ To build Aquila from source, you need to have the following tools installed:
 
 ### Prerequisites
 
-- [.NET 9.0 SDK]
-> The .NET 9.0 SDK includes everything you need to build and run .NET applications on your machine.
+- [.NET 9.0 SDK] and [.NET 10.0 SDK]
+> The SDK includes everything you need to build and run .NET applications on your machine.
 
 - [Cmake]
 > Minimum version required: `3.16.0`
@@ -155,10 +155,13 @@ Aquila leverages SDL3 and draws inspiration from the following resources:
 - [Lazy Foo' Productions]
 - [Sayers.SDL2.Core]
 - [SDL3-CS]
+- [SFML]
 
 [Cmake]: https://cmake.org/download/
 [Lazy Foo' Productions]: https://lazyfoo.net/index.php
 [.NET 9.0 SDK]: https://dotnet.microsoft.com/download/dotnet/9.0
+[.NET 10.0 SDK]: https://dotnet.microsoft.com/download/dotnet/10.0
 [Sayers.SDL2.Core]: https://github.com/JeremySayers/Sayers.SDL2.Core
 [SDL3]: https://www.libsdl.org/
 [SDL3-CS]: https://github.com/flibitijibibo/SDL3-CS
+[SFML]: https://www.sfml-dev.org/

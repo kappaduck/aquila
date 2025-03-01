@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup Label="Configure all .csproj">
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -11,13 +11,29 @@
     <!-- https://github.com/NuGet/Home/wiki/DevelopmentDependency-support-for-PackageReference -->
     <IncludedAssets>runtime;build;native;contentfiles;analyzers</IncludedAssets>
 
-    <!-- Configure the output directory -->
-    <!-- https://devblogs.microsoft.com/dotnet/announcing-dotnet-8-preview-3/ -->
     <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
 
   <ItemGroup Label="Link and configure analyzer rules">
     <GlobalAnalyzerConfigFiles Include="$(MSBuildStartupDirectory)\rules\*.editorconfig" />
     <AdditionalFiles Include="$(MSBuildStartupDirectory)\.config\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+
+  <PropertyGroup Label="Configure package informations">
+    <Authors>KappaDuck</Authors>
+    <Company>@(Authors)</Company>
+    <Copyright>Copyright © KappaDuck $([System.DateTime]::Now.Year)</Copyright>
+    <Version>0.1.0</Version>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
+    <PackageLicenseFile>license</PackageLicenseFile>
+    <PackageReleaseNotes>changelog.md</PackageReleaseNotes>
+    <PackageIcon>icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup Label="Common files to include into the package">
+    <None Include="$(MSBuildStartupDirectory)\$(PackageReadmeFile)" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\$(PackageLicenseFile)" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\$(PackageReleaseNotes)" Pack="true" PackagePath="" Visible="false" />
+    <None Include="$(MSBuildStartupDirectory)\$(PackageIcon)" Pack="true" PackagePath="" Visible="false" />
   </ItemGroup>
 </Project>
