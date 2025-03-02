@@ -1,7 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
-namespace KappaDuck.Aquila.Geometry.Extensions;
+namespace KappaDuck.Aquila.Geometry;
 
 internal static class FloatingPoint
 {

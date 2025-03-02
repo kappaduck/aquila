@@ -19,7 +19,7 @@ public struct Vertex
     /// </summary>
     /// <param name="position">The position of the vertex.</param>
     /// <param name="color">The color of the vertex.</param>
-    public Vertex(Point<float> position, Color color)
+    public Vertex(Vector2 position, Color color)
     {
         Position = position;
         Color = color;
@@ -31,7 +31,7 @@ public struct Vertex
     /// <param name="x">The x-coordinate of the vertex.</param>
     /// <param name="y">The y-coordinate of the vertex.</param>
     /// <param name="color">The color of the vertex.</param>
-    public Vertex(float x, float y, Color color) : this(new Point<float>(x, y), color)
+    public Vertex(float x, float y, Color color) : this(new Vector2(x, y), color)
     {
     }
 
@@ -40,7 +40,7 @@ public struct Vertex
     /// </summary>
     /// <param name="x">The x-coordinate of the vertex.</param>
     /// <param name="y">The y-coordinate of the vertex.</param>
-    public Vertex(float x, float y) : this(new Point<float>(x, y), Color.White)
+    public Vertex(float x, float y) : this(new Vector2(x, y), Color.White)
     {
     }
 
@@ -48,7 +48,7 @@ public struct Vertex
     /// Creates a vertex with the specified position.
     /// </summary>
     /// <param name="position">The position of the vertex.</param>
-    public Vertex(Point<float> position) : this(position, Color.White)
+    public Vertex(Vector2 position) : this(position, Color.White)
     {
     }
 
@@ -56,17 +56,17 @@ public struct Vertex
     /// Creates a vertex with the specified color.
     /// </summary>
     /// <param name="color">The color of the vertex.</param>
-    public Vertex(Color color) : this(new Point<float>(0, 0), color)
+    public Vertex(Color color) : this(new Vector2(0, 0), color)
     {
     }
 
     /// <summary>
     /// Gets or sets the position of the vertex.
     /// </summary>
-    public Point<float> Position;
+    public Vector2 Position;
 
     private SDL_FColor _color;
-    private Point<float> _texCoord;
+    private Vector2 _texCoord;
 
     /// <summary>
     /// Gets or sets the color of the vertex.

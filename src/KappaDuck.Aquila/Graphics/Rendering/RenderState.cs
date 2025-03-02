@@ -60,7 +60,7 @@ public readonly record struct RenderState
     /// If this results in scaling or subpixel drawing by the rendering backend,
     /// it will be handled using the appropriate quality hints.For best results use integer scaling factors.
     /// </remarks>
-    public readonly Point<float>? Scale { get; init; }
+    public readonly Vector2? Scale { get; init; }
 
     internal static RenderState Default { get; } = new RenderState();
 }

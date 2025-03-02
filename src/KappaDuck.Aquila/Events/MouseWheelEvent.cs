@@ -58,5 +58,5 @@ public readonly struct MouseWheelEvent
     /// <summary>
     /// Gets the position of the mouse, relative to window.
     /// </summary>
-    public readonly Point<float> MousePosition => new(_mouseX, _mouseY);
+    public readonly Vector2 MousePosition => new(_mouseX, _mouseY);
 }

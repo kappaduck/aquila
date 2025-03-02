@@ -214,7 +214,7 @@ public sealed class Display
     /// <param name="point">The point to query.</param>
     /// <returns>The display containing the specified point.</returns>
     /// <exception cref="SDLException">Failed to get the display containing the specified point.</exception>
-    public static Display GetDisplay(Point<int> point)
+    public static Display GetDisplay(Vector2i point)
     {
         uint display;
 

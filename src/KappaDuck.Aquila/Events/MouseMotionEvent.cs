@@ -1,4 +1,4 @@
-﻿// Copyright (c) KappaDuck. All rights reserved.
+// Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
 using KappaDuck.Aquila.Geometry;
@@ -40,10 +40,10 @@ public readonly struct MouseMotionEvent
     /// <summary>
     /// Gets the position of the mouse, relative to window.
     /// </summary>
-    public Point<float> Position => new(_x, _y);
+    public Vector2 Position => new(_x, _y);
 
     /// <summary>
     /// Gets the relative position of the mouse.
     /// </summary>
-    public Point<float> RelativePosition => new(_xRel, _yRel);
+    public Vector2 RelativePosition => new(_xRel, _yRel);
 }

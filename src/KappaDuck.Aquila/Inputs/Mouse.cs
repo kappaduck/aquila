@@ -39,7 +39,7 @@ public sealed class Mouse
         get
         {
             ButtonState buttons = SDLNative.SDL_GetMouseState(out float x, out float y);
-            return new State(buttons, new Point<float>(x, y));
+            return new State(buttons, new Vector2(x, y));
         }
     }
 
@@ -61,7 +61,7 @@ public sealed class Mouse
         get
         {
             ButtonState buttons = SDLNative.SDL_GetGlobalMouseState(out float x, out float y);
-            return new State(buttons, new Point<float>(x, y));
+            return new State(buttons, new Vector2(x, y));
         }
     }
 
@@ -99,7 +99,7 @@ public sealed class Mouse
         get
         {
             ButtonState buttons = SDLNative.SDL_GetRelativeMouseState(out float x, out float y);
-            return new State(buttons, new Point<float>(x, y));
+            return new State(buttons, new Vector2(x, y));
         }
     }
 
@@ -152,7 +152,7 @@ public sealed class Mouse
     /// </remarks>
     /// <param name="position">The position in global screen space.</param>
     /// <exception cref="SDLException">An error occurred while moving the mouse.</exception>
-    public static void Warp(Point<float> position) => Warp(position.X, position.Y);
+    public static void Warp(Vector2 position) => Warp(position.X, position.Y);
 
     /// <summary>
     /// Represents the state of the mouse.
@@ -165,7 +165,7 @@ public sealed class Mouse
         /// </summary>
         /// <param name="buttons">The state of the mouse buttons.</param>
         /// <param name="position">The current position of the mouse.</param>
-        internal State(ButtonState buttons, Point<float> position)
+        internal State(ButtonState buttons, Vector2 position)
         {
             Buttons = buttons;
             Position = position;
@@ -179,7 +179,7 @@ public sealed class Mouse
         /// <summary>
         /// Gets the current position of the mouse.
         /// </summary>
-        public readonly Point<float> Position { get; }
+        public readonly Vector2 Position { get; }
 
         /// <summary>
         /// Gets a value indicating whether the button is pressed.

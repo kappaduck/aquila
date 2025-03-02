@@ -19,5 +19,5 @@ internal readonly struct MSG
 
     private readonly nuint _time;
 
-    public readonly Point<int> Point;
+    public readonly Vector2i Point;
 }
