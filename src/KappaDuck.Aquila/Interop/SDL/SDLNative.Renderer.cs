@@ -15,12 +15,12 @@ namespace KappaDuck.Aquila.Interop.SDL;
 
 internal static partial class SDLNative
 {
-    internal static unsafe bool SetRenderClip(RendererHandle renderer, Rectangle<int>? value)
+    internal static unsafe bool SetRenderClip(RendererHandle renderer, RectInt? value)
     {
         if (value is null)
             return SDL_SetRenderClipRect(renderer, rect: null);
 
-        Rectangle<int> rect = value.Value;
+        RectInt rect = value.Value;
         return SDL_SetRenderClipRect(renderer, &rect);
     }
 
@@ -53,7 +53,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static partial bool SDL_GetRenderLogicalPresentationRect(RendererHandle renderer, out Rectangle<float> rect);
+    internal static partial bool SDL_GetRenderLogicalPresentationRect(RendererHandle renderer, out Rect rect);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -88,7 +88,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static unsafe partial bool SDL_SetRenderClipRect(RendererHandle renderer, Rectangle<int>* rect);
+    internal static unsafe partial bool SDL_SetRenderClipRect(RendererHandle renderer, RectInt* rect);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

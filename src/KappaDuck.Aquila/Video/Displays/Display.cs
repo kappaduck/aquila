@@ -42,11 +42,11 @@ public sealed class Display
     /// Gets the bounds of the display.
     /// </summary>
     /// <exception cref="SDLException">Failed to get the display bounds.</exception>
-    public Rectangle<int> Bounds
+    public RectInt Bounds
     {
         get
         {
-            if (!SDLNative.SDL_GetDisplayBounds(Id, out Rectangle<int> bounds))
+            if (!SDLNative.SDL_GetDisplayBounds(Id, out RectInt bounds))
                 SDLException.Throw();
 
             return bounds;
@@ -60,11 +60,11 @@ public sealed class Display
     /// This is the same area as <see cref="Bounds"/> reports, but with portions reserved by the system removed.
     /// </remarks>
     /// <exception cref="SDLException">Failed to get the usable display bounds.</exception>
-    public Rectangle<int> UsableBounds
+    public RectInt UsableBounds
     {
         get
         {
-            if (!SDLNative.SDL_GetDisplayUsableBounds(Id, out Rectangle<int> bounds))
+            if (!SDLNative.SDL_GetDisplayUsableBounds(Id, out RectInt bounds))
                 SDLException.Throw();
 
             return bounds;
@@ -214,7 +214,7 @@ public sealed class Display
     /// <param name="point">The point to query.</param>
     /// <returns>The display containing the specified point.</returns>
     /// <exception cref="SDLException">Failed to get the display containing the specified point.</exception>
-    public static Display GetDisplay(Point<int> point)
+    public static Display GetDisplay(Vector2i point)
     {
         uint display;
 
@@ -234,7 +234,7 @@ public sealed class Display
     /// <param name="rectangle">The rectangle to query.</param>
     /// <returns>The display entirely containing the specified rectangle or closest to the center of the rectangle.</returns>
     /// <exception cref="SDLException">Failed to get the display containing the specified rectangle.</exception>
-    public static Display GetDisplay(Rectangle<int> rectangle)
+    public static Display GetDisplay(RectInt rectangle)
     {
         uint display;
 

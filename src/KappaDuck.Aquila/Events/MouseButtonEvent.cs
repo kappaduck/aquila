@@ -53,5 +53,5 @@ public readonly struct MouseButtonEvent
     /// <summary>
     /// Gets the position of the mouse, relative to window.
     /// </summary>
-    public readonly Point<float> Position => new(_x, _y);
+    public readonly Vector2 Position => new(_x, _y);
 }

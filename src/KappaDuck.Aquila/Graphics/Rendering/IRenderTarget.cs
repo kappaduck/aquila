@@ -85,7 +85,7 @@ public interface IRenderTarget
     /// </para>
     /// <para>
     /// Relative mouse coordinates (x relative and y relative event fields) are also converted.
-    /// Applications that do not want these fields converted should use <see cref="MapPixelsToCoordinates(Point{float})"/>
+    /// Applications that do not want these fields converted should use <see cref="MapPixelsToCoordinates(Vector2)"/>
     /// on the specific event fields instead of converting the entire event structure.
     /// </para>
     /// <para>
@@ -109,7 +109,7 @@ public interface IRenderTarget
     /// </remarks>
     /// <param name="point">The point in pixel coordinates.</param>
     /// <returns>The point in render target coordinates.</returns>
-    Point<float> MapPixelsToCoordinates(Point<float> point);
+    Vector2 MapPixelsToCoordinates(Vector2 point);
 
     /// <summary>
     /// Maps a point in render target coordinates to pixel coordinates.
@@ -125,5 +125,5 @@ public interface IRenderTarget
     /// </remarks>
     /// <param name="point">The point in render target coordinates.</param>
     /// <returns>The point in pixel coordinates.</returns>
-    Point<float> MapCoordinatesToPixels(Point<float> point);
+    Vector2 MapCoordinatesToPixels(Vector2 point);
 }

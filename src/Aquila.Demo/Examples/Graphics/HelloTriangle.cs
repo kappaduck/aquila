@@ -79,7 +79,7 @@ internal static class HelloTriangle
             float x = (Width / 2) + (MathF.Cos(angle) * radius);
             float y = (Height / 2) + (MathF.Sin(angle) * radius);
 
-            vertices[i].Position = new Point<float>(x, y);
+            vertices[i].Position = new Vector2(x, y);
         }
 
         return vertices;

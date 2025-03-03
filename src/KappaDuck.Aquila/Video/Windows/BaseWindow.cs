@@ -28,7 +28,7 @@ public abstract class BaseWindow : IDisposable
 
     private bool _disposed;
     private WindowState _state;
-    private Point<int> _position;
+    private Vector2i _position;
     private int _width;
     private int _height;
     private string _title = string.Empty;
@@ -553,11 +553,11 @@ public abstract class BaseWindow : IDisposable
     /// Gets or sets the confined area of the mouse in the window.
     /// </summary>
     /// <remarks>
-    /// <para>Setting to <see langword="null"/> or an empty <see cref="Rectangle{T}"/> removes the confined area.</para>
+    /// <para>Setting to <see langword="null"/> or an empty <see cref="RectInt"/> removes the confined area.</para>
     /// <para>This will not grab the cursor, it only defines the area a cursor is restricted to when the window has mouse focus.</para>
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window mouse clip.</exception>
-    public Rectangle<int>? MouseClip
+    public RectInt? MouseClip
     {
         get;
         set
@@ -721,7 +721,7 @@ public abstract class BaseWindow : IDisposable
     /// <para>This is the current position of the window as last reported by the windowing system.</para>
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window position.</exception>
-    public Point<int> Position
+    public Vector2i Position
     {
         get => _position;
         set
@@ -773,14 +773,14 @@ public abstract class BaseWindow : IDisposable
     /// but it should not contain visually important or interactable content.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while getting the window safe area.</exception>
-    public Rectangle<int> SafeArea
+    public RectInt SafeArea
     {
         get
         {
             if (!IsOpen)
                 return default;
 
-            if (!SDLNative.SDL_GetWindowSafeArea(_handle, out Rectangle<int> area))
+            if (!SDLNative.SDL_GetWindowSafeArea(_handle, out RectInt area))
                 SDLException.Throw();
 
             return area;
@@ -1166,7 +1166,7 @@ public abstract class BaseWindow : IDisposable
     /// <para>It will not move the mouse when used over Microsoft Remote Desktop.</para>
     /// </remarks>
     /// <param name="position">The position within the window.</param>
-    public void WarpMouse(Point<float> position) => WarpMouse(position.X, position.Y);
+    public void WarpMouse(Vector2 position) => WarpMouse(position.X, position.Y);
 
     /// <summary>
     /// Releases the unmanaged resources used by the <see cref="BaseWindow"/> and optionally releases the managed resources.
@@ -1206,7 +1206,7 @@ public abstract class BaseWindow : IDisposable
         if (_position.IsZero)
         {
             SDLNative.SDL_GetWindowPosition(handle, out int x, out int y);
-            _position = new Point<int>(x, y);
+            _position = new Vector2i(x, y);
         }
         else
         {

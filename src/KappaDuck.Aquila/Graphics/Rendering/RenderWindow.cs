@@ -96,7 +96,7 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// it is safe to toggle logical presentation during the rendering of a frame: perhaps most of the rendering is done to specific dimensions
     /// but to make fonts look sharp, the app turns off logical presentation while drawing text.
     /// Letterboxing will only happen if logical presentation is enabled during <see cref="Render"/>; be sure to reenable it first if you were using it.
-    /// You can convert coordinates in an event into rendering coordinates using <see cref="MapEventToCoordinates(ref SDLEvent)"/> or <see cref="MapPixelsToCoordinates(Point{float})"/>.
+    /// You can convert coordinates in an event into rendering coordinates using <see cref="MapEventToCoordinates(ref SDLEvent)"/> or <see cref="MapPixelsToCoordinates(Vector2)"/>.
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">The width or height is negative.</exception>
     /// <exception cref="SDLException">An error occurred while setting the logical presentation.</exception>
@@ -127,14 +127,14 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// the rectangle with the output size, in pixels.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while getting the renderer presentation rectangle.</exception>
-    public Rectangle<float> PresentationRectangle
+    public Rect PresentationRectangle
     {
         get
         {
             if (_renderer.IsInvalid)
                 return default;
 
-            if (!SDLNative.SDL_GetRenderLogicalPresentationRect(_renderer, out Rectangle<float> rectangle))
+            if (!SDLNative.SDL_GetRenderLogicalPresentationRect(_renderer, out Rect rectangle))
                 SDLException.Throw();
 
             return rectangle;
@@ -235,17 +235,17 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
         => SDLNative.SDL_ConvertEventToRenderCoordinates(_renderer, ref e);
 
     /// <inheritdoc/>
-    public Point<float> MapPixelsToCoordinates(Point<float> point)
+    public Vector2 MapPixelsToCoordinates(Vector2 point)
     {
         SDLNative.SDL_RenderCoordinatesFromWindow(_renderer, point.X, point.Y, out float x, out float y);
-        return new Point<float>(x, y);
+        return new Vector2(x, y);
     }
 
     /// <inheritdoc/>
-    public Point<float> MapCoordinatesToPixels(Point<float> point)
+    public Vector2 MapCoordinatesToPixels(Vector2 point)
     {
         SDLNative.SDL_RenderCoordinatesToWindow(_renderer, point.X, point.Y, out float x, out float y);
-        return new Point<float>(x, y);
+        return new Vector2(x, y);
     }
 
     /// <summary>
@@ -279,7 +279,7 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
 
         if (state.Scale.HasValue)
         {
-            Point<float> scale = state.Scale.Value;
+            Vector2 scale = state.Scale.Value;
             SDLNative.SDL_SetRenderScale(_renderer, scale.X, scale.Y);
         }
 
