@@ -34,7 +34,7 @@ public readonly record struct RenderState
     /// <remarks>
     /// Setting the clipping rectangle to <see langword="null"/> will disable clipping.
     /// </remarks>
-    public readonly Rectangle<int>? Clip { get; init; }
+    public readonly RectInt? Clip { get; init; }
 
     /// <summary>
     /// Gets the color scale used by the renderer.

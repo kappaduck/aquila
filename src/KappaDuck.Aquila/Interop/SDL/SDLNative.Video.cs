@@ -42,7 +42,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static partial bool SDL_GetDisplayBounds(uint display, out Rectangle<int> bounds);
+    internal static partial bool SDL_GetDisplayBounds(uint display, out RectInt bounds);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -54,7 +54,7 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static unsafe partial uint SDL_GetDisplayForRect(Rectangle<int>* rectangle);
+    internal static unsafe partial uint SDL_GetDisplayForRect(RectInt* rectangle);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -68,7 +68,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static partial bool SDL_GetDisplayUsableBounds(uint display, out Rectangle<int> bounds);
+    internal static partial bool SDL_GetDisplayUsableBounds(uint display, out RectInt bounds);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

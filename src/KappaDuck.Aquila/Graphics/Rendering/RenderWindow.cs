@@ -127,14 +127,14 @@ public sealed class RenderWindow : BaseWindow, IRenderTarget
     /// the rectangle with the output size, in pixels.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while getting the renderer presentation rectangle.</exception>
-    public Rectangle<float> PresentationRectangle
+    public Rect PresentationRectangle
     {
         get
         {
             if (_renderer.IsInvalid)
                 return default;
 
-            if (!SDLNative.SDL_GetRenderLogicalPresentationRect(_renderer, out Rectangle<float> rectangle))
+            if (!SDLNative.SDL_GetRenderLogicalPresentationRect(_renderer, out Rect rectangle))
                 SDLException.Throw();
 
             return rectangle;

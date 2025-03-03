@@ -22,12 +22,12 @@ internal static partial class SDLNative
         return SDL_SetWindowFullscreenMode(handle, &mode);
     }
 
-    internal static unsafe bool SetWindowMouseRect(WindowHandle handle, Rectangle<int>? value)
+    internal static unsafe bool SetWindowMouseRect(WindowHandle handle, RectInt? value)
     {
         if (value is null)
             return SDL_SetWindowMouseRect(handle, rectangle: null);
 
-        Rectangle<int> rect = value.Value;
+        RectInt rect = value.Value;
         return SDL_SetWindowMouseRect(handle, &rect);
     }
 
@@ -66,7 +66,7 @@ internal static partial class SDLNative
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    internal static unsafe partial Rectangle<int>* SDL_GetWindowMouseRect(WindowHandle window);
+    internal static unsafe partial RectInt* SDL_GetWindowMouseRect(WindowHandle window);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -88,7 +88,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    internal static partial bool SDL_GetWindowSafeArea(WindowHandle window, out Rectangle<int> area);
+    internal static partial bool SDL_GetWindowSafeArea(WindowHandle window, out RectInt area);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
@@ -173,7 +173,7 @@ internal static partial class SDLNative
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
     [return: MarshalAs(UnmanagedType.I1)]
-    private static unsafe partial bool SDL_SetWindowMouseRect(WindowHandle window, Rectangle<int>* rectangle);
+    private static unsafe partial bool SDL_SetWindowMouseRect(WindowHandle window, RectInt* rectangle);
 
     [LibraryImport(LibraryName)]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]

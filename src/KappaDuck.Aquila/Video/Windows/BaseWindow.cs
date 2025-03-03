@@ -553,11 +553,11 @@ public abstract class BaseWindow : IDisposable
     /// Gets or sets the confined area of the mouse in the window.
     /// </summary>
     /// <remarks>
-    /// <para>Setting to <see langword="null"/> or an empty <see cref="Rectangle{T}"/> removes the confined area.</para>
+    /// <para>Setting to <see langword="null"/> or an empty <see cref="RectInt"/> removes the confined area.</para>
     /// <para>This will not grab the cursor, it only defines the area a cursor is restricted to when the window has mouse focus.</para>
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while setting the window mouse clip.</exception>
-    public Rectangle<int>? MouseClip
+    public RectInt? MouseClip
     {
         get;
         set
@@ -773,14 +773,14 @@ public abstract class BaseWindow : IDisposable
     /// but it should not contain visually important or interactable content.
     /// </remarks>
     /// <exception cref="SDLException">An error occurred while getting the window safe area.</exception>
-    public Rectangle<int> SafeArea
+    public RectInt SafeArea
     {
         get
         {
             if (!IsOpen)
                 return default;
 
-            if (!SDLNative.SDL_GetWindowSafeArea(_handle, out Rectangle<int> area))
+            if (!SDLNative.SDL_GetWindowSafeArea(_handle, out RectInt area))
                 SDLException.Throw();
 
             return area;
