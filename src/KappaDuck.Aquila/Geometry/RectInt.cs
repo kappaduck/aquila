@@ -1,6 +1,7 @@
 // Copyright (c) KappaDuck. All rights reserved.
 // The source code is licensed under MIT License.
 
+using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -122,6 +123,14 @@ public struct RectInt(int x, int y, int width, int height) : IEquatable<RectInt>
             Height = value.Y - Y;
         }
     }
+
+    /// <summary>
+    /// Gets the points of the rectangle.
+    /// </summary>
+    /// <remarks>
+    /// Points within the rectangle are not inclusive of the points on the upper limits of the rectangle.
+    /// </remarks>
+    public readonly PointEnumerable Points => new(this);
 
     /// <summary>
     /// Gets or sets the position of the rectangle.
@@ -304,4 +313,82 @@ public struct RectInt(int x, int y, int width, int height) : IEquatable<RectInt>
 
     /// <inheritdoc/>
     public override readonly string ToString() => $"({X}, {Y}, {Width}, {Height})";
+
+    /// <summary>
+    /// Enumerates all the points in the rectangle.
+    /// </summary>
+    public readonly struct PointEnumerable : IEnumerable<Vector2i>
+    {
+        private readonly RectInt _rect;
+
+        internal PointEnumerable(RectInt rect) => _rect = rect;
+
+        /// <summary>
+        /// Gets an enumerator that iterates through the points of the rectangle.
+        /// </summary>
+        /// <returns>The enumerator.</returns>
+        public PointEnumerator GetEnumerator() => new(_rect);
+
+        /// <inheritdoc/>
+        IEnumerator<Vector2i> IEnumerable<Vector2i>.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    /// <summary>
+    /// Enumerates all the points in the rectangle.
+    /// </summary>
+    [StructLayout(LayoutKind.Auto)]
+    public struct PointEnumerator : IEnumerator<Vector2i>
+    {
+        private readonly int _startX;
+        private readonly int _startY;
+        private readonly int _endX;
+        private readonly int _endY;
+
+        private Vector2i _current;
+
+        internal PointEnumerator(RectInt rectangle)
+        {
+            _startX = rectangle.X;
+            _startY = rectangle.Y;
+            _endX = rectangle.MaxX;
+            _endY = rectangle.MaxY;
+
+            _current = new(_startX - 1, _startY);
+        }
+
+        /// <inheritdoc/>
+        public readonly Vector2i Current => _current;
+
+        /// <inheritdoc/>
+        readonly object IEnumerator.Current => Current;
+
+        /// <inheritdoc/>
+        public bool MoveNext()
+        {
+            _current.X++;
+
+            if (_current.X >= _endX)
+            {
+                _current.X = _startX;
+                _current.Y++;
+            }
+
+            return _current.Y < _endY;
+        }
+
+        /// <inheritdoc/>
+        public void Reset()
+        {
+            _current.X = _startX - 1;
+            _current.Y = _startY;
+        }
+
+        /// <inheritdoc/>
+        public readonly void Dispose()
+        {
+        }
+    }
 }
